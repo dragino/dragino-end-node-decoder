@@ -1,0 +1,144 @@
+[
+    {
+        "id": "dd9bb6df28966175",
+        "type": "tab",
+        "label": "流程 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "85369141020cd791",
+        "type": "inject",
+        "z": "dd9bb6df28966175",
+        "name": "create table",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE test1( BAT  FLOAT , TEMP    FLOAT, HUM   FLOAT,TIMEDATA  TEXT);",
+        "x": 310,
+        "y": 160,
+        "wires": [
+            [
+                "3d0ce7d68cb7bb56"
+            ]
+        ]
+    },
+    {
+        "id": "67cc0b1ad461b01c",
+        "type": "inject",
+        "z": "dd9bb6df28966175",
+        "name": "delete table",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE test1;",
+        "x": 310,
+        "y": 260,
+        "wires": [
+            [
+                "3d0ce7d68cb7bb56"
+            ]
+        ]
+    },
+    {
+        "id": "5305600785444327",
+        "type": "inject",
+        "z": "dd9bb6df28966175",
+        "name": "insert data",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "INSERT INTO test1 VALUES (3.5,30.6,50.6,1658799260);",
+        "x": 300,
+        "y": 360,
+        "wires": [
+            [
+                "3d0ce7d68cb7bb56"
+            ]
+        ]
+    },
+    {
+        "id": "da79d594744ec51a",
+        "type": "inject",
+        "z": "dd9bb6df28966175",
+        "name": "view data",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM test1;",
+        "x": 300,
+        "y": 480,
+        "wires": [
+            [
+                "3d0ce7d68cb7bb56"
+            ]
+        ]
+    },
+    {
+        "id": "3d0ce7d68cb7bb56",
+        "type": "sqlite",
+        "z": "dd9bb6df28966175",
+        "mydb": "36f9e4699f093bd2",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 610,
+        "y": 320,
+        "wires": [
+            [
+                "611cb899bd6650ff"
+            ]
+        ]
+    },
+    {
+        "id": "611cb899bd6650ff",
+        "type": "debug",
+        "z": "dd9bb6df28966175",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "36f9e4699f093bd2",
+        "type": "sqlitedb",
+        "db": "C:/sqlite/data",
+        "mode": "RWC"
+    }
+]

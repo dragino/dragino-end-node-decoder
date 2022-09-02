@@ -1,0 +1,341 @@
+[
+    {
+        "id": "25cb03b208015a1b",
+        "type": "mqtt in",
+        "z": "445b87fe1191f5c2",
+        "name": "LMDS200",
+        "topic": "v3/lorat@ttn/devices/lmds200/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "c65bd382727c3519",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 880,
+        "wires": [
+            [
+                "1b2f09b7b3e7becb",
+                "2236d564a348fd74"
+            ]
+        ]
+    },
+    {
+        "id": "1b2f09b7b3e7becb",
+        "type": "function",
+        "z": "445b87fe1191f5c2",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"Bat\"]\nw2 = w[\"dis1\"]\na1 ={payload:w1},a2 ={payload:w2},a3 ={payload:b},a4 ={payload:c}\nreturn [a3,a4,a1,a2];",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 900,
+        "wires": [
+            [
+                "1a43a11c8cca0235"
+            ],
+            [
+                "2e0c1b831284175b"
+            ],
+            [
+                "8b0ef0e53ed6d6f8"
+            ],
+            [
+                "12ca87f8d0bd155b"
+            ]
+        ]
+    },
+    {
+        "id": "1a43a11c8cca0235",
+        "type": "ui_chart",
+        "z": "445b87fe1191f5c2",
+        "name": "F-PORT",
+        "group": "1418c329c53b503f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "F-PORT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 880,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2e0c1b831284175b",
+        "type": "ui_chart",
+        "z": "445b87fe1191f5c2",
+        "name": "F-COUNT",
+        "group": "9df8c943708555dc",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "F-COUNT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 880,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8b0ef0e53ed6d6f8",
+        "type": "ui_chart",
+        "z": "445b87fe1191f5c2",
+        "name": "BAT",
+        "group": "17ae1cbadb28e549",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 870,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "12ca87f8d0bd155b",
+        "type": "ui_chart",
+        "z": "445b87fe1191f5c2",
+        "name": "Distance1",
+        "group": "f48f6f0edff7de95",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Distance1",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 880,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b5b68d7bc25fc075",
+        "type": "file",
+        "z": "445b87fe1191f5c2",
+        "name": "",
+        "filename": "root1/ZIHAN/LMDS200.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 530,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2236d564a348fd74",
+        "type": "function",
+        "z": "445b87fe1191f5c2",
+        "name": "",
+        "func": "var a1 = new Date() \nvar a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nq = a[\"frm_payload\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"Bat\"]\nw2 = w[\"dis1\"]\nd = a1.toLocaleString()+\"\\n\"+\"f_port:\"+b+\"\\n\"+\"f_cnt:\"+c+\"\\n\"+\"frm_payload:\"+q+\"\\n\"+\"Bat:\"+w1+\"\\n\"+\"dis1:\"+w2\na1 = {payload:d}\nreturn a1;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 820,
+        "wires": [
+            [
+                "b5b68d7bc25fc075"
+            ]
+        ]
+    },
+    {
+        "id": "c65bd382727c3519",
+        "type": "mqtt-broker",
+        "name": "LMDS200",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "1418c329c53b503f",
+        "type": "ui_group",
+        "name": "F-PORT",
+        "tab": "2fd82c3c97f14ec3",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9df8c943708555dc",
+        "type": "ui_group",
+        "name": "F-COUNT",
+        "tab": "2fd82c3c97f14ec3",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "17ae1cbadb28e549",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "2fd82c3c97f14ec3",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f48f6f0edff7de95",
+        "type": "ui_group",
+        "name": "Distance1",
+        "tab": "2fd82c3c97f14ec3",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2fd82c3c97f14ec3",
+        "type": "ui_tab",
+        "name": "LMDS200",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

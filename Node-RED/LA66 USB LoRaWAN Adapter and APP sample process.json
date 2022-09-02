@@ -1,0 +1,347 @@
+[
+    {
+        "id": "2f6daabcd21de9d9",
+        "type": "tab",
+        "label": "LA66",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ddcc68419b5973d7",
+        "type": "ui_worldmap",
+        "z": "2f6daabcd21de9d9",
+        "group": "94b3d4c0b04e64dd",
+        "order": 0,
+        "width": "15",
+        "height": "10",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "true",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "deg",
+        "showgrid": "false",
+        "allowFileDrop": "true",
+        "path": "/worldmap",
+        "overlist": "DR,CO,DN,BU,TL,HM",
+        "maplist": "OSMG,OSMC,OSMH,EsriC,EsriS,EsriT,EsriDG,UKOS,OpTop,AN",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1260,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "522c75e67fccb155",
+        "type": "mqtt in",
+        "z": "2f6daabcd21de9d9",
+        "name": "LA66经纬度",
+        "topic": "v3/la66@ttn/devices/eui-a840415e7184e9c0/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "f19f09e331f3a1b7",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 90,
+        "y": 80,
+        "wires": [
+            [
+                "5cbe0d0e2f88ea95"
+            ]
+        ]
+    },
+    {
+        "id": "5cbe0d0e2f88ea95",
+        "type": "function",
+        "z": "2f6daabcd21de9d9",
+        "name": "",
+        "func": "var data = msg.payload\nvar data1 = [];\nvar tablesname = data[\"end_device_ids\"][\"dev_eui\"]\nvar lat = data[\"uplink_message\"][\"decoded_payload\"][\"latitude\"]\nvar lon = data[\"uplink_message\"][\"decoded_payload\"][\"longitude\"]\ndata1[0]=tablesname\ndata1[1]=lat\ndata1[2]=lon\nmsg.payload = data1\nflow.set('data2',data1)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 80,
+        "wires": [
+            [
+                "c608cfa8a44f6371"
+            ]
+        ]
+    },
+    {
+        "id": "324e2ae982cd464c",
+        "type": "sqlite",
+        "z": "2f6daabcd21de9d9",
+        "mydb": "36f9e4699f093bd2",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 470,
+        "y": 180,
+        "wires": [
+            [
+                "6194b3caa4b70d59"
+            ]
+        ]
+    },
+    {
+        "id": "c608cfa8a44f6371",
+        "type": "function",
+        "z": "2f6daabcd21de9d9",
+        "name": "查看表是否存在",
+        "func": "var data=msg.payload\nvar name = \"t\"+data[0].substring(12,)\nmsg.topic=\"SELECT name FROM sqlite_master WHERE type='table' AND name='\"+name+\"';\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 180,
+        "wires": [
+            [
+                "324e2ae982cd464c"
+            ]
+        ]
+    },
+    {
+        "id": "6194b3caa4b70d59",
+        "type": "function",
+        "z": "2f6daabcd21de9d9",
+        "name": "如果表不存在则创建存在则存数据",
+        "func": "var data2 = flow.get('data2',data2);\nif (msg.payload.length==1){\n    msg.topic = \"INSERT INTO t\"+data2[0].substring(12,)+\" \"+\"VALUES (NULL\"+\",\"+data2[1]+\",\"+data2[2]+\")\";\n    return msg;\n}\nelse if (msg.payload.length==0){\n    msg.topic=\"CREATE TABLE t\"+data2[0].substring(12,)+\" \"+\"(name  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,lat FLOAT NOT NULL,lon FLOAT NOT NULL)\";\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 80,
+        "wires": [
+            [
+                "74da7bf6cb847ec9"
+            ]
+        ]
+    },
+    {
+        "id": "afae98415f499c9c",
+        "type": "sqlite",
+        "z": "2f6daabcd21de9d9",
+        "mydb": "36f9e4699f093bd2",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 1130,
+        "y": 80,
+        "wires": [
+            [
+                "a920b4da9c1a5d03"
+            ]
+        ]
+    },
+    {
+        "id": "74da7bf6cb847ec9",
+        "type": "delay",
+        "z": "2f6daabcd21de9d9",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 80,
+        "wires": [
+            [
+                "afae98415f499c9c"
+            ]
+        ]
+    },
+    {
+        "id": "a920b4da9c1a5d03",
+        "type": "function",
+        "z": "2f6daabcd21de9d9",
+        "name": "读取表的数据",
+        "func": "var data2 = flow.get('data2',data2);\nmsg.topic=\"SELECT * FROM t\"+ data2[0].substring(12,);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 180,
+        "wires": [
+            [
+                "f4d07546ed94a531"
+            ]
+        ]
+    },
+    {
+        "id": "a522294069f6b024",
+        "type": "inject",
+        "z": "2f6daabcd21de9d9",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM testui;",
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "73f5fd123b793a28"
+            ]
+        ]
+    },
+    {
+        "id": "73f5fd123b793a28",
+        "type": "sqlite",
+        "z": "2f6daabcd21de9d9",
+        "mydb": "36f9e4699f093bd2",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 790,
+        "y": 300,
+        "wires": [
+            [
+                "ddcc68419b5973d7",
+                "e9a817c7ecedd9a4"
+            ]
+        ]
+    },
+    {
+        "id": "e9a817c7ecedd9a4",
+        "type": "debug",
+        "z": "2f6daabcd21de9d9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "f4d07546ed94a531",
+        "type": "sqlite",
+        "z": "2f6daabcd21de9d9",
+        "mydb": "36f9e4699f093bd2",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 1030,
+        "y": 180,
+        "wires": [
+            [
+                "ddcc68419b5973d7"
+            ]
+        ]
+    },
+    {
+        "id": "4fe92756498b301d",
+        "type": "inject",
+        "z": "2f6daabcd21de9d9",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE tE9C0;",
+        "x": 540,
+        "y": 380,
+        "wires": [
+            [
+                "73f5fd123b793a28"
+            ]
+        ]
+    },
+    {
+        "id": "94b3d4c0b04e64dd",
+        "type": "ui_group",
+        "name": "MAP",
+        "tab": "36d9aaa443f50c58",
+        "order": 1,
+        "disp": true,
+        "width": "15",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f19f09e331f3a1b7",
+        "type": "mqtt-broker",
+        "name": "LA66",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "36f9e4699f093bd2",
+        "type": "sqlitedb",
+        "db": "C:/sqlite/data",
+        "mode": "RWC"
+    },
+    {
+        "id": "36d9aaa443f50c58",
+        "type": "ui_tab",
+        "name": "TEST",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

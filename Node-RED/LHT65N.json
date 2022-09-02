@@ -1,0 +1,711 @@
+[
+    {
+        "id": "db1ad33c18c250a7",
+        "type": "mqtt in",
+        "z": "d340d98f7a5ae55a",
+        "name": "LHT65N",
+        "topic": "v3/lht65n@ttn/devices/eui-70b3d57ed0054e50/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "9b8fb797cef6f6f8",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 40,
+        "wires": [
+            [
+                "ab290f9e7d6dcb6f",
+                "a07f1cc44ec75848",
+                "655dc2d2579aad23",
+                "803dbe64add5d2c4",
+                "ade2362281914f6d"
+            ]
+        ]
+    },
+    {
+        "id": "ab290f9e7d6dcb6f",
+        "type": "debug",
+        "z": "d340d98f7a5ae55a",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "a07f1cc44ec75848",
+        "type": "function",
+        "z": "d340d98f7a5ae55a",
+        "name": "",
+        "func": "var data=msg.payload[\"uplink_message\"]\nif (data[\"decoded_payload\"][\"Ext_sensor\"]==\"Temperature Sensor\"){\nf_port=data[\"f_port\"]\nf_cnt=data[\"f_cnt\"]\nvar data2=data[\"decoded_payload\"]\nbat =data2[\"BatV\"]\nbat_status=data2[\"Bat_status\"]\next_sensor=data2[\"Ext_sensor\"]\nhum_SHT=data2[\"Hum_SHT\"]\nif (\"TempC_DS\" in data[\"decoded_payload\"]){\ntempC_DS=data2[\"TempC_DS\"]\n}\nelse {\ntempC_DS=data2[\"TempC_TMP117\"]\n}\ntempC_SHT=data2[\"TempC_SHT\"]\na1={payload:f_port},a2={payload:f_cnt},a3={payload:bat},a4={payload:bat_status},a5={payload:ext_sensor},\na6={payload:hum_SHT},a7={payload:tempC_DS},a8={payload:tempC_SHT}\nreturn [a1,a2,a3,a4,a5,a6,a7,a8];\n}",
+        "outputs": 8,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 140,
+        "wires": [
+            [
+                "505a6fb6a079c0aa"
+            ],
+            [
+                "c64b5c6982bb3a2c"
+            ],
+            [
+                "af031f8e7571ed84"
+            ],
+            [
+                "97ded210083437f4"
+            ],
+            [
+                "7101b0d56d3ab4c5"
+            ],
+            [
+                "a6452d91660f80af"
+            ],
+            [
+                "bad73c61acdcd961"
+            ],
+            [
+                "52cc9f50d0b20162"
+            ]
+        ]
+    },
+    {
+        "id": "505a6fb6a079c0aa",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "6c8dcef19b33b1ab",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "f_port",
+        "label": "f_port",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c64b5c6982bb3a2c",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "9d9e40253fa3a62f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "f_cunt",
+        "label": "f_cunt",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "af031f8e7571ed84",
+        "type": "ui_chart",
+        "z": "d340d98f7a5ae55a",
+        "name": "bat",
+        "group": "b24db75b1499c15f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "bat",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 790,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "97ded210083437f4",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "758898c4bead5e6f",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "Bat_status",
+        "label": "Bat_status",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 810,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "7101b0d56d3ab4c5",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "a8f02d8f9b3e80a1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Ext_sensor",
+        "label": "Ext_sensor",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 810,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "a6452d91660f80af",
+        "type": "ui_chart",
+        "z": "d340d98f7a5ae55a",
+        "name": "Hum_SHT",
+        "group": "a9ef53ea130e5557",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "label": "Hum_SHT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 810,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bad73c61acdcd961",
+        "type": "ui_chart",
+        "z": "d340d98f7a5ae55a",
+        "name": "TempC_sensor",
+        "group": "1558cd7a030388f7",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "label": "TempC_sensor",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 820,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "52cc9f50d0b20162",
+        "type": "ui_chart",
+        "z": "d340d98f7a5ae55a",
+        "name": "TempC_SHT",
+        "group": "f523098714ee6cd6",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "label": "TempC_SHT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 810,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "655dc2d2579aad23",
+        "type": "function",
+        "z": "d340d98f7a5ae55a",
+        "name": "",
+        "func": "var data=msg.payload[\"uplink_message\"]\nif (data[\"decoded_payload\"][\"Work_mode\"]==\"Interrupt Sensor send\"){\nf_port=data[\"f_port\"]\nf_cnt=data[\"f_cnt\"]\nvar data2=data[\"decoded_payload\"]\nbat =data2[\"BatV\"]\nbat_status=data2[\"Bat_status\"]\nwork_mode=data2[\"Work_mode\"]\nexti_pin_level=data2[\"Exti_pin_level\"]\nexti_status=data2[\"Exti_status\"]\nhum_SHT=data2[\"Hum_SHT\"]\ntempC_SHT=data2[\"TempC_SHT\"]\na1={payload:f_port},a2={payload:f_cnt},a3={payload:bat},a4={payload:bat_status},a5={payload:work_mode},\na6={payload:exti_pin_level},a7={payload:exti_status},a8={payload:hum_SHT},a9={payload:tempC_SHT}\nreturn [a1,a2,a3,a4,a5,a6,a7,a8,a9];\n}",
+        "outputs": 9,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 320,
+        "wires": [
+            [
+                "505a6fb6a079c0aa"
+            ],
+            [
+                "c64b5c6982bb3a2c"
+            ],
+            [
+                "af031f8e7571ed84"
+            ],
+            [
+                "97ded210083437f4"
+            ],
+            [
+                "7101b0d56d3ab4c5"
+            ],
+            [
+                "e72bfab9cee764e4"
+            ],
+            [
+                "3a5ef6c764e6a678"
+            ],
+            [
+                "a6452d91660f80af"
+            ],
+            [
+                "52cc9f50d0b20162"
+            ]
+        ]
+    },
+    {
+        "id": "e72bfab9cee764e4",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "b1dc3cad430eb5b7",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Exti_pin_level",
+        "label": "Exti_pin_level",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 800,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "3a5ef6c764e6a678",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "4184be11e1179998",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Exti_status",
+        "label": "Exti_status",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "803dbe64add5d2c4",
+        "type": "function",
+        "z": "d340d98f7a5ae55a",
+        "name": "",
+        "func": "var data=msg.payload[\"uplink_message\"]\nif (data[\"decoded_payload\"][\"Work_mode\"]==\"Interrupt Sensor count\"){\nf_port=data[\"f_port\"]\nf_cnt=data[\"f_cnt\"]\nvar data2=data[\"decoded_payload\"]\nbat =data2[\"BatV\"]\nbat_status=data2[\"Bat_status\"]\nwork_mode=data2[\"Work_mode\"]\nexit_count=data2[\"Exit_count\"]\nhum_SHT=data2[\"Hum_SHT\"]\ntempC_SHT=data2[\"TempC_SHT\"]\na1={payload:f_port},a2={payload:f_cnt},a3={payload:bat},a4={payload:bat_status},a5={payload:work_mode},\na6={payload:exit_count},a8={payload:hum_SHT},a9={payload:tempC_SHT}\nreturn [a1,a2,a3,a4,a5,a6,a8,a9];\n}",
+        "outputs": 8,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 500,
+        "wires": [
+            [
+                "505a6fb6a079c0aa"
+            ],
+            [
+                "c64b5c6982bb3a2c"
+            ],
+            [
+                "af031f8e7571ed84"
+            ],
+            [
+                "97ded210083437f4"
+            ],
+            [
+                "7101b0d56d3ab4c5"
+            ],
+            [
+                "26adaaf76d116734"
+            ],
+            [
+                "a6452d91660f80af"
+            ],
+            [
+                "52cc9f50d0b20162"
+            ]
+        ]
+    },
+    {
+        "id": "26adaaf76d116734",
+        "type": "ui_text",
+        "z": "d340d98f7a5ae55a",
+        "group": "28cf5cca4c2c0bb5",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "exit_count",
+        "label": "exit_count",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 810,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "ade2362281914f6d",
+        "type": "function",
+        "z": "d340d98f7a5ae55a",
+        "name": "",
+        "func": "var data=msg.payload[\"uplink_message\"]\nif (data[\"decoded_payload\"][\"Work_mode\"]==\"ADC Sensor\"){\nf_port=data[\"f_port\"]\nf_cnt=data[\"f_cnt\"]\nvar data2=data[\"decoded_payload\"]\nbat =data2[\"BatV\"]\nbat_status=data2[\"Bat_status\"]\nwork_mode=data2[\"Work_mode\"]\nadc_V=data2[\"ADC_V\"]\nhum_SHT=data2[\"Hum_SHT\"]\ntempC_SHT=data2[\"TempC_SHT\"]\na1={payload:f_port},a2={payload:f_cnt},a3={payload:bat},a4={payload:bat_status},a5={payload:work_mode},\na6={payload:adc_V},a8={payload:hum_SHT},a9={payload:tempC_SHT}\nreturn [a1,a2,a3,a4,a5,a6,a8,a9];\n}",
+        "outputs": 8,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 640,
+        "wires": [
+            [
+                "505a6fb6a079c0aa"
+            ],
+            [
+                "c64b5c6982bb3a2c"
+            ],
+            [
+                "af031f8e7571ed84"
+            ],
+            [
+                "97ded210083437f4"
+            ],
+            [
+                "7101b0d56d3ab4c5"
+            ],
+            [
+                "463220519f0143cd"
+            ],
+            [
+                "a6452d91660f80af"
+            ],
+            [
+                "52cc9f50d0b20162"
+            ]
+        ]
+    },
+    {
+        "id": "463220519f0143cd",
+        "type": "ui_chart",
+        "z": "d340d98f7a5ae55a",
+        "name": "ADC_V",
+        "group": "5f974d1fd1c0edfa",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "ADC_V",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 800,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9b8fb797cef6f6f8",
+        "type": "mqtt-broker",
+        "name": "LHT65N",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6c8dcef19b33b1ab",
+        "type": "ui_group",
+        "name": "f_port",
+        "tab": "7e01624d2b1a030f",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9d9e40253fa3a62f",
+        "type": "ui_group",
+        "name": "f_cunt",
+        "tab": "7e01624d2b1a030f",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b24db75b1499c15f",
+        "type": "ui_group",
+        "name": "bat",
+        "tab": "7e01624d2b1a030f",
+        "order": 8,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "758898c4bead5e6f",
+        "type": "ui_group",
+        "name": "Bat_status",
+        "tab": "7e01624d2b1a030f",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a8f02d8f9b3e80a1",
+        "type": "ui_group",
+        "name": "Ext_sensor",
+        "tab": "7e01624d2b1a030f",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a9ef53ea130e5557",
+        "type": "ui_group",
+        "name": "Hum_SHT",
+        "tab": "7e01624d2b1a030f",
+        "order": 9,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1558cd7a030388f7",
+        "type": "ui_group",
+        "name": "TempC_sensor",
+        "tab": "7e01624d2b1a030f",
+        "order": 10,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f523098714ee6cd6",
+        "type": "ui_group",
+        "name": "TempC_SHT",
+        "tab": "7e01624d2b1a030f",
+        "order": 11,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b1dc3cad430eb5b7",
+        "type": "ui_group",
+        "name": "Exti_pin_level",
+        "tab": "7e01624d2b1a030f",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4184be11e1179998",
+        "type": "ui_group",
+        "name": "Exti_status",
+        "tab": "7e01624d2b1a030f",
+        "order": 7,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "28cf5cca4c2c0bb5",
+        "type": "ui_group",
+        "name": "exit_count",
+        "tab": "7e01624d2b1a030f",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5f974d1fd1c0edfa",
+        "type": "ui_group",
+        "name": "ADC_V",
+        "tab": "7e01624d2b1a030f",
+        "order": 12,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7e01624d2b1a030f",
+        "type": "ui_tab",
+        "name": "LHT65N",
+        "icon": "LHT65N",
+        "disabled": false,
+        "hidden": false
+    }
+]

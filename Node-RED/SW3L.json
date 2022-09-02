@@ -1,0 +1,519 @@
+[
+    {
+        "id": "5b537ef9357470c9",
+        "type": "e-mail",
+        "z": "aabc51f0cf321544",
+        "server": "smtp.qiye.aliyun.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "",
+        "dname": "用水监控",
+        "x": 1140,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "29760e4517e4fabc",
+        "type": "mqtt in",
+        "z": "aabc51f0cf321544",
+        "name": "SW3L",
+        "topic": "v3/ln50-001@ttn/devices/cpl01/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "3312cc876e0629fe",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "2cfc07bc0e22cf20",
+                "327da3f826c52b24"
+            ]
+        ]
+    },
+    {
+        "id": "2cfc07bc0e22cf20",
+        "type": "function",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"BatV\"]\nw2 = w[\"Alarm\"]\nw3 = w[\"Total_pulse\"]\nw4 = w[\"Water_flow_value\"]\nw5 = w[\"Data_time\"]\nw6 = [w2,w3,w4,w5]\na1 ={payload:w6}\nreturn [a1];",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 460,
+        "wires": [
+            [
+                "c0e5cf8b2c62d3f1",
+                "f8b30263b3a4a1f3",
+                "c5634b29b0aa427a"
+            ]
+        ]
+    },
+    {
+        "id": "c0e5cf8b2c62d3f1",
+        "type": "function",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "func": "a = new Date()\nif (msg.payload[0] == \"TRUE\"){\n    msg.to =\"edwin@dragino.cc\"\n    msg.topic = \"Dragino Office Water Usage -- Alarm Event\"\n    msg.payload =   \"Total Water Used:\" + msg.payload[2] +\"L\"+ \"\\n\" +\n                    (msg.payload[2]/1000).toFixed(4) + \"m³\"  + \"\\n\" +                \n                    \"Alarm at:\" + \"\\n\"+\"UTC Time:\"+\n                    msg.payload[3] + \"\\n\" +\n                    \"Beijing Time:\" + a.toLocaleString()\n    return msg;\n}\n\n\n    \n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 540,
+        "wires": [
+            [
+                "5b537ef9357470c9"
+            ]
+        ]
+    },
+    {
+        "id": "e62e199d58b7a17a",
+        "type": "inject",
+        "z": "aabc51f0cf321544",
+        "name": "每周一18点发送",
+        "props": [],
+        "repeat": "",
+        "crontab": "00 18 * * 1",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "17a60e0f9b658ec7"
+            ]
+        ]
+    },
+    {
+        "id": "17a60e0f9b658ec7",
+        "type": "file in",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "filename": "root1/xiaolin/sw3l.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 700,
+        "y": 120,
+        "wires": [
+            [
+                "bfdb8194ccccac81"
+            ]
+        ]
+    },
+    {
+        "id": "f8b30263b3a4a1f3",
+        "type": "file",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "filename": "root1/xiaolin/sw3l.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 720,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bfdb8194ccccac81",
+        "type": "function",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "func": "a = new Date()\nvar a1 = msg.payload.split(\"\\n\")\nvar w2 = a1[a1.length-2]\nvar a2 = w2.replace(\"[\",\"\")\nvar a3 = a2.replace(\"]\",\"\")\nvar w3 = a3.split(\",\")\nmsg.to =\"edwin@dragino.cc\"\nmsg.cc =\"liupeng@dragino.cc\"\nmsg.topic = \"Dragino Office Water Usage -- Daily Report\"\nmsg.payload =   \"Total Water Used:\" + w3[2] +\"L\"+ \"\\n\" +\n                (w3[2]/1000).toFixed(4) + \"m³\"  + \"\\n\" +                \n                \"Alarm at:\" + \"\\n\"+\"UTC Time:\"+\n                w3[3] + \"\\n\" +\"beijing Time:\"+a.toLocaleString()\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 120,
+        "wires": [
+            [
+                "5b537ef9357470c9"
+            ]
+        ]
+    },
+    {
+        "id": "981318fcd86c2a36",
+        "type": "file in",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "filename": "root1/xiaolin/sw3l.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 620,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "932eeb99188253e8",
+        "type": "inject",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 370,
+        "y": 60,
+        "wires": [
+            [
+                "981318fcd86c2a36"
+            ]
+        ]
+    },
+    {
+        "id": "327da3f826c52b24",
+        "type": "function",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"BAT\"]\nw2 = w[\"Alarm\"]\nif (w2 ==\"TRUE\")\n    w2 = 1;\nelse\n    w2 = 0; \nw3 = w[\"Total_pulse\"]\nw4 = w[\"Water_flow_value\"]\na1 ={payload:w1},a2 ={payload:w2},a3 ={payload:w3},a4 ={payload:w4}\nreturn [a1,a2,a3,a4];",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 740,
+        "wires": [
+            [
+                "f88206103a66759b"
+            ],
+            [
+                "f35c5861c956f0f4"
+            ],
+            [
+                "5d34d1de6e354e9a"
+            ],
+            [
+                "0a29746dad9d2989"
+            ]
+        ]
+    },
+    {
+        "id": "f88206103a66759b",
+        "type": "ui_chart",
+        "z": "aabc51f0cf321544",
+        "name": "BAT",
+        "group": "660729e75a4a90db",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#ca1616",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 790,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f35c5861c956f0f4",
+        "type": "ui_chart",
+        "z": "aabc51f0cf321544",
+        "name": "Alarm",
+        "group": "cb1271fcb3795a19",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Alarm",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1e57b3",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 790,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d34d1de6e354e9a",
+        "type": "ui_chart",
+        "z": "aabc51f0cf321544",
+        "name": "Total_pulse",
+        "group": "ef128afa0cc95625",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Total_pulse",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 810,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0a29746dad9d2989",
+        "type": "ui_chart",
+        "z": "aabc51f0cf321544",
+        "name": "Water_flow_value",
+        "group": "ed9e9610030a59d5",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Water_flow_value",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "main",
+        "x": 830,
+        "y": 800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1aa476a79eb432f7",
+        "type": "http request",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=65b46a26-6adf-4660-85cd-f44dff03b6b9",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "credentials": {},
+        "x": 1000,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c5634b29b0aa427a",
+        "type": "function",
+        "z": "aabc51f0cf321544",
+        "name": "",
+        "func": "a = new Date()\nif (msg.payload[0] == \"TRUE\"){\n    msg.payload = {\n    \"msgtype\": \"text\",\n    \"text\": {\n        \"content\": \"Total Water Used:\" + msg.payload[2] +\"L\"+ \"\\n\" +\n                    (msg.payload[2]/1000).toFixed(4) + \"m³\"  + \"\\n\" +                \n                    \"Alarm at:\" + \"\\n\"+\"UTC Time:\"+\n                    msg.payload[3] + \"\\n\" +\n                    \"Beijing Time:\" + a.toLocaleString()\n    }\n    }\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 600,
+        "wires": [
+            [
+                "1aa476a79eb432f7"
+            ]
+        ]
+    },
+    {
+        "id": "3312cc876e0629fe",
+        "type": "mqtt-broker",
+        "name": "LSN50-V2-D20-S31-LDS03A",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "660729e75a4a90db",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "3c123f740125b50b",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cb1271fcb3795a19",
+        "type": "ui_group",
+        "name": "Alarm",
+        "tab": "3c123f740125b50b",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ef128afa0cc95625",
+        "type": "ui_group",
+        "name": "Total_pulse",
+        "tab": "3c123f740125b50b",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ed9e9610030a59d5",
+        "type": "ui_group",
+        "name": "Water_flow_value",
+        "tab": "3c123f740125b50b",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3c123f740125b50b",
+        "type": "ui_tab",
+        "name": "SW3L",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

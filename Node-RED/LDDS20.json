@@ -1,0 +1,341 @@
+[
+    {
+        "id": "4fa3397d87c6fc13",
+        "type": "mqtt in",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "LDDS20",
+        "topic": "v3/lsn50-485-001@ttn/devices/20test001/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "cb03b74d3078727b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 360,
+        "y": 280,
+        "wires": [
+            [
+                "2df25f626e5a8338",
+                "6a1179372cc23d84"
+            ]
+        ]
+    },
+    {
+        "id": "2df25f626e5a8338",
+        "type": "function",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "",
+        "func": "var a1 = new Date() \nvar a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nq = a[\"frm_payload\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"Bat\"]\nw2 = w[\"Distance\"]\nd = a1.toLocaleString()+\"\\n\"+\"f_port:\"+b+\"\\n\"+\"f_cnt:\"+c+\"\\n\"+\"frm_payload:\"+q+\"\\n\"+\"Bat:\"+w1+\"\\n\"+\"Distance:\"+w2\na1 = {payload:d}\nreturn a1;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 280,
+        "wires": [
+            [
+                "86cfa78c54869aa6"
+            ]
+        ]
+    },
+    {
+        "id": "86cfa78c54869aa6",
+        "type": "file",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "",
+        "filename": "root1/ZIHAN/LDDS20.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 910,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6a1179372cc23d84",
+        "type": "function",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"Bat\"]\nw2 = w[\"Distance\"]\na1 ={payload:w1},a2 ={payload:w2},a3 ={payload:b},a4 ={payload:c}\nreturn [a1,a2,a3,a4];",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 380,
+        "wires": [
+            [
+                "798ac5394c77c519"
+            ],
+            [
+                "89c9cdfd08942985"
+            ],
+            [
+                "39d3027bd129ac71"
+            ],
+            [
+                "6075b59872e3db8f"
+            ]
+        ]
+    },
+    {
+        "id": "798ac5394c77c519",
+        "type": "ui_chart",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "BAT",
+        "group": "f9607ac04a0b3cf0",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "label": "BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "5",
+        "removeOlderPoints": "10000000",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 930,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "89c9cdfd08942985",
+        "type": "ui_chart",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "Distance",
+        "group": "41eab810401fc466",
+        "order": 0,
+        "width": "6",
+        "height": "4",
+        "label": "Distance",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 940,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "39d3027bd129ac71",
+        "type": "ui_chart",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "F-PORT",
+        "group": "59db2eba73efd252",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "F-PORT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 940,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6075b59872e3db8f",
+        "type": "ui_chart",
+        "z": "25ba2fabc5a6e2cc",
+        "name": "F-COUNT",
+        "group": "316eefea04fdfd6d",
+        "order": 0,
+        "width": "6",
+        "height": "4",
+        "label": "F_COUNT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 940,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cb03b74d3078727b",
+        "type": "mqtt-broker",
+        "name": "rs485",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f9607ac04a0b3cf0",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "ee76acd299ee1ebd",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "41eab810401fc466",
+        "type": "ui_group",
+        "name": "Distance",
+        "tab": "ee76acd299ee1ebd",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "59db2eba73efd252",
+        "type": "ui_group",
+        "name": "F-PORT",
+        "tab": "ee76acd299ee1ebd",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "316eefea04fdfd6d",
+        "type": "ui_group",
+        "name": "F_COUNT",
+        "tab": "ee76acd299ee1ebd",
+        "order": 7,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ee76acd299ee1ebd",
+        "type": "ui_tab",
+        "name": "LDDS20",
+        "icon": "LDDS20",
+        "disabled": false,
+        "hidden": false
+    }
+]

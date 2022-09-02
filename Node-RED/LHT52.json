@@ -1,0 +1,488 @@
+[
+    {
+        "id": "be9b5e86c5481bbf",
+        "type": "tab",
+        "label": "LHT52",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "56a99ebde3414751",
+        "type": "function",
+        "z": "be9b5e86c5481bbf",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nw = a[\"decoded_payload\"]\nw2 = w[\"Hum_SHT\"]\nw3 = w[\"TempC_DS\"]\nw4 = w[\"TempC_SHT\"]\na2 ={payload:w2},a3 ={payload:b},a4 ={payload:c},a5 ={payload:w3},a6 ={payload:w4}\nreturn [a3,a4,a2,a5,a6];",
+        "outputs": 5,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 160,
+        "wires": [
+            [
+                "81b2c97d277f4d96"
+            ],
+            [
+                "9ed7bbd36a3541bc"
+            ],
+            [
+                "da8e237886084049"
+            ],
+            [
+                "4bc43f9e7a17743a"
+            ],
+            [
+                "93574cbd17a98f8f"
+            ]
+        ]
+    },
+    {
+        "id": "a0959847a3b81586",
+        "type": "function",
+        "z": "be9b5e86c5481bbf",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nif(b==5){\nc = a[\"f_cnt\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"Bat_mV\"]\na1 ={payload:b},a2={payload:c},a3={payload:w1}\nreturn [a1,a2,a3]\n}",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 300,
+        "wires": [
+            [
+                "81b2c97d277f4d96"
+            ],
+            [
+                "9ed7bbd36a3541bc"
+            ],
+            [
+                "ea96765a31a21c8c"
+            ]
+        ]
+    },
+    {
+        "id": "125c539e8f63eb2f",
+        "type": "function",
+        "z": "be9b5e86c5481bbf",
+        "name": "",
+        "func": "var a1 = new Date() \nvar a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nq = a[\"frm_payload\"]\nd = a1.toLocaleString()+\"\\n\"+\"f_port:\"+b+\"\\n\"+\"f_cnt:\"+c+\"\\n\"+\"frm_payload:\"+q\na1 = {payload:d}\nreturn a1;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 80,
+        "wires": [
+            [
+                "3ed86accb1613ec1"
+            ]
+        ]
+    },
+    {
+        "id": "3ed86accb1613ec1",
+        "type": "file",
+        "z": "be9b5e86c5481bbf",
+        "name": "",
+        "filename": "root1/luogong/LHT52-yanfashi.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 720,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "81b2c97d277f4d96",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-PORT",
+        "group": "55eb6bb25293b958",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-PORT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1050,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9ed7bbd36a3541bc",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-COUNT",
+        "group": "2644d06752bf0646",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-COUNT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1060,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "da8e237886084049",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-Hum_SHT",
+        "group": "8f4efe4928950282",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-Hum_SHT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1070,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4bc43f9e7a17743a",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-TempC_DS",
+        "group": "a9878944e863812a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-TempC_DS",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1070,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "93574cbd17a98f8f",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-TempC_SHT",
+        "group": "ad8a6fd9d1b63455",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-TempC_SHT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1070,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ea96765a31a21c8c",
+        "type": "ui_chart",
+        "z": "be9b5e86c5481bbf",
+        "name": "R&D ROOM-BAT",
+        "group": "c953b04c87c7e103",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "R&D ROOM-BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 870,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bc2eedf6cbd86fe7",
+        "type": "mqtt in",
+        "z": "be9b5e86c5481bbf",
+        "name": "LHT52",
+        "topic": "v3/lht52@ttn/devices/eui-70b3d57ed0043fb2/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "9c3ad6ea33270155",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 160,
+        "wires": [
+            [
+                "125c539e8f63eb2f",
+                "56a99ebde3414751",
+                "a0959847a3b81586"
+            ]
+        ]
+    },
+    {
+        "id": "55eb6bb25293b958",
+        "type": "ui_group",
+        "name": "R&D ROOM-PORT",
+        "tab": "62c324e645796587",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2644d06752bf0646",
+        "type": "ui_group",
+        "name": "R&D ROOM-COUNT",
+        "tab": "62c324e645796587",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8f4efe4928950282",
+        "type": "ui_group",
+        "name": "R&D ROOM-Hum_SHT",
+        "tab": "62c324e645796587",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a9878944e863812a",
+        "type": "ui_group",
+        "name": "R&D ROOM-TempC_DS",
+        "tab": "62c324e645796587",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ad8a6fd9d1b63455",
+        "type": "ui_group",
+        "name": "R&D ROOM-TempC_SHT",
+        "tab": "62c324e645796587",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c953b04c87c7e103",
+        "type": "ui_group",
+        "name": "R&D ROOM-BAT",
+        "tab": "62c324e645796587",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9c3ad6ea33270155",
+        "type": "mqtt-broker",
+        "name": "LHT52",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "62c324e645796587",
+        "type": "ui_tab",
+        "name": "LHT52",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

@@ -1,0 +1,341 @@
+[
+    {
+        "id": "4568fcc5b62d9763",
+        "type": "mqtt in",
+        "z": "605e44c8b3b73da8",
+        "name": "LSN50-V2-D20",
+        "topic": "v3/ln50-001@ttn/devices/test001/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "3312cc876e0629fe",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 160,
+        "wires": [
+            [
+                "0406754d68ed4a76",
+                "8b75f9312d23cc17"
+            ]
+        ]
+    },
+    {
+        "id": "0406754d68ed4a76",
+        "type": "function",
+        "z": "605e44c8b3b73da8",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"BatV\"]\nw2 = w[\"TempC1\"]\na1 ={payload:b},a2 ={payload:c},a3 ={payload:w1},a4 ={payload:w2}\nreturn [a1,a2,a3,a4];",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 160,
+        "wires": [
+            [
+                "a0409559d59eb0a6"
+            ],
+            [
+                "0cef9e82bd6a43a0"
+            ],
+            [
+                "d8ca679973d6eca7"
+            ],
+            [
+                "42755867196f3ef6"
+            ]
+        ]
+    },
+    {
+        "id": "a0409559d59eb0a6",
+        "type": "ui_chart",
+        "z": "605e44c8b3b73da8",
+        "name": "F-PORT",
+        "group": "6f265c544942c8f3",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "F-PORT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 600,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0cef9e82bd6a43a0",
+        "type": "ui_chart",
+        "z": "605e44c8b3b73da8",
+        "name": "F-COUNT",
+        "group": "2f805616f128dfb3",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "F-COUNT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 600,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d8ca679973d6eca7",
+        "type": "ui_chart",
+        "z": "605e44c8b3b73da8",
+        "name": "BAT",
+        "group": "0f205cb276b9a568",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 590,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "42755867196f3ef6",
+        "type": "ui_chart",
+        "z": "605e44c8b3b73da8",
+        "name": "TempC1",
+        "group": "8c074ad3752d5094",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "TempC1",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 600,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8b75f9312d23cc17",
+        "type": "function",
+        "z": "605e44c8b3b73da8",
+        "name": "",
+        "func": "var a1 = new Date() \nvar a = msg.payload[\"uplink_message\"]\nb = a[\"f_port\"]\nc = a[\"f_cnt\"]\nq = a[\"frm_payload\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"BatV\"]\nw2 = w[\"TempC1\"]\nd = a1.toLocaleString()+\"\\n\"+\"f_port:\"+b+\"\\n\"+\"f_cnt:\"+c+\"\\n\"+\"frm_payload:\"+q+\"\\n\"+\"BatV:\"+w1+\"\\n\"+\"TempC1:\"+w2\na1 = {payload:d}\nreturn a1;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 60,
+        "wires": [
+            [
+                "b5d986074f66bfcc"
+            ]
+        ]
+    },
+    {
+        "id": "b5d986074f66bfcc",
+        "type": "file",
+        "z": "605e44c8b3b73da8",
+        "name": "",
+        "filename": "root1/xiaolin/D20.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 560,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3312cc876e0629fe",
+        "type": "mqtt-broker",
+        "name": "LSN50-V2-D20-S31-LDS03A",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6f265c544942c8f3",
+        "type": "ui_group",
+        "name": "F-PORT",
+        "tab": "7d94b911e7ee5489",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2f805616f128dfb3",
+        "type": "ui_group",
+        "name": "F-COUNT",
+        "tab": "7d94b911e7ee5489",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0f205cb276b9a568",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "7d94b911e7ee5489",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8c074ad3752d5094",
+        "type": "ui_group",
+        "name": "TempC1",
+        "tab": "7d94b911e7ee5489",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7d94b911e7ee5489",
+        "type": "ui_tab",
+        "name": "LSN50-V2-D20",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
