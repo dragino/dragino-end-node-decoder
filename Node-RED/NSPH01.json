@@ -1,0 +1,645 @@
+[
+    {
+        "id": "ce2ab67e4128c271",
+        "type": "udp in",
+        "z": "43cb15b889b5a737",
+        "name": "4999",
+        "iface": "",
+        "port": "4999",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "buffer",
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "e080db81e7b6294c",
+                "4f89a81d9fd5fd3f",
+                "d496a736c970e7ce"
+            ]
+        ]
+    },
+    {
+        "id": "e080db81e7b6294c",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "NSPH01",
+        "func": "var data = msg.payload\nfunction phdata(ph2,ph3){\n    ph4 = (data[ph2]<<8|data[ph3])/100\n    return ph4\n}\nfunction tempdata(temp2,temp3){\n    value=data[temp2]<<8 | data[temp3]\n\tvar temp=0\n    if((value & 0x8000)>>15 === 0)\n\t\ttemp=(value/10);//temp_SOIL,temperature\n\telse if((value & 0x8000)>>15 === 1)\n\t\ttemp=((value-0xFFFF)/10)\n\treturn temp\n}\nfunction shijiandata(d1,d2,d3,d4){\n    shijian = data[d1]<<24|data[d2]<<16|data[d3]<<8|data[d4]\n    return shijian\n}\nid = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nver = (data[8]<<8|data[9])+\"\"\nbat = data[10]<<8|data[11]\nsignal = data[12]\nmod =data[13]\ninterrupt_flag=data[14]\nph = (data[15]<<8|data[16])/100\nvalue=data[17]<<8 | data[18]\n\tvar temp=0\n    if((value & 0x8000)>>15 === 0)\n\t\ttemp=(value/10);//temp_SOIL,temperature\n\telse if((value & 0x8000)>>15 === 1)\n\t\ttemp=((value-0xFFFF)/10)\nshijian = data[19]<<24|data[20]<<16|data[21]<<8|data[22]\nid1 = {payload:id.substring(1,)}\nver1 = {payload:\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)}\nbat1 = {payload:bat}\nsignal1 ={payload:signal}\nmod1 = {payload:mod}\ninterrupt_flag1 = {payload:interrupt_flag}\nvar pharray=[]\npharray[0]=phdata(81,82),pharray[1]=phdata(73,74),pharray[2]=phdata(65,66),pharray[3]=phdata(57,58),pharray[4]=phdata(49,50),pharray[5]=phdata(41,42),pharray[6]=phdata(33,34),pharray[7]=phdata(25,26),pharray[8]=ph\npayload = {payload:pharray}\nvar temparray=[]\ntemparray[0]=tempdata(79,80),temparray[1]=tempdata(71,72),temparray[2]=tempdata(63,64),temparray[3]=tempdata(55,56),temparray[4]=tempdata(47,48),temparray[5]=tempdata(39,40),temparray[6]=tempdata(31,32),temparray[7]=tempdata(23,24),temparray[8]=temp\npayload1 = {payload:temparray}\nvar shijianarray=[]\nshijianarray[0]=shijiandata(83,84,85,86),shijianarray[1]=shijiandata(75,76,77,78),shijianarray[2]=shijiandata(67,68,69,70),shijianarray[3]=shijiandata(59,60,61,62),shijianarray[4]=shijiandata(51,52,53,54),shijianarray[5]=shijiandata(43,44,45,46),shijianarray[6]=shijiandata(35,36,37,38),\nshijianarray[7]=shijiandata(27,28,29,30),shijianarray[8]=shijian\npayload2 = {payload:shijianarray}\nreturn [id1,ver1,bat1,signal1,mod1,interrupt_flag1,payload,payload1,payload2];\n",
+        "outputs": 9,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "eaf46fa35c1b6ad0"
+            ],
+            [
+                "037a69054371a14d"
+            ],
+            [
+                "041688ad38f351cf"
+            ],
+            [
+                "21f43966f6a51b93"
+            ],
+            [
+                "ee6e88e5c957b222"
+            ],
+            [
+                "d36d70445e605ef6"
+            ],
+            [
+                "edb512bcd7b7d3ba"
+            ],
+            [
+                "ef9c1a60930deb2e"
+            ],
+            [
+                "292b2ae25cce1a56"
+            ]
+        ]
+    },
+    {
+        "id": "4f89a81d9fd5fd3f",
+        "type": "debug",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "eaf46fa35c1b6ad0",
+        "type": "ui_text",
+        "z": "43cb15b889b5a737",
+        "group": "59e65cf863ddee90",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "IMEI",
+        "label": "IMEI",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "037a69054371a14d",
+        "type": "ui_text",
+        "z": "43cb15b889b5a737",
+        "group": "68720fabb28773e6",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "VER",
+        "label": "VER",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "041688ad38f351cf",
+        "type": "ui_chart",
+        "z": "43cb15b889b5a737",
+        "name": "BAT",
+        "group": "eb455eb3c0d362cd",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "BAT",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 790,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ee6e88e5c957b222",
+        "type": "ui_text",
+        "z": "43cb15b889b5a737",
+        "group": "215248dcfcfceb23",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "MOD",
+        "label": "MOD",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "21f43966f6a51b93",
+        "type": "ui_text",
+        "z": "43cb15b889b5a737",
+        "group": "136320f2ef1fed8d",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Signal",
+        "label": "Signal",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 790,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "edb512bcd7b7d3ba",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "PH",
+        "func": "var ph = msg.payload\nglobal.set(\"ph\",ph)\nmsg.payload = ph\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ef9c1a60930deb2e",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "TEMP",
+        "func": "var temp = msg.payload\nglobal.set(\"temp\",temp)\nmsg.payload = temp\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "292b2ae25cce1a56",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "TIME",
+        "func": "var timedata = msg.payload\nglobal.set(\"time\",timedata)\nmsg.payload = timedata\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d36d70445e605ef6",
+        "type": "ui_text",
+        "z": "43cb15b889b5a737",
+        "group": "620cf24ec9c7f5cb",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "interrupt_flag",
+        "label": "interrupt_flag",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 810,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "d496a736c970e7ce",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "查看表是否存在",
+        "func": "var data = msg.payload\nid = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar name = \"t\"+id.substring(1,)\nflow.set('data2',name);\nmsg.topic=\"SELECT name FROM sqlite_master WHERE type='table' AND name='\"+name+\"';\"\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 480,
+        "wires": [
+            [
+                "bf3cd18ee6e911a9"
+            ]
+        ]
+    },
+    {
+        "id": "bf3cd18ee6e911a9",
+        "type": "sqlite",
+        "z": "43cb15b889b5a737",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 410,
+        "y": 400,
+        "wires": [
+            [
+                "61bf979d9b334657"
+            ]
+        ]
+    },
+    {
+        "id": "61bf979d9b334657",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "如果表不存在则创建存在则存数据",
+        "func": "var data2 = flow.get('data2',data2);\nvar ph = global.get(\"ph\",ph)\nvar temp = global.get(\"temp\",temp)\nvar timedata = global.get(\"time\",timedata)\nif (msg.payload.length==1){\n    msg.topic = \"INSERT INTO \"+data2+\"(PH,TEMP,TIMEDATA) SELECT \"\n                +ph[0]+\",\"+temp[0]+\",\"+\"'\"+timedata[0]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[1]+\",\"+temp[1]+\",\"+\"'\"+timedata[1]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[2]+\",\"+temp[2]+\",\"+\"'\"+timedata[2]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[3]+\",\"+temp[3]+\",\"+\"'\"+timedata[3]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[4]+\",\"+temp[4]+\",\"+\"'\"+timedata[4]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[5]+\",\"+temp[5]+\",\"+\"'\"+timedata[5]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[6]+\",\"+temp[6]+\",\"+\"'\"+timedata[6]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[7]+\",\"+temp[7]+\",\"+\"'\"+timedata[7]+\"'\"+\" \"\n                +\"UNION ALL SELECT \"+ph[8]+\",\"+temp[8]+\",\"+\"'\"+timedata[8]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==0){\n    msg.topic=\"CREATE TABLE \"+data2+\"(PH FLOAT,TEMP FLOAT,TIMEDATA TEXT);\"\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 640,
+        "wires": [
+            [
+                "9a3bc291a5af0c23"
+            ]
+        ]
+    },
+    {
+        "id": "9a3bc291a5af0c23",
+        "type": "sqlite",
+        "z": "43cb15b889b5a737",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 350,
+        "y": 720,
+        "wires": [
+            [
+                "2c880c25336f2bd7"
+            ]
+        ]
+    },
+    {
+        "id": "151099f1e9ef7731",
+        "type": "inject",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 670,
+        "y": 820,
+        "wires": [
+            [
+                "d12c9b0cf8e644a0"
+            ]
+        ]
+    },
+    {
+        "id": "d12c9b0cf8e644a0",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "func": "msg.topic='SELECT * FROM t868411056754138;'\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 820,
+        "wires": [
+            [
+                "aeb6b81dff49e1a6"
+            ]
+        ]
+    },
+    {
+        "id": "2c880c25336f2bd7",
+        "type": "delay",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 560,
+        "y": 720,
+        "wires": [
+            [
+                "491cb57a3cea2718"
+            ]
+        ]
+    },
+    {
+        "id": "491cb57a3cea2718",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "func": "var data2 = flow.get('data2',data2);\nmsg.topic=\"SELECT * FROM \"+data2+\";\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 720,
+        "wires": [
+            [
+                "aeb6b81dff49e1a6"
+            ]
+        ]
+    },
+    {
+        "id": "aeb6b81dff49e1a6",
+        "type": "sqlite",
+        "z": "43cb15b889b5a737",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 950,
+        "y": 720,
+        "wires": [
+            [
+                "b9cecdd034b4b1df",
+                "f95dad904931df6a"
+            ]
+        ]
+    },
+    {
+        "id": "b9cecdd034b4b1df",
+        "type": "debug",
+        "z": "43cb15b889b5a737",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "f95dad904931df6a",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "获取表的所有数据",
+        "func": "function add0(m){return m<10?'0'+m:m }\nfunction format(shijianchuo)\n{\n//shijianchuo是整数，否则要parseInt转换\nvar time = new Date(shijianchuo);\nvar y = time.getFullYear();\nvar m = time.getMonth()+1;\nvar d = time.getDate();\nvar h = time.getHours();\nvar mm = time.getMinutes();\nvar s = time.getSeconds();\nreturn y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);\n}\nvar data = msg.payload\nph = []\ntemp = []\ntimedata = []\ndata1 = {ph,temp,timedata}\nfor (var i=0;i<data.length;i++){\n   ph[i] = data[i]['PH']\n   temp[i] = data[i]['TEMP']\n   timedata[i] = format((parseInt(data[i]['TIMEDATA'])*1000)\n}\n/*id1 = {payload:id}\nbat1 = {payload:bat}\ntemp1 = {payload:temp}\nhum1 = {payload:hum}\nds18b201 = {payload:ds18b20}\ntimedata1 ={payload:timedata}\nreturn [id1,bat1,temp1,hum1,ds18b201,timedata1];*/\ndata2 = {payload:data1}\nreturn data2;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 640,
+        "wires": [
+            [
+                "1ae4ec79e37e76c0"
+            ]
+        ]
+    },
+    {
+        "id": "1ae4ec79e37e76c0",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "echarts折线图",
+        "func": "var xdata = msg.payload['timedata']\nvar ph = msg.payload['ph']\nvar temp = msg.payload['temp']\noption = {\n  title: {\n    text: 'TEST Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['PH', 'TEMP', 'timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'PH',\n      type: 'line',\n      stack: 'Total',\n      data: ph\n    },\n    {\n      name: 'TEMP',\n      type: 'line',\n      stack: 'Total',\n      data: temp\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 560,
+        "wires": [
+            [
+                "87f21349434ae31f"
+            ]
+        ]
+    },
+    {
+        "id": "2f8d543cd9e654ab",
+        "type": "template",
+        "z": "43cb15b889b5a737",
+        "name": "模板",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart1\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart1\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1070,
+        "y": 560,
+        "wires": [
+            [
+                "b44ba688f8429b3c"
+            ]
+        ]
+    },
+    {
+        "id": "87f21349434ae31f",
+        "type": "function",
+        "z": "43cb15b889b5a737",
+        "name": "转为JSON",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 560,
+        "wires": [
+            [
+                "2f8d543cd9e654ab"
+            ]
+        ]
+    },
+    {
+        "id": "b44ba688f8429b3c",
+        "type": "ui_template",
+        "z": "43cb15b889b5a737",
+        "group": "cba772591f91ce09",
+        "name": "可视化",
+        "order": 1,
+        "width": "12",
+        "height": "10",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1230,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "59e65cf863ddee90",
+        "type": "ui_group",
+        "name": "IMEI",
+        "tab": "2b320881dc8e0fc0",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "68720fabb28773e6",
+        "type": "ui_group",
+        "name": "VER",
+        "tab": "2b320881dc8e0fc0",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "eb455eb3c0d362cd",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "2b320881dc8e0fc0",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "215248dcfcfceb23",
+        "type": "ui_group",
+        "name": "MOD",
+        "tab": "2b320881dc8e0fc0",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "136320f2ef1fed8d",
+        "type": "ui_group",
+        "name": "Signal",
+        "tab": "2b320881dc8e0fc0",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "620cf24ec9c7f5cb",
+        "type": "ui_group",
+        "name": "interrupt_flag",
+        "tab": "2b320881dc8e0fc0",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d7ab97b4130894e3",
+        "type": "sqlitedb",
+        "db": "/root/test.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "cba772591f91ce09",
+        "type": "ui_group",
+        "name": "PH/TEMP",
+        "tab": "2b320881dc8e0fc0",
+        "order": 7,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2b320881dc8e0fc0",
+        "type": "ui_tab",
+        "name": "NSPH01",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

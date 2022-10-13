@@ -1,0 +1,231 @@
+[
+    {
+        "id": "da0cbe19fce3553e",
+        "type": "tab",
+        "label": "NB门磁",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "08bf278f2f08a31d",
+        "type": "udp in",
+        "z": "da0cbe19fce3553e",
+        "name": "udp1999",
+        "iface": "",
+        "port": "1999",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "buffer",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "18bf437e332ce702",
+                "4f1ba6bb4c8a34d9",
+                "f081a51a2966d85e"
+            ]
+        ]
+    },
+    {
+        "id": "18bf437e332ce702",
+        "type": "function",
+        "z": "da0cbe19fce3553e",
+        "name": "英文版",
+        "func": "var data = msg.payload\nif (data.length==32){\n\tvar value = {1:\"TDC\",2:\"Alarm\",3:\"Remove alarm\",4:\"Dismantling alarm\",5:\"Demove demolition alarm\",6:\"Low voltage\",7:\"Remove low voltage\"}\n\tvar v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var data2 =data.toString()\n    var nodeid = data2.substring(6,21)\n    //var nodeid = String.fromCharCode(nodeid1.toString(16))\n\tvar upmsg = data[3]\n\t\tif (upmsg == 0x02)\n\t\t    upmsg ='Devices upload'\n\tvar node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar upmsgs = data[21]\n\t\tupmsgs = value[upmsgs]\n\tvar door = data[22]\n\t\tif (door == 0)\n\t\t  door = 'close'\n\t\telse\n\t\t  door = 'open'\n\tvar bat = data[23]/10\n\tvar csq = data[24]\n\tvar temp = data[25]+(data[26]*0.01)\n\tvar hum = data[27]+(data[28]*0.01)\n\tvar data1 = {payload:'Device ID：'+nodeid+'\\n'+'Version：'+v1+\"\\n\"+\"Data type：\"+upmsg+\"\\n\"+\"Device type：\"+node+\"\\n\"+\"Event type：\"+upmsgs+\"\\n\"+\"Door magnetic state：\"+door+\"\\n\"+\"BAT：\"+bat+\"V\"+\"\\n\"+\n\t\"Signal：\"+csq+\"\\n\"+\"Temp：\"+temp+'℃'+'\\n'+'Hum'+hum+'%'}\n\treturn data1;\n}\nelse{\n    var v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var upmsg = data[3]\n\t\tif (upmsg == 0x01)\n\t\t    upmsg ='Devices registration package'\n    var node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar data2 =data.toString()//buuffer转字符串\n    var nodeid = data2.substring(6,21)\n    var imsi = data2.substring(21,36)\n    var iccid = data2.substring(36,56)\n    var bat = data[56]/10\n    var csq = data[57]\n    var data1 = {payload:'Device ID：'+nodeid+'\\n'+'IMSI:'+imsi+'\\n'+'ICCID:'+iccid+'\\n'+'Version：'+v1+\"\\n\"+\"Data type：\"+upmsg+\"\\n\"+\"Device type：\"+node+\"\\n\"+\"BAT：\"+bat+\"V\"+\"\\n\"+\n\t\"Signal：\"+csq}\n\treturn data1;\n    \n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 180,
+        "wires": [
+            [
+                "37a4ca8414acf073"
+            ]
+        ]
+    },
+    {
+        "id": "37a4ca8414acf073",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "English",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "4f1ba6bb4c8a34d9",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "8bbe5fce6695ab29",
+        "type": "tcp in",
+        "z": "da0cbe19fce3553e",
+        "name": "TCP2002",
+        "server": "server",
+        "host": "",
+        "port": "2002",
+        "datamode": "stream",
+        "datatype": "buffer",
+        "newline": "",
+        "topic": "",
+        "base64": false,
+        "tls": "",
+        "x": 160,
+        "y": 300,
+        "wires": [
+            [
+                "551b9da88ded61c6",
+                "e56d5dda91cee3e5",
+                "9a0f50861efcabe0"
+            ]
+        ]
+    },
+    {
+        "id": "551b9da88ded61c6",
+        "type": "function",
+        "z": "da0cbe19fce3553e",
+        "name": "中文版",
+        "func": "var data = msg.payload\nif (data.length==32){\n\tvar value = {1:\"心跳\",2:\"报警\",3:\"报警恢复\",4:\"防拆报警\",5:\"防拆报警恢复\",6:\"低电压\",7:\"低电压恢复\"}\n\tvar v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var data2 =data.toString()\n    var nodeid = data2.substring(6,21)\n    //var nodeid = String.fromCharCode(nodeid1.toString(16))\n\tvar upmsg = data[3]\n\t\tif (upmsg == 0x02)\n\t\t    upmsg ='设备事件上报'\n\tvar node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar upmsgs = data[21]\n\t\tupmsgs = value[upmsgs]\n\tvar door = data[22]\n\t\tif (door == 0)\n\t\t  door = '关'\n\t\telse\n\t\t  door = '开'\n\tvar bat = data[23]/10\n\tvar csq = data[24]\n\tvar temp = data[25]+(data[26]*0.01)\n\tvar hum = data[27]+(data[28]*0.01)\n\tvar data1 = {payload:'设备编号：'+nodeid+'\\n'+'版本：'+v1+\"\\n\"+\"上报类型：\"+upmsg+\"\\n\"+\"节点类型：\"+node+\"\\n\"+\"上报数据类型：\"+upmsgs+\"\\n\"+\"门状态：\"+door+\"\\n\"+\"电压：\"+bat+\"V\"+\"\\n\"+\n\t\"信号：\"+csq+\"\\n\"+\"温度：\"+temp+'℃'+'\\n'+'湿度'+hum+'%'}\n\treturn data1;\n}\nelse{\n    var v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var upmsg = data[3]\n\t\tif (upmsg == 0x01)\n\t\t    upmsg ='注册上报'\n    var node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar data2 =data.toString()//buuffer转字符串\n    var nodeid = data2.substring(6,21)\n    var imsi = data2.substring(21,36)\n    var iccid = data2.substring(36,56)\n    var bat = data[56]/10\n    var csq = data[57]\n    var data1 = {payload:'设备编号：'+nodeid+'\\n'+'IMSI:'+imsi+'\\n'+'ICCID:'+iccid+'\\n'+'版本：'+v1+\"\\n\"+\"上报类型：\"+upmsg+\"\\n\"+\"节点类型：\"+node+\"\\n\"+\"电压：\"+bat+\"V\"+\"\\n\"+\n\t\"信号：\"+csq}\n\treturn data1;\n    \n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 300,
+        "wires": [
+            [
+                "566f852111c9aab7"
+            ]
+        ]
+    },
+    {
+        "id": "566f852111c9aab7",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "中文",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e56d5dda91cee3e5",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 370,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "f081a51a2966d85e",
+        "type": "function",
+        "z": "da0cbe19fce3553e",
+        "name": "中文版",
+        "func": "var data = msg.payload\nif (data.length==32){\n\tvar value = {1:\"心跳\",2:\"报警\",3:\"报警恢复\",4:\"防拆报警\",5:\"防拆报警恢复\",6:\"低电压\",7:\"低电压恢复\"}\n\tvar v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var data2 =data.toString()\n    var nodeid = data2.substring(6,21)\n    //var nodeid = String.fromCharCode(nodeid1.toString(16))\n\tvar upmsg = data[3]\n\t\tif (upmsg == 0x02)\n\t\t    upmsg ='设备事件上报'\n\tvar node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar upmsgs = data[21]\n\t\tupmsgs = value[upmsgs]\n\tvar door = data[22]\n\t\tif (door == 0)\n\t\t  door = '关'\n\t\telse\n\t\t  door = '开'\n\tvar bat = data[23]/10\n\tvar csq = data[24]\n\tvar temp = data[25]+(data[26]*0.01)\n\tvar hum = data[27]+(data[28]*0.01)\n\tvar data1 = {payload:'设备编号：'+nodeid+'\\n'+'版本：'+v1+\"\\n\"+\"上报类型：\"+upmsg+\"\\n\"+\"节点类型：\"+node+\"\\n\"+\"上报数据类型：\"+upmsgs+\"\\n\"+\"门状态：\"+door+\"\\n\"+\"电压：\"+bat+\"V\"+\"\\n\"+\n\t\"信号：\"+csq+\"\\n\"+\"温度：\"+temp+'℃'+'\\n'+'湿度'+hum+'%'}\n\treturn data1;\n}\nelse{\n    var v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var upmsg = data[3]\n\t\tif (upmsg == 0x01)\n\t\t    upmsg ='注册上报'\n    var node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar data2 =data.toString()//buuffer转字符串\n    var nodeid = data2.substring(6,21)\n    var imsi = data2.substring(21,36)\n    var iccid = data2.substring(36,56)\n    var bat = data[56]/10\n    var csq = data[57]\n    var data1 = {payload:'设备编号：'+nodeid+'\\n'+'IMSI:'+imsi+'\\n'+'ICCID:'+iccid+'\\n'+'版本：'+v1+\"\\n\"+\"上报类型：\"+upmsg+\"\\n\"+\"节点类型：\"+node+\"\\n\"+\"电压：\"+bat+\"V\"+\"\\n\"+\n\t\"信号：\"+csq}\n\treturn data1;\n    \n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 140,
+        "wires": [
+            [
+                "726cb4dce33fed4d"
+            ]
+        ]
+    },
+    {
+        "id": "726cb4dce33fed4d",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "中文",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "9a0f50861efcabe0",
+        "type": "function",
+        "z": "da0cbe19fce3553e",
+        "name": "英文版",
+        "func": "var data = msg.payload\nif (data.length==32){\n\tvar value = {1:\"TDC\",2:\"Alarm\",3:\"Remove alarm\",4:\"Dismantling alarm\",5:\"Demove demolition alarm\",6:\"Low voltage\",7:\"Remove low voltage\"}\n\tvar v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var data2 =data.toString()\n    var nodeid = data2.substring(6,21)\n    //var nodeid = String.fromCharCode(nodeid1.toString(16))\n\tvar upmsg = data[3]\n\t\tif (upmsg == 0x02)\n\t\t    upmsg ='Devices upload'\n\tvar node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar upmsgs = data[21]\n\t\tupmsgs = value[upmsgs]\n\tvar door = data[22]\n\t\tif (door == 0)\n\t\t  door = 'close'\n\t\telse\n\t\t  door = 'open'\n\tvar bat = data[23]/10\n\tvar csq = data[24]\n\tvar temp = data[25]+(data[26]*0.01)\n\tvar hum = data[27]+(data[28]*0.01)\n\tvar data1 = {payload:'Device ID：'+nodeid+'\\n'+'Version：'+v1+\"\\n\"+\"Data type：\"+upmsg+\"\\n\"+\"Device type：\"+node+\"\\n\"+\"Event type：\"+upmsgs+\"\\n\"+\"Door magnetic state：\"+door+\"\\n\"+\"BAT：\"+bat+\"V\"+\"\\n\"+\n\t\"Signal：\"+csq+\"\\n\"+\"Temp：\"+temp+'℃'+'\\n'+'Hum'+hum+'%'}\n\treturn data1;\n}\nelse{\n    var v1 = data[2]\n\t\tif (v1 ==0x10);\n\t\t    v1 = 'V1.0'\n    var upmsg = data[3]\n\t\tif (upmsg == 0x01)\n\t\t    upmsg ='Devices registration package'\n    var node = data[5]\n\t\tif (node == 0x01)\n\t        node = \"NDS01\"\n\tvar data2 =data.toString()//buuffer转字符串\n    var nodeid = data2.substring(6,21)\n    var imsi = data2.substring(21,36)\n    var iccid = data2.substring(36,56)\n    var bat = data[56]/10\n    var csq = data[57]\n    var data1 = {payload:'Device ID：'+nodeid+'\\n'+'IMSI:'+imsi+'\\n'+'ICCID:'+iccid+'\\n'+'Version：'+v1+\"\\n\"+\"Data type：\"+upmsg+\"\\n\"+\"Device type：\"+node+\"\\n\"+\"BAT：\"+bat+\"V\"+\"\\n\"+\n\t\"Signal：\"+csq}\n\treturn data1;\n    \n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 360,
+        "wires": [
+            [
+                "63e29baa72f4dfa4"
+            ]
+        ]
+    },
+    {
+        "id": "63e29baa72f4dfa4",
+        "type": "debug",
+        "z": "da0cbe19fce3553e",
+        "name": "English",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 360,
+        "wires": []
+    }
+]
