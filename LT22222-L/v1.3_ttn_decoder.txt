@@ -1,0 +1,43 @@
+function Decoder(bytes, port) {
+// Decode an uplink message from a buffer
+// (array) of bytes to an object of fields.
+var value=bytes[0]<<8 | bytes[1];
+if(bytes[0] & 0x80)
+{value |= 0xFFFF0000;}
+var ACI1=(value/1000).toFixed(3); //ACI1 Current,units:mA
+value=bytes[2]<<8 | bytes[3];
+if(bytes[2] & 0x80)
+{value |= 0xFFFF0000;}
+var ACI2=(value/1000).toFixed(3); // ACI2 Current,units:mA
+value=bytes[4]<<8 | bytes[5];
+if(bytes[4] & 0x80)
+{value |= 0xFFFF0000;}
+var AVI1=(value/1000).toFixed(3); // AVI1 voltage,units:V
+value=bytes[6]<<8 | bytes[7];
+if(bytes[6] & 0x80)
+{value |= 0xFFFF0000;}
+var AVI2=(value/1000).toFixed(3); // AVI2 voltage,units:V
+value=bytes[8]
+var DO1=(value&0x01)? "L":"H"; //DO1，Digital Output Status
+var DO2=(value&0x02)? "L":"H"; //DO2，Digital Output Status
+var DO3=(value&0x04)? "L":"H"; //DO3，Digital Output Status
+var DI1=(value&0x08)? "H":"L"; //DI1，Digital Input Status
+var DI2=(value&0x10)? "H":"L"; //DI2，Digital Input Status
+var DI3=(value&0x20)? "H":"L"; //DI3，Digital Input Status
+var RO2=(value&0x40)? "ON":"OFF"; //RO2，Relay Status
+var RO1=(value&0x80)? "ON":"OFF"; //RO1，Relay Status
+return {
+ACI1_mA:ACI1,
+ACI2_mA:ACI2,
+AVI1_V:AVI1,
+AVI2_V:AVI2,
+DO1_status:DO1,
+DO2_status:DO2,
+DO3_status:DO3,
+DI1_status:DI1,
+DI2_status:DI2,
+DI3_status:DI3,
+RO1_status:RO1,
+RO2_status:RO2,
+};
+}

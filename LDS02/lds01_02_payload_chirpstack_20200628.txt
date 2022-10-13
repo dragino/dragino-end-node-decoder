@@ -1,0 +1,93 @@
+function Decode(fPort, bytes) {
+
+//Payload Formats of LDS01 Deceive
+
+var data = {  
+
+         MOD: 
+
+         { 
+
+        "1":"Door sensor",
+
+      "2":"Water leak sensor",
+
+         }[bytes[2]&0xFF],
+
+ 
+
+         BAT_V:
+
+         {
+
+      "1":((bytes[0]<<8 | bytes[1])&0x3FFF)/1000,
+
+      "2":((bytes[0]<<8 | bytes[1])&0x3FFF)/1000,  
+
+         }[bytes[2]&0xFF],
+
+  
+
+         DOOR_OPEN_STATUS:
+
+         {
+
+      "1":(bytes[0]&0x80?1:0),
+
+         }[bytes[2]&0xFF],
+
+ 
+
+         DOOR_OPEN_TIMES:
+
+         {
+
+      "1":(bytes[3]<<16 | bytes[4]<<8 | bytes[5]),
+
+         }[bytes[2]&0xFF],
+
+ 
+
+         LAST_DOOR_OPEN_DURATION:
+
+         {
+
+      "1":( bytes[6]<<16 | bytes[7]<<8 | bytes[8]),
+
+         }[bytes[2]&0xFF],
+
+ 
+
+         WATER_LEAK_STATUS:
+
+         {
+
+      "2":bytes[0]&0x40?1:0,
+
+    }[bytes[2]&0xFF],
+
+ 
+
+         WATER_LEAK_TIMES:
+
+         {
+
+      "2":(bytes[3]<<16 | bytes[4]<<8 | bytes[5]),
+
+         }[bytes[2]&0xFF],
+
+ 
+
+         LAST_WATER_LEAK_DURATION:
+
+         {
+
+           "2":( bytes[6]<<16 | bytes[7]<<8 | bytes[8]),
+
+         }[bytes[2]&0xFF],  
+
+};
+
+         return data;
+
+}

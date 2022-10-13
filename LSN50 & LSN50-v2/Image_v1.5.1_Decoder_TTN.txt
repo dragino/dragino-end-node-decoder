@@ -1,0 +1,61 @@
+function Decoder(bytes, port) {
+// Decode an uplink message from a buffer
+// (array) of bytes to an object of fields.
+var value=bytes[0]<<8 | bytes[1];
+var batV=value/1000;//Battery,units:V
+value=bytes[2]<<8 | bytes[3];
+if(bytes[2] & 0x80)
+{value |= 0xFFFF0000;}
+var tempc=(value/10).toFixed(2);//DS18B20,PB3,units:℃
+var adc_ch0=(bytes[4]<<8 | bytes[5])/1000;//PA0,ADC Channel 0,units:V
+if(bytes[6] & 0x08)
+{
+var mod3="3ADC"; //work mode
+}
+else if(bytes[6] & 0x04)
+{
+var mod2="ULT"; //work mode
+}
+else if(!(bytes[6] & 0x04))
+{
+var mod1="IIC"; //work mode
+}
+var digital_IS=(bytes[6] & 0x02)? "H":"L";//PA12，Digital Input Status
+var exti_trigger=(bytes[6] & 0x01)? "TRUE":"FALSE";//PB14,GPIO_MODE_IT_FALLING
+var switch_=(bytes[6] & 0x80)? "CLOSE":"OPEN";//PB14,GPIO_MODE_IT_FALLING
+if(mod3=="3ADC")
+{
+var adc_ch1=(bytes[7]<<8 | bytes[8])/1000;//PA1,ADC Channel 1,units:V
+var adc_ch4=(bytes[9]<<8 | bytes[10])/1000;//PA4,ADC Channel 4,units:V
+}
+else if(mod2=="ULT")
+{
+value=bytes[7]<<8 | bytes[8];
+var ult=(value/10); //ultrasonic,units:cm
+}
+else if(mod1=="IIC")
+{
+value=bytes[7]<<8 | bytes[8];
+if(bytes[7] & 0x80)
+{value |= 0xFFFF0000;}
+var temp_SHT=(value/10).toFixed(2);//SHT20,temperature,units:℃
+value=bytes[9]<<8 | bytes[10];
+var hum_SHT=(value/10).toFixed(1);//SHT20,Humidity,units:%
+}
+return {
+BatV:batV,
+TempC:tempc,
+ADC_CH0V:adc_ch0,
+ADC_CH1V:adc_ch1,
+ADC_CH4V:adc_ch4,
+Digital_IStatus:digital_IS,
+EXTI_Trigger:exti_trigger,
+Door_status:switch_,
+MOD1:mod1,
+MOD2:mod2,
+MOD3:mod3,
+Ultrasonic:ult,
+TempC_SHT:temp_SHT,
+Hum_SHT:hum_SHT
+};
+}

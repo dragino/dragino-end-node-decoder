@@ -1,0 +1,22 @@
+function Decode(fPort, bytes)  {
+    // Decode an uplink message from a buffer
+    // (array) of bytes to an object of fields.
+    return{
+    //ACI1 Current,units:mA  
+    ACI1_mA:((bytes[0]<<24>>16 | bytes[1])/1000).toFixed(3),  
+    // ACI2 Current,units:mA 
+    ACI2_mA:((bytes[2]<<24>>16 | bytes[3])/1000).toFixed(3),
+    // AVI1 voltage,units:V
+    AVI1_V:((bytes[4]<<24>>16 | bytes[5])/1000).toFixed(3),
+    // AVI2 voltage,units:V
+    AVI2_V:((bytes[6]<<24>>16 | bytes[7])/1000).toFixed(3),
+    DO1_status:(bytes[8]&0x01)? "L":"H", //DO1，Digital Output Status
+    DO2_status:(bytes[8]&0x02)? "L":"H", //DO2，Digital Output Status
+    DO3_status:(bytes[8]&0x04)? "L":"H", //DO3，Digital Output Status
+    DI1_status:(bytes[8]&0x08)? "H":"L", //DI1，Digital Input Status
+    DI2_status:(bytes[8]&0x10)? "H":"L", //DI2，Digital Input Status
+    DI3_status:(bytes[8]&0x20)? "H":"L", //DI3，Digital Input Status
+    RO1_status:(bytes[8]&0x40)? "ON":"OFF", //RO2，Relay Status
+    RO2_status:(bytes[8]&0x80)? "ON":"OFF", //RO1，Relay Status
+    };
+}

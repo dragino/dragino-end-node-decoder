@@ -1,0 +1,148 @@
+function Decode(fPort, bytes) {
+//Payload Formats of LT33222 or LT22222 Deceive
+  var data = {
+    "Hardware_mode":
+    {
+      "0":"LT33222",
+      "1":"LT22222",
+    }[(bytes[10] & 0xC0)>>6],
+  
+//Work mode
+    "Work_mode":
+    {
+      "1":"2ACI+2AVI",
+      "2":"Count mode 1",
+      "3":"2ACI+1Count",
+      "4":"Count mode 2",
+      "5":"1ACI+2AVI+1Count ",
+}[bytes[10] & 0x3f],
+
+// AVI1 voltage,units:V
+    "AVI1_V":
+    {
+      "1": ((bytes[0]<<24>>16 | bytes[1])/1000).toFixed(3),
+      "5": ((bytes[0]<<24>>16 | bytes[1])/1000).toFixed(3),
+    }[bytes[10] & 0x3f],
+
+// AVI2 voltage,units:V
+   "AVI2_V":
+    {
+      "1": ((bytes[2]<<24>>16 | bytes[3])/1000).toFixed(3),
+      "5": ((bytes[2]<<24>>16 | bytes[3])/1000).toFixed(3),
+    }[bytes[10] & 0x3f],
+
+//ACI1 Current,units:mA
+    "ACI1_mA":
+    {
+      "1": ((bytes[4]<<24>>16 | bytes[5])/1000).toFixed(3),
+      "3": ((bytes[4]<<24>>16 | bytes[5])/1000).toFixed(3),
+      "5": ((bytes[4]<<24>>16 | bytes[5])/1000).toFixed(3),
+    }[bytes[10] & 0x3f],
+
+// ACI2 Current,units:mA
+    "ACI2_mA":
+    {
+      "1": ((bytes[6]<<24>>16 | bytes[7])/1000).toFixed(3),
+      "3": ((bytes[6]<<24>>16 | bytes[7])/1000).toFixed(3),
+    }[bytes[10] & 0x3f],
+    
+// Count1,units:times;
+    "Count1_times":
+    {
+      "2": ( bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]),
+      "3": ( bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]),
+      "4": ( bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]),
+      "5":( bytes[6]<<8 | bytes[7]),
+    }[bytes[10] & 0x3f],
+
+// Count2,units:times;
+    "Count2_times":
+    {
+      "2": ( bytes[4]<<24 | bytes[5]<<16 | bytes[6]<<8 | bytes[7]),
+    }[bytes[10] & 0x3f],
+
+// ACount,units:times;
+    "Acount_times":
+    {
+      "4":( bytes[4]<<24 | bytes[5]<<16 | bytes[6]<<8 | bytes[7]),
+    }[bytes[10] & 0x3f],
+
+//First，First payload for join network
+    "First_status":
+    {
+      "2":( bytes[8] &0x20)? "Yes":"No",
+      "3":( bytes[8] &0x20)? "Yes":"No",
+      "4":( bytes[8] &0x20)? "Yes":"No",
+      "5":( bytes[8] &0x20)? "Yes":"No",
+    }[bytes[10] & 0x3f],
+
+//DO1，Digital Output Status
+    "DO1_status":
+    {
+      "1":( bytes[8] &0x01)? "L":"H",
+      "2":( bytes[8] &0x01)? "L":"H",
+      "3":( bytes[8] &0x01)? "L":"H",
+      "4":( bytes[8] &0x01)? "L":"H",
+      "5":( bytes[8] &0x01)? "L":"H",
+    }[bytes[10] & 0x3f],
+
+//DO2，Digital Output Status
+    "DO2_status":
+    {
+      "1":( bytes[8] &0x02)? "L":"H",
+      "2":( bytes[8] &0x02)? "L":"H",
+      "3":( bytes[8] &0x02)? "L":"H",
+      "4":( bytes[8] &0x02)? "L":"H",
+      "5":( bytes[8] &0x02)? "L":"H",
+    }[bytes[10] & 0x3f],
+
+//DO3，Digital Output Status
+    "DO3_status":
+    {
+      "1":( bytes[8] &0x04)? "L":"H",
+      "2":( bytes[8] &0x04)? "L":"H",
+      "3":( bytes[8] &0x04)? "L":"H",
+      "4":( bytes[8] &0x04)? "L":"H",
+      "5":( bytes[8] &0x04)? "L":"H",
+    }[bytes[10] & 0xff],
+
+//DI1，Digital Input Status
+    "DI1_status":
+    {
+      "1":( bytes[8] &0x08)? "H":"L",
+    }[bytes[10] & 0x3f],
+
+//DI2，Digital Input Status
+    "DI2_status":
+    {
+      "1":( bytes[8] &0x10)? "H":"L",
+    }[bytes[10] & 0x3f],
+
+//DI3，Digital Input Status
+   "DI3_status":
+    {
+      "1": ( bytes[8] &0x20)? "H":"L",
+    }[bytes[10] & 0xff],
+
+//RO1，Relay Status
+    "RO1_status":
+    {
+      "1":( bytes[8] &0x80)? "ON":"OFF",
+      "2":( bytes[8] &0x80)? "ON":"OFF",
+      "3":( bytes[8] &0x80)? "ON":"OFF",
+      "4":( bytes[8] &0x80)? "ON":"OFF",
+      "5":( bytes[8] &0x80)? "ON":"OFF",      
+    }[bytes[10] & 0x3f],
+
+//RO2，Relay Status
+    "RO2_status":
+    {
+      "1":( bytes[8] &0x40)? "ON":"OFF",
+      "2":( bytes[8] &0x40)? "ON":"OFF",
+      "3":( bytes[8] &0x40)? "ON":"OFF",
+      "4":( bytes[8] &0x40)? "ON":"OFF",
+      "5":( bytes[8] &0x40)? "ON":"OFF",
+    }[bytes[10] & 0x3f],
+  };
+  return data;
+}
