@@ -105,7 +105,7 @@ if((port==3)&(bytes[2]==(0x01))|(bytes[2]==(0x02))){
 	else{
 		decode.sensor="tmp117"
 	}
-	for (var i=0;i<data1.length;i++){//循环解析数组获取数据
+	for (var i=0;i<data1.length;i++){
     var temp=(parseInt(bytes1+data1[i].substring(0,4)))/100+"℃"
     array1[i]=temp
  }
