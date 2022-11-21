@@ -98,7 +98,7 @@ if((port==3)&(bytes[2]==(0x01))|(bytes[2]==(0x02))){
 	var new_set = new Set(rs)
 	var new_arr = [...new_set]
 	var data1=new_arr
-	decode.bat=parseInt(bytes1+str2.substring(0,4)& 0x3FFF)+"mv"
+	decode.bat=parseInt(bytes1+str2.substring(0,4)& 0x3FFF)
 	if (parseInt(bytes1+str2.substring(4,))==1){
 		decode.sensor="ds18b20"
 	}
@@ -106,7 +106,7 @@ if((port==3)&(bytes[2]==(0x01))|(bytes[2]==(0x02))){
 		decode.sensor="tmp117"
 	}
 	for (var i=0;i<data1.length;i++){
-    var temp=(parseInt(bytes1+data1[i].substring(0,4)))/100+"℃"
+    var temp=(parseInt(bytes1+data1[i].substring(0,4)))/100
     array1[i]=temp
  }
 	decode.Temp=array1
