@@ -26,10 +26,10 @@ function Decoder(bytes, port) {
 	var i_flag = bytes[10]&0x0F;
   return {
        Bat:batV +" V",
-       TempC_DS18B20:temp_DS18B20+" °C",
-       water_SOIL:water_SOIL+" %",
-       temp_SOIL:temp_SOIL+" °C",
-       conduct_SOIL:conduct_SOIL+" uS/cm",
+       TempC_DS18B20:temp_DS18B20,
+       water_SOIL:water_SOIL,
+       temp_SOIL:temp_SOIL,
+       conduct_SOIL:conduct_SOIL",
 	   Sensor_flag:s_flag,
 	   Interrupt_flag:i_flag
   };
