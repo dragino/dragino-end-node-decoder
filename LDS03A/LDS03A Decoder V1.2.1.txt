@@ -44,6 +44,7 @@ return{
 DATALOG:data_sum
 };
 }
+}
 elseif(port==0x04)
 {
 vartdc=bytes[0]<<16|bytes[1]<<8|bytes[2];
