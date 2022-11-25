@@ -22,8 +22,8 @@ function Decoder(bytes, port) {
 	var i_flag = bytes[8];
 	var mes_type = bytes[10];
   return {
-       Bat:batV +" V",
-       TempC_DS18B20:temp_DS18B20+" °C",
+       Bat:batV,
+       TempC_DS18B20:temp_DS18B20,
        PH1_SOIL:PH1,
        TEMP_SOIL:temp,
 	   Interrupt_flag:i_flag,
