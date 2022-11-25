@@ -5,7 +5,7 @@ function Decoder(bytes, port) {
   var batV=value/1000;//Battery,units:V
    
   value=bytes[2]<<8 | bytes[3];
-  var distance=(value)+" mm";//distance,units:mm
+  var distance=(value);//distance,units:mm
 
   var i_flag = bytes[4]; 
   
