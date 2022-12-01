@@ -1,3 +1,12 @@
+function Str1(str2){
+  var str3 ="";
+  for (var i=0;i<str2.length;i++){
+    if (str2[i]<=0x0f){
+     str2[i]="0"+str2[i].toString(16)+"";
+    }
+  str3+= str2[i].toString(16)+"";}
+  return str3;
+}
 function str_pad(byte){
     var zero = '00';
     var hex= byte.toString(16);    
@@ -76,6 +85,35 @@ var Ext= bytes[6]&0x0F;
 var poll_message_status=((bytes[6]>>7)&0x01);
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
+if((port==3)&(bytes[2]==(0x01))|(bytes[2]==(0x02))){
+	var array1=[]
+	var bytes1="0x"
+	var str1=Str1(bytes)
+	var str2=str1.substring(0,6)
+	var str3=str1.substring(6,)
+  var reg=/.{4}/g;
+	var rs=str3.match(reg);
+	rs.push(str3.substring(rs.join('').length));
+	rs.pop()
+	var new_set = new Set(rs)
+	var new_arr = [...new_set]
+	var data1=new_arr
+	decode.bat=parseInt(bytes1+str2.substring(0,4)& 0x3FFF)
+	if (parseInt(bytes1+str2.substring(4,))==1){
+		decode.sensor="ds18b20"
+	}
+	else{
+		decode.sensor="tmp117"
+	}
+	for (var i=0;i<data1.length;i++){
+    var temp=(parseInt(bytes1+data1[i].substring(0,4)))/100
+    array1[i]=temp
+ }
+	decode.Temp=array1
+	{
+    return decode;
+  }
+ }	
  switch (poll_message_status) {		
 case 0:	
 { 
@@ -172,7 +210,6 @@ case 1:
 return decode;
 }
  break;
-
 default:
     return {
       errors: ["unknown"]
