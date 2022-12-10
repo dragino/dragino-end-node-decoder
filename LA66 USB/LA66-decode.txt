@@ -1,0 +1,29 @@
+function add0(m){return m<10?'0'+m:m }
+function format(shijianchuo){
+//shijianchuo是整数，否则要parseInt转换
+  var time = new Date(shijianchuo);
+  var y = time.getFullYear();
+  var m = time.getMonth()+1;
+  var d = time.getDate();
+  var h = time.getHours();
+  var mm = time.getMinutes();
+  var s = time.getSeconds();
+  return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+}
+
+function Decoder(bytes) {
+  var data={};
+  if (bytes.length==12){
+    data.latitude=parseFloat(((bytes[0]<<24|bytes[1]<<16|bytes[2]<<8|bytes[3])/1000000).toFixed(6));
+    data.longitude=parseFloat(((bytes[4]<<24|bytes[5]<<16|bytes[6]<<8|bytes[7])/1000000).toFixed(6));
+    timestamp1=bytes[8]<<24|bytes[9]<<16|bytes[10]<<8|bytes[11];
+    data.timestamp=timestamp1;
+    data.beijintime=format((timestamp1+28800)*1000);
+    return data;
+  }
+  else if(bytes.length==8){
+    data.latitude=parseFloat(((bytes[0]<<24|bytes[1]<<16|bytes[2]<<8|bytes[3])/1000000).toFixed(6));
+    data.longitude=parseFloat(((bytes[4]<<24|bytes[5]<<16|bytes[6]<<8|bytes[7])/1000000).toFixed(6));
+    return data;
+  }
+}
