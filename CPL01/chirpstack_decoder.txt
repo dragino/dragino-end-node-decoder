@@ -36,7 +36,7 @@ function getMyDate(str){
 }
  
 function Decode(fPort, bytes, variables) {
-  if(port==0x02)
+  if(fPort==0x02)
   {
     var alarm=(bytes[0]&0x02)?"TRUE":"FALSE";
     var pin_status=(bytes[0]&0x01)?"DISCONNECT":"CONNECT"; 
@@ -57,7 +57,7 @@ function Decode(fPort, bytes, variables) {
       }
     }
   }
-  else if(port==0x03)
+  else if(fPort==0x03)
   {
     for(var i=0;i<bytes.length;i=i+11)
     {
@@ -71,7 +71,7 @@ function Decode(fPort, bytes, variables) {
     DATALOG:data_sum
     }
   }
-  else if(port==0x04)
+  else if(fPort==0x04)
   {
     var tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
     var disalarm= bytes[3]&0x01;
@@ -87,7 +87,7 @@ function Decode(fPort, bytes, variables) {
     TRIGGER_MODE:trigger_mode
     }
   }
-  else if(port==0x05)
+  else if(fPort==0x05)
   {
     var sub_band;
     var freq_band;
