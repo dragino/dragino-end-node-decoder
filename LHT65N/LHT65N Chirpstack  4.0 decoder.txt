@@ -79,7 +79,7 @@ function getMyDate(str){
 
 function Decode(fPort, bytes, variables) {
 var Ext= bytes[6]&0x0F;
-var poll_message_status=((bytes[6]>>7)&0x01);
+var poll_message_status=((bytes[6]>>6)&0x01);
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
  switch (poll_message_status) {		
