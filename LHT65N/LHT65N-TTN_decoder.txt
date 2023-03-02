@@ -189,7 +189,7 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
-  if(bytes.length==11)
+  if((bytes.length==11)|(bytes.length==7))
   {
     return decode;
   }
