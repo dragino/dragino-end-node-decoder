@@ -1,0 +1,527 @@
+[
+    {
+        "id": "98705e908273ac60",
+        "type": "tab",
+        "label": "地图",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "62dd6b6618f09119",
+        "type": "sqlite",
+        "z": "98705e908273ac60",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "地图",
+        "x": 370,
+        "y": 220,
+        "wires": [
+            [
+                "b8acfec776b3405d"
+            ]
+        ]
+    },
+    {
+        "id": "6775b8f08b125051",
+        "type": "inject",
+        "z": "98705e908273ac60",
+        "name": "创建表",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE dingwei( name  INTEGER PRIMARY KEY AUTOINCREMENT    NOT NULL, lat    FLOAT NOT NULL, lon   FLOAT  NOT NULL,date TEXT NOT NULL);",
+        "x": 170,
+        "y": 220,
+        "wires": [
+            [
+                "62dd6b6618f09119"
+            ]
+        ]
+    },
+    {
+        "id": "5cb157c21f3f74c2",
+        "type": "mqtt in",
+        "z": "98705e908273ac60",
+        "name": "",
+        "topic": "v3/litest@ttn/devices/eu868solarenergy/up",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "46cfd5ab6b0be910",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 280,
+        "y": 100,
+        "wires": [
+            [
+                "fd0b195ce9fd3731",
+                "cdcc72c5a53b8d2c",
+                "e7081a28fe0570d4"
+            ]
+        ]
+    },
+    {
+        "id": "fd0b195ce9fd3731",
+        "type": "function",
+        "z": "98705e908273ac60",
+        "name": "",
+        "func": "var data = msg.payload\nvar data1 = data[\"uplink_message\"][\"decoded_payload\"]\nvar date = new Date()\nvar d = date.toLocaleString('chinese',{hour12:false})\nvar lat = data[\"uplink_message\"][\"decoded_payload\"][\"Latitude\"]\nvar lon = data[\"uplink_message\"][\"decoded_payload\"][\"Longitud\"]\nvar time = data[\"uplink_message\"][\"decoded_payload\"][\"Time\"]\nif (\"Time\" in data1){\nmsg.topic = \"INSERT INTO dingwei VALUES ( NULL\"+\",\"+lat+\",\"+ lon+\",\"+'\"'+time+'\"'+\")\";\nreturn msg;\n}\nif ((\"ALARM_status\" in data1) && (\"Latitude\" in data1)) {\nmsg.topic = \"INSERT INTO dingwei VALUES ( NULL\"+\",\"+lat+\",\"+ lon+\",\"+'\"'+d+'\"'+\")\"; \nreturn msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 120,
+        "wires": [
+            [
+                "62dd6b6618f09119"
+            ]
+        ]
+    },
+    {
+        "id": "b8acfec776b3405d",
+        "type": "delay",
+        "z": "98705e908273ac60",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "4e54f9e28f07d699"
+            ]
+        ]
+    },
+    {
+        "id": "4e54f9e28f07d699",
+        "type": "function",
+        "z": "98705e908273ac60",
+        "name": "",
+        "func": "msg.topic='SELECT * FROM dingwei;'\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 260,
+        "wires": [
+            [
+                "b02c814e25623e9a"
+            ]
+        ]
+    },
+    {
+        "id": "b02c814e25623e9a",
+        "type": "sqlite",
+        "z": "98705e908273ac60",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 950,
+        "y": 260,
+        "wires": [
+            [
+                "12b3e17ce92a12c3",
+                "dc30c9f3d11e25e7"
+            ]
+        ]
+    },
+    {
+        "id": "07c6d269b05e2019",
+        "type": "inject",
+        "z": "98705e908273ac60",
+        "name": "更新数据 测试",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "INSERT INTO dingwei VALUES (NULL,22.702188,114.222788,\"2022/09/22, 17:50:50\");",
+        "x": 170,
+        "y": 360,
+        "wires": [
+            [
+                "62dd6b6618f09119"
+            ]
+        ]
+    },
+    {
+        "id": "293687c3c66af5f1",
+        "type": "inject",
+        "z": "98705e908273ac60",
+        "name": "删除表",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE dingwei;",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "62dd6b6618f09119"
+            ]
+        ]
+    },
+    {
+        "id": "6d66d2e89ecdbb18",
+        "type": "inject",
+        "z": "98705e908273ac60",
+        "name": "点击直接获取所有数据",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 580,
+        "y": 420,
+        "wires": [
+            [
+                "4e54f9e28f07d699"
+            ]
+        ]
+    },
+    {
+        "id": "cdcc72c5a53b8d2c",
+        "type": "function",
+        "z": "98705e908273ac60",
+        "name": "",
+        "func": "var a = msg.payload[\"uplink_message\"]\nw = a[\"decoded_payload\"]\nw1 = w[\"BatV\"]\nw2 = w[\"Hum\"]\nw3 = w[\"Tem\"]\na1 ={payload:w1},a2 ={payload:w2},a3 ={payload:w3}\nreturn [a1,a2,a3];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 80,
+        "wires": [
+            [
+                "3adfea72a83be60e"
+            ],
+            [
+                "610e56075796137b"
+            ],
+            [
+                "6682f12ba189f756"
+            ]
+        ]
+    },
+    {
+        "id": "3adfea72a83be60e",
+        "type": "ui_chart",
+        "z": "98705e908273ac60",
+        "name": "",
+        "group": "13c77d9193594312",
+        "order": 0,
+        "width": "15",
+        "height": "7",
+        "label": "bat",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1010,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e7081a28fe0570d4",
+        "type": "debug",
+        "z": "98705e908273ac60",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "12b3e17ce92a12c3",
+        "type": "debug",
+        "z": "98705e908273ac60",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "610e56075796137b",
+        "type": "ui_chart",
+        "z": "98705e908273ac60",
+        "name": "",
+        "group": "cc0964dba53b2b41",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "hum",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1010,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6682f12ba189f756",
+        "type": "ui_chart",
+        "z": "98705e908273ac60",
+        "name": "",
+        "group": "8de273f4c787293c",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "tem",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1010,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc30c9f3d11e25e7",
+        "type": "worldmap",
+        "z": "98705e908273ac60",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showgrid": "false",
+        "showruler": "false",
+        "allowFileDrop": "false",
+        "path": "/ditu",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,NatGeo,UKOS,OpTop,AN",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1150,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "d7ab97b4130894e3",
+        "type": "sqlitedb",
+        "db": "/root/test.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "46cfd5ab6b0be910",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "13c77d9193594312",
+        "type": "ui_group",
+        "name": "bat",
+        "tab": "160159999b508acd",
+        "order": 2,
+        "disp": true,
+        "width": "15",
+        "collapse": false,
+        "className": "运动检测"
+    },
+    {
+        "id": "cc0964dba53b2b41",
+        "type": "ui_group",
+        "name": "hum",
+        "tab": "160159999b508acd",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8de273f4c787293c",
+        "type": "ui_group",
+        "name": "tem",
+        "tab": "160159999b508acd",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "160159999b508acd",
+        "type": "ui_tab",
+        "name": "地图1",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
