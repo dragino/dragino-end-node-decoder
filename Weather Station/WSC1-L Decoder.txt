@@ -9,13 +9,13 @@ function Decoder(bytes, port) {
 	  var dic = {};
 	  var sensor	  =["bat","wind_speed","wind_direction_angle","illumination",
 					  "rain_snow","CO2","TEM","HUM","pressure",
-					  "rain_gauge","PM2_5","PM10","PAR","TSR"];
+					  "rain_gauge","PM2_5","PM10","PAR","TSR","SHT31_TEM","SHT31_HUM"];
 	  var sensor_diy=["A1","A2","A3","A4"];
 	  //4~7:0->/,1->*,2->NULL
 	  //3~0:count
 	  var algorithm =[0x03,0x01,0x01,0x11,
 					  0x20,0x20,0x01,0x01,0x01,
-					  0x01,0x20,0x20,0x20,0x01];
+					  0x01,0x20,0x20,0x20,0x01,0x0A,0x0A];
 	  for(i=0;i<bytes.length;)
 	  {
 		  var len=bytes[i+1];
@@ -27,7 +27,7 @@ function Decoder(bytes, port) {
 			  
 			  if(operation===0)
 			 {
-				  if(sensor_type === 0x06)	//TEM
+				   if(sensor_type === 0x06 || sensor_type === 0x0E)	//TEM
 				  {
 					  if(bytes[i+2] & 0x80)
 						  dic[sensor[sensor_type]] = (((bytes[i+2]<<8)|bytes[i+3])-0xFFFF)/(count*10.0);	//<0
