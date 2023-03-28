@@ -1,0 +1,16 @@
+function Decode(fPort, bytes, variables) {
+   var decode = {}; 
+   var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
+   decode.BatV= value/1000;
+   decode.EXTI_Trigger=(bytes[0] & 0x80)? "TRUE":"FALSE";
+   decode.distance1_cm=(bytes[2]<<8 | bytes[3])/10;
+   decode.distance2_cm=(bytes[4]<<8 | bytes[5])/10;
+   decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10
+   decode.distance4_cm=(bytes[8]<<8 | bytes[9])/10;
+   decode.mes_type= bytes[10];
+
+   if(!((bytes[0]==0x03)&&(bytes[10]==0x02)))
+   {
+     return decode;
+   }
+}
