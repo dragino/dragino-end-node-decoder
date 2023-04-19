@@ -90,7 +90,7 @@ function Str1(str2){
   
   function Decoder(bytes, port) {
   var Ext= bytes[6]&0x0F;
-  var poll_message_status=((bytes[6]>>7)&0x01);
+  var poll_message_status=((bytes[6]>>6)&0x01);
   var Connect=(bytes[6]&0x80)>>7;
   var decode = {};
   if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03))){
