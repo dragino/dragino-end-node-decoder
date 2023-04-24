@@ -92,6 +92,9 @@ function Decoder(bytes, port) {
 					}        
 			   }
 			}		
+			else
+					location="invalid value";
+					
 			alarm=(bytes[8] & 0x40)?"TRUE":"FALSE";//Alarm status
 			batV=(((bytes[8] & 0x3f) <<8) | bytes[9])/1000;//Battery,units:V
 			mod = bytes[10] & 0xC0;
@@ -141,11 +144,14 @@ if(port == 0x04)
 				if ((longitude < 190) && (longitude > -190)) {
 					if ((latitude !== 0) && (longitude !==0)) {
 							field: "location",
-						  location= "" + latitude + "," + longitude + ""
+						  location= "" + latitude + "," + longitude + "";
 					
 					}        
 			   }
 			}	
+			else
+					location="invalid value";
+					
 			var year = bytes[8]<<8 | bytes[9];
 			var Month =  bytes[10];
 			var day =  bytes[11];
