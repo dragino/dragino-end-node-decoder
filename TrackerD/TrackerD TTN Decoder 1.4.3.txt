@@ -112,7 +112,7 @@ function Decoder(bytes, port) {
 			return {
 			  Location: location,
 			  Latitude: latitude,
-			  Longitud: longitude,
+			  Longitude: longitude,
 			  Hum:hum,
 			  Tem:tem,
 			  BatV:batV,
@@ -127,7 +127,7 @@ function Decoder(bytes, port) {
   			return {
   			  Location: location,
   			  Latitude: latitude,
-  			  Longitud: longitude,
+  			  Longitude: longitude,
   			  BatV:batV,
   			  ALARM_status:alarm,
   			  MD:mod,
@@ -163,7 +163,7 @@ if(port == 0x04)
 			time = hour+":"+min+":"+sen;
 			return {
 			  Latitude: latitude,
-			  Longitud: longitude,
+			  Longitude: longitude,
 			  Date:date,
 			  Time:time,
 			  };			
