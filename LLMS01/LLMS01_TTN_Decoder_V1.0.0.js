@@ -12,7 +12,7 @@ function Decoder(bytes, port) {
 	value=bytes[4]<<8 | bytes[5];
 	var moisture=(value/10).toFixed(2);	
 	
-    var temp=((bytes[6] << 24 >> 16 | bytes[7]) / 10).toFixed(2); //temp_SOIL,temperature
+    var temp=((bytes[6] << 24 >> 16 | bytes[7]) / 10).toFixed(2); //leaf temperature
 	   
 	var i_flag = bytes[8];
 	var mes_type = bytes[10];
