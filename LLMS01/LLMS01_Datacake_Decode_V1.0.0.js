@@ -12,12 +12,7 @@ function Decoder(bytes, port) {
 	value=bytes[4]<<8 | bytes[5];
 	var hum=(value/10).toFixed(2);	
    
-	value=bytes[6]<<8 | bytes[7];
-	var temp=0;	
-    if((value & 0x8000)>>15 === 0)
-		temp=(value/10).toFixed(2);//temp_SOIL,temperature
-	else if((value & 0x8000)>>15 === 1)
-		temp=((value-0xFFFF)/10).toFixed(2);
+	var temp=((bytes[6] << 24 >> 16 | bytes[7]) / 10).toFixed(2); //temp_SOIL,temperature
    
 	var i_flag = bytes[8];
     var mes_type = bytes[10];
