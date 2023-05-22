@@ -1,0 +1,82 @@
+function Decoder(bytes, port) {
+  // Decode an uplink message from a buffer
+  // (array) of bytes to an object of fields.
+	var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
+	var batV=value/1000;//Battery,units:V
+  var Moisture_A1=0;
+  var Moisture_B1=25.05;
+  var Moisture_C1=62.55;
+  var Moisture_A2=0;
+  var Moisture_B2=50;
+  var Moisture_C2=80;
+  var EC_D1=0;
+  var EC_E1=261;
+  var EC_F1=1150;
+  var EC_D2=0;
+  var EC_E2=2.5;
+  var EC_F2=3.2;
+  var EC_After_Cal;
+  var EC_After_Cal
+	value=bytes[2]<<8 | bytes[3];
+	if(bytes[2] & 0x80)
+	{value |= 0xFFFF0000;}
+	var temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+   
+	value=bytes[4]<<8 | bytes[5];
+	var lse01read1=(value/100).toFixed(2);//water_SOIL,Humidity,units:%
+	
+	var Y1;
+    if (lse01read1<Moisture_A1){
+      Y1=parseFloat((lse01read1*Moisture_A2/Moisture_A1).toFixed(2));
+       }
+    else if (Moisture_A1<=lse01read1&lse01read1<Moisture_B1){
+      Y1=parseFloat(((lse01read1-Moisture_A1) * (Moisture_B2-Moisture_A2) / (Moisture_B1-Moisture_A1) + Moisture_A2).toFixed(2));
+       }
+    else if (Moisture_B1<=lse01read1&lse01read1<Moisture_C1){
+      Y1=parseFloat(((lse01read1-Moisture_B1) * (Moisture_C2-Moisture_B2) / (Moisture_C1-Moisture_B1) + Moisture_B2).toFixed(2));
+       }
+   else if (Moisture_C1<=lse01read1&lse01read1<100){
+      Y1=parseFloat((lse01read1+Moisture_C2-Moisture_C1).toFixed(2));
+       }
+    else if(lse01read1>100){
+      Y1=100
+    }
+    
+	value=bytes[8]<<8 | bytes[9];
+	var lse01read2=value
+	var Y2;
+    if (lse01read2<EC_D1){
+      Y2=parseFloat((lse01read2*EC_D2/EC_D1).toFixed(2));
+       }
+    else if (EC_D1<=lse01read2&lse01read2<EC_E1){
+      Y2=parseFloat(((lse01read2-EC_D1) * (EC_E2-EC_D2) / (EC_E1-EC_D1) + EC_D2).toFixed(2));
+       }
+    else if (EC_E1<=lse01read2&lse01read2<EC_F1){
+      Y2=parseFloat(((lse01read2-EC_E1) * (EC_F2-EC_E2) / (EC_F1-EC_E1) + EC_E2).toFixed(2));
+       }
+   else if (EC_F1<=lse01read2&lse01read2<100){
+      Y2=parseFloat((lse01read2+EC_F2-EC_F1).toFixed(2));
+       }
+	
+value=bytes[6]<<8 | bytes[7];
+	var temp_SOIL;
+	if((value & 0x8000)>>15 === 0)
+		temp_SOIL=(value/100).toFixed(2);//temp_SOIL,temperature
+	else if((value & 0x8000)>>15 === 1)
+	temp_SOIL=((value-0xFFFF)/100).toFixed(2);
+	
+	var s_flag = bytes[10]>>4;
+	var i_flag = bytes[10]&0x0F;
+  return {
+       Bat:batV +" V",
+       TempC_DS18B20:temp_DS18B20,
+       water_SOIL:lse01read1,
+       temp_SOIL:temp_SOIL,
+       conduct_SOIL:lse01read2,
+       Moisture_After_Cal:Y1,
+       EC_After_Cal:Y2,
+	   Sensor_flag:s_flag,
+	   Interrupt_flag:i_flag,
+  };
+}
+
