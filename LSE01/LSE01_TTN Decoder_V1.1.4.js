@@ -29,8 +29,8 @@ function Decoder(bytes, port) {
        TempC_DS18B20:temp_DS18B20,
        water_SOIL:water_SOIL,
        temp_SOIL:temp_SOIL,
-       conduct_SOIL:conduct_SOIL",
+       conduct_SOIL:conduct_SOIL,
 	   Sensor_flag:s_flag,
-	   Interrupt_flag:i_flag
+	   Interrupt_flag:i_flag,
   };
 }
