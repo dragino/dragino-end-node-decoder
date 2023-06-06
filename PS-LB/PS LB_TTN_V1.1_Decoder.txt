@@ -60,7 +60,7 @@ function Decoder(bytes, port) {
       FREQUENCY_BAND:freq_band,
       SUB_BAND:sub_band,
       BAT:bat,
-  	}
+  	};
   }
   else if(port==7)
   {
