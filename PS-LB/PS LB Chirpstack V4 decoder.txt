@@ -65,7 +65,7 @@ function Decode(fPort, bytes, variables) {
       FREQUENCY_BAND:freq_band,
       SUB_BAND:sub_band,
       BAT:bat,
-  	}
+  	};
   }
   else if(fPort==7)
   {
