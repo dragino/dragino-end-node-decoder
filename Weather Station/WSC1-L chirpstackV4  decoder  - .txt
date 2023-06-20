@@ -1,0 +1,166 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+ function zxc(num){ 
+	if(parseInt(num) < 10)
+	  num = '0'+ num; 
+	return num; 
+  }
+function Decode(fPort, bytes, variables)  {
+	if(fPort == 2 && bytes[0]<0xE0)
+	{ var direction = {0:"N",1:"NNE",2:"NE",3:"ENE",4:"E",5:"ESE",6:"SE",7:"SSE",8:"S",9:"SSW",10:"SW",11:"WSW",12:"W",13:"WNW",14:"NW",15:"NNW"};
+	  var dic = {};
+	  var sensor	  =["bat","wind_speed","wind_direction_angle","illumination",
+					  "rain_snow","CO2","TEM","HUM","pressure",
+					  "rain_gauge","PM2_5","PM10","PAR","TSR","SHT31_TEM","SHT31_HUM"];
+	  var sensor_diy=["A1","A2","A3","A4"];
+	  //4~7:0->/,1->*,2->NULL
+	  //3~0:count
+	  var algorithm =[0x03,0x01,0x01,0x11,
+					  0x20,0x20,0x01,0x01,0x01,
+					  0x01,0x20,0x20,0x20,0x01,0x0A,0x0A];
+	  for(i=0;i<bytes.length;)
+	  {
+		  var len=bytes[i+1];
+		  if(bytes[i]<0xA1)
+		  {
+			  var sensor_type= bytes[i];			
+			  var operation  = algorithm[sensor_type]>>4;
+			  var count  	   = algorithm[sensor_type]&0x0F;
+			  
+			  if(operation===0)
+			 {
+				   if(sensor_type === 0x06 || sensor_type === 0x0E)	//TEM
+				  {
+					  if(bytes[i+2] & 0x80)
+						  dic[sensor[sensor_type]] = (((bytes[i+2]<<8)|bytes[i+3])-0xFFFF)/(count*10.0);	//<0
+					  else
+						  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
+				  }
+				  else
+					  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
+					 
+					if ((dic[sensor[1]])=== 20)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+					if ((dic[sensor[2]])=== 383.8)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+				
+					if ((dic[sensor[5]])=== 5374)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					
+					 if ((dic[sensor[6]])=== 76.6)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					
+					if ((dic[sensor[7]])=== 102.2)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+					if ((dic[sensor[8]])=== 0)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+					if ((dic[sensor[9]])=== 102.2)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					i
+					if ((dic[sensor[10]])=== 102.2)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					i
+					if ((dic[sensor[11]])=== 102.2)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					
+					if ((dic[sensor[12]])=== 2558)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+					if ((dic[sensor[13]])=== 2022.2)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+					
+			  }
+			  else if(operation===1)
+			  {
+				  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])*(count*10);
+			  }
+			  else
+			  {
+				  if(sensor_type === 0x04)	//RAIN_SNOW
+					  dic[sensor[sensor_type]] = bytes[i+2];
+				  else
+					  dic[sensor[sensor_type]] = (bytes[i+2]<<8)|bytes[i+3];
+			  }
+			  	if ((dic[sensor[3]])=== 202220)
+					{
+					  dic[sensor[sensor_type]]= "No sensor"
+					}
+				
+			  
+				if ((dic[sensor[1]])=== 76.6)
+					{
+					  dic.wind_speed = "No sensor"
+					  dic.wind_speed_level = "No sensor"
+					}
+			else  if(sensor_type===0x01)
+			  {
+				  dic.wind_speed_level = bytes[i+4];
+			  }
+			  else if(sensor_type===0x02)
+			  {
+				  values = bytes[i+4];
+				  dic.wind_direction = direction[values];
+					
+				  }
+			
+		  }		
+		  else
+		  {
+			  dic[sensor_diy[bytes[i]-0xA1]]=(bytes[i+2]<<8)|bytes[i+3];
+		  }
+			  
+		  i=i+2+len;
+	  }
+  
+	  return dic;
+	}
+    if(fPort==05){
+	var frequency = {1:"EU868",2:"US915",3:"IN865",4:"AU915",5:"KZ865",6:"RU864",7:"AS923",8:"AS923-1",9:"AS923-2",10:"AS923-3"};
+    {
+		var info = {};
+		var node = bytes[0];
+			if (node ===13);
+				info.node="WSC1-L";
+		var version1 = bytes[1],version2 = bytes[2]>>4,version3 = bytes[2]&0x0f;
+				info.version="V"+"."+version1+"."+version2+"."+version3;
+		var values = bytes[3];
+				info.frequency_band = frequency[values];
+				info.sub_band = bytes[4];
+				info.bat = (bytes[5]<<8|bytes[6])/1000;
+				info.weather_sensor_types=bytes[7].toString(16)+zxc(bytes[8].toString(16))+bytes[9].toString(16);
+
+	}
+	return info;
+
+	}
+
+}
