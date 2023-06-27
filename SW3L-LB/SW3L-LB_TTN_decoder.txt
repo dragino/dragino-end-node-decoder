@@ -78,7 +78,7 @@ function Decoder(bytes, port) {
     var freq_band;
     var sensor;
     
-    if(bytes[0]==0x11)
+    if(bytes[0]==0x1f)
        sensor= "SW3L-LB";
       
     if(bytes[4]==0xff)
