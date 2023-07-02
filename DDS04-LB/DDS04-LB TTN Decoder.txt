@@ -25,7 +25,7 @@ function Decoder(bytes,port) {
   	var sub_band;
     var sensor;
     
-    if(bytes[0]==0x03)
+    if(bytes[0]==0x23)
       sensor= "DDS04-LB";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
