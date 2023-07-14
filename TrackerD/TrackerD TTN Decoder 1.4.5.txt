@@ -30,7 +30,7 @@ value |=0xFFFF0000;
 var pitch=value/100; //pitch,units: °
 return {
 Latitude: latitude,
-Longitud: longitude,
+Longitude: longitude,
 Roll: roll,
 Pitch:pitch,
 BatV:batV,
@@ -103,7 +103,7 @@ function Decoder(bytes, port) {
 			return {
 			  Location: location,
 			  Latitude: latitude,
-			  Longitud: longitude,
+			  Longitude: longitude,
 			  Hum:hum,
 			  Tem:tem,
 			  BatV:batV,
@@ -117,7 +117,7 @@ function Decoder(bytes, port) {
   			return {
   			  Location: location,
   			  Latitude: latitude,
-  			  Longitud: longitude,
+  			  Longitude: longitude,
   			  BatV:batV,
   			  ALARM_status:alarm,
   			  MD:mod,
@@ -151,7 +151,7 @@ if(port == 0x04)
 			time = date+" "+time1
 			return {
 			  Latitude: latitude,
-			  Longitud: longitude,
+			  Longitude: longitude,
 			  Time:time,
 			  };			
 			
