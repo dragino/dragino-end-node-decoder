@@ -2,7 +2,7 @@ function datalog(i,bytes){
   var aa=(bytes[0+i]&0x08)?"PART":"SUM";
   var bb=(bytes[0+i]&0x04)?"YES":"NO"; 
   var cc=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
-  var dd=(bytes[0+i]&0x01)?"LEAK":"NO LEAK";   
+  var dd=(bytes[0+i]&0x01)?"OPEN":"CLOSE";   
   var ee=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
   var ff=(bytes[4+i]<<16 | bytes[5+i]<<8 | bytes[6+i]).toString(10);
   var gg= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
@@ -21,9 +21,9 @@ function getzf(c_num){
 function getMyDate(str){ 
   var c_Date;
   if(str > 9999999999)
-    c_Date = new Date(parseInt(str));
+     c_Date = new Date(parseInt(str));
   else 
-    c_Date = new Date(parseInt(str) * 1000);
+     c_Date = new Date(parseInt(str) * 1000);
   
   var c_Year = c_Date.getFullYear(), 
   c_Month = c_Date.getMonth()+1, 
@@ -39,7 +39,7 @@ function getMyDate(str){
 function Decoder(bytes, port) {
   if(port==0x03)
   {
-    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
+    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";   
     for(var i=0;i<bytes.length;i=i+11)
     {
       var data= datalog(i,bytes);
@@ -51,22 +51,26 @@ function Decoder(bytes, port) {
     return{
     DATALOG:data_sum,
     PNACKMD:pnack,
-    };   
+    };
   }
   else if(port==0x04)
   {
     var tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
     var disalarm= bytes[3]&0x01;
-    var keep_status= bytes[4]&0x01;
-    var keep_time= bytes[5]<<8 | bytes[6];
-    var leak_alarm_time= bytes[7];
+    var keep_status1= bytes[4]&0x01;
+    var keep_time1= bytes[5]<<8 | bytes[6];
+    var keep_status2= bytes[7]&0x01;
+    var keep_time2= bytes[8]<<8 | bytes[9];
+    var alarm_tdc= bytes[10];
    
     return {
     TDC:tdc,
     DISALARM:disalarm,
-    KEEP_STATUS:keep_status,
-    KEEP_TIME:keep_time,
-    LEAK_ALARM_TIME:leak_alarm_time
+    KEEP_STATUS1:keep_status1,
+    KEEP_TIME1:keep_time1,
+    KEEP_STATUS2:keep_status2,
+    KEEP_TIME2:keep_time2,
+    ALARM_TDC:alarm_tdc
     };
   }
   else if(port==0x05)
@@ -75,8 +79,8 @@ function Decoder(bytes, port) {
     var freq_band;
     var sensor;
     
-    if(bytes[0]==0x1D)
-      sensor= "WL03A-LB";
+    if(bytes[0]==0x1B)
+       sensor= "DS03A-LB";
       
     if(bytes[4]==0xff)
       sub_band="NULL";
@@ -126,24 +130,44 @@ function Decoder(bytes, port) {
   else
   { 
     var count_mod=(bytes[0]&0x08)?"PART":"SUM"; 
-    var tdc_interval=(bytes[0]&0x04)?"YES":"NO"; 
-    var alarm=(bytes[0]&0x02)?"TRUE":"FALSE"; 
-    var leak_status=(bytes[0]&0x01)?"LEAK":"NO LEAK";  
-    var leak_times=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
-    var leak_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];
+    var tdc_interval=(bytes[0]&0x04)?"YES":"NO";    
+    var alarm1=(bytes[0]&0x02)?"TRUE":"FALSE"; 
+    var door1_open_status=(bytes[0]&0x01)?"OPEN":"CLOSE";  
+    var open1_times=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
+    var open1_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];
+    var alarm2=(bytes[11]&0x02)?"TRUE":"FALSE"; 
+    var door2_open_status=(bytes[11]&0x01)?"OPEN":"CLOSE";  
+    var open2_times=bytes[12]<<16 | bytes[13]<<8 | bytes[14];
+    var open2_duration=bytes[15]<<16 | bytes[16]<<8 | bytes[17];    
     var data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
     
     if(bytes.length==11)
     {
       return {
       CMOD:count_mod,  
-      TDC:tdc_interval,
-      ALARM:alarm,
-      WATER_LEAK_STATUS:leak_status,
-      WATER_LEAK_TIMES:leak_times,
-      LAST_WATER_LEAK_DURATION:leak_duration,
+      TDC:tdc_interval,        
+      ALARM:alarm1,
+      DOOR_OPEN_STATUS:door1_open_status,
+      DOOR_OPEN_TIMES:open1_times,
+      LAST_DOOR_OPEN_DURATION:open1_duration,
       TIME:data_time
       };
     }
+    else if(bytes.length==18)
+    {
+      return {
+      CMOD:count_mod,  
+      TDC:tdc_interval,       
+      ALARM1:alarm1,
+      DOOR1_OPEN_STATUS:door1_open_status,
+      DOOR1_OPEN_TIMES:open1_times,
+      LAST_DOOR1_OPEN_DURATION:open1_duration,
+      ALARM2:alarm2,
+      DOOR2_OPEN_STATUS:door2_open_status,
+      DOOR2_OPEN_TIMES:open2_times,
+      LAST_DOOR2_OPEN_DURATION:open2_duration,      
+      TIME:data_time
+      };
+    }    
   }
 }

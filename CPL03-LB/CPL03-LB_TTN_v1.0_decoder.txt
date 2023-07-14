@@ -1,13 +1,21 @@
 function datalog(i,bytes){
-  var aa=(bytes[0+i]&0x08)?"PART":"SUM";
-  var bb=(bytes[0+i]&0x04)?"YES":"NO"; 
-  var cc=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
-  var dd=(bytes[0+i]&0x01)?"LEAK":"NO LEAK";   
-  var ee=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
-  var ff=(bytes[4+i]<<16 | bytes[5+i]<<8 | bytes[6+i]).toString(10);
-  var gg= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
-  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+']'+',';  
+  var aa=(bytes[0+i]&0x08)?"CPL03":"CPL01";
+  var bb=(bytes[0+i]&0x20)?"PART":"SUM";
+  var cc=(bytes[0+i]&0x10)?"YES":"NO"; 
+  var dd=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
+  var ee=(bytes[0+i]&0x01)?"OPEN":"CLOSE";  
+  var ff=(bytes[0+i]&0x04)>>2;
+  var gg=(bytes[0+i]&0x07);
+  var hh=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
+  var ii=(bytes[4+i]<<16 | bytes[5+i]<<8 | bytes[6+i]).toString(10);
+  var jj= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string;
   
+  if(aa=="CPL01")
+    string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+hh+','+ii+','+jj+']'+',';  
+  else
+    string='['+aa+','+bb+','+cc+','+gg+','+hh+','+ii+','+jj+']'+',';  
+     
   return string;
 }
 
@@ -39,7 +47,7 @@ function getMyDate(str){
 function Decoder(bytes, port) {
   if(port==0x03)
   {
-    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
+    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";   
     for(var i=0;i<bytes.length;i=i+11)
     {
       var data= datalog(i,bytes);
@@ -51,7 +59,7 @@ function Decoder(bytes, port) {
     return{
     DATALOG:data_sum,
     PNACKMD:pnack,
-    };   
+    };
   }
   else if(port==0x04)
   {
@@ -59,14 +67,20 @@ function Decoder(bytes, port) {
     var disalarm= bytes[3]&0x01;
     var keep_status= bytes[4]&0x01;
     var keep_time= bytes[5]<<8 | bytes[6];
-    var leak_alarm_time= bytes[7];
+    var ttrig_mod1= bytes[7];
+    var ttrig_mod2= bytes[8];
+    var ttrig_mod3= bytes[9];
+    var alarm_tdc= bytes[10];
    
     return {
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
     KEEP_TIME:keep_time,
-    LEAK_ALARM_TIME:leak_alarm_time
+    TTRIG_MOD1:ttrig_mod1,
+    TTRIG_MOD2:ttrig_mod2,
+    TTRIG_MOD3:ttrig_mod3,
+    ALARM_TDC:alarm_tdc
     };
   }
   else if(port==0x05)
@@ -75,8 +89,8 @@ function Decoder(bytes, port) {
     var freq_band;
     var sensor;
     
-    if(bytes[0]==0x1D)
-      sensor= "WL03A-LB";
+    if(bytes[0]==0x20)
+      sensor= "CPL03-LB";
       
     if(bytes[4]==0xff)
       sub_band="NULL";
@@ -125,25 +139,45 @@ function Decoder(bytes, port) {
   }
   else
   { 
-    var count_mod=(bytes[0]&0x08)?"PART":"SUM"; 
-    var tdc_interval=(bytes[0]&0x04)?"YES":"NO"; 
+    var work_mod=(bytes[0]&0x08)?"CPL03":"CPL01";
+    var count_mod=(bytes[0]&0x20)?"PART":"SUM"; 
+    var tdc_interval=(bytes[0]&0x10)?"YES":"NO";   
+    var ttrig_mod=(bytes[0]&0x04)>>2; 
     var alarm=(bytes[0]&0x02)?"TRUE":"FALSE"; 
-    var leak_status=(bytes[0]&0x01)?"LEAK":"NO LEAK";  
-    var leak_times=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
-    var leak_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];
+    var pin_status=(bytes[0]&0x01)?"OPEN":"CLOSE";  
+    var total_pulse=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
+    var last_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];   
     var data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    var calculate_flag=(bytes[0]&0x07);
+    var pa8_total_pulse=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
+    var pa4_total_pulse=bytes[4]<<16 | bytes[5]<<8 | bytes[6];
+    var pb15_total_pulse=bytes[7]<<16 | bytes[8]<<8 | bytes[9];
     
     if(bytes.length==11)
     {
       return {
+      WORKMOD:work_mod,       
       CMOD:count_mod,  
-      TDC:tdc_interval,
+      TDC:tdc_interval,        
       ALARM:alarm,
-      WATER_LEAK_STATUS:leak_status,
-      WATER_LEAK_TIMES:leak_times,
-      LAST_WATER_LEAK_DURATION:leak_duration,
+      PIN_STATUS:pin_status,
+      TTRIG_MOD:ttrig_mod,
+      TOTAL_PULSE:total_pulse,
+      LAST_DURATION:last_duration,
       TIME:data_time
       };
+    }
+    else if(bytes.length==10)
+    {
+      return {
+      WORKMOD:work_mod,
+      CMOD:count_mod,  
+      TDC:tdc_interval,
+      CALCULATE_FLAG:calculate_flag,
+      PA8_TOTAL_PULSE:pa8_total_pulse,
+      PA4_TOTAL_PULSE:pa4_total_pulse,
+      PB15_TOTAL_PULSE:pb15_total_pulse
+      };      
     }
   }
 }
