@@ -1,9 +1,9 @@
 function datalog(i,bytes){
-  var aa= (bytes[1+i]<<8 | bytes[2+i])/10;
-  var bb= (bytes[3+i]<<8 | bytes[4+i])/10;
-  var cc= (bytes[5+i]<<8 | bytes[6+i])/10;   
+  var aa= (bytes[2+i]<<8 | bytes[3+i])/10;
+  var bb= bytes[4+i]<<8 | bytes[5+i];
+  var cc= bytes[6+i]<<24>>24;    
   var dd= (bytes[0+i]&0x02) ? "High":"Low";
-  var ee= (bytes[0+i]&0x01) ? "True":"False";
+  var ee= (bytes[0+i]&0x01) ? "True":"False"; 
   var ff= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+']'+',';  
   
@@ -38,20 +38,38 @@ function getMyDate(str){
 function Decoder(bytes, port) {
   if(port==0x02)
   {
-    var decode = {}; 
     var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
-    decode.BatV= value/1000;
-    decode.EXTI_Trigger=(bytes[0] & 0x40)? "TRUE":"FALSE";
-    decode.EXTI_Level=(bytes[0] & 0x80)? "HIGH":"LOW";
-    decode.distance1_cm=(bytes[2]<<8 | bytes[3])/10;
-    decode.distance2_cm=(bytes[4]<<8 | bytes[5])/10;
-    decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10
-    decode.distance4_cm=(bytes[8]<<8 | bytes[9])/10;
-    decode.mes_type= bytes[10];
+    var batV=value/1000;//Battery,units:V
+  
+    value=(bytes[2]<<24>>16) | bytes[3];
+    var temp_DS18B20=parseFloat((value/10).toFixed(1));
+     
+    value=bytes[4]<<8 | bytes[5];
+    var Distance_cm=(value/10);  
+    
+    value=bytes[6]<<8 | bytes[7];
+    var Distance_signal_strength=value; 
+  
+    value=bytes[9]<<24>>24;
+    var Lidar_temp=value; 
+   
+    var i_flag=(bytes[8] & 0x01)? "TRUE":"FALSE";
+    var i_level=(bytes[8] & 0x02)? "HIGH":"LOW";
+
+    var mes_type=bytes[10];
    
     if(bytes.length==11)
     {
-      return decode;     
+     return {
+              Bat:batV,
+              TempC_DS18B20:temp_DS18B20,
+              Lidar_distance:Distance_cm,
+              Lidar_signal:Distance_signal_strength,
+              Lidar_temp:Lidar_temp,
+              Interrupt_flag:i_flag,
+	      Interrupt_level:i_level,
+              Message_type:mes_type
+            };       
     }
   }
   else if(port==0x03)  
@@ -76,8 +94,8 @@ function Decoder(bytes, port) {
   	var sub_band;
     var sensor;
     
-    if(bytes[0]==0x23)
-      sensor= "DDS04-LB";
+    if(bytes[0]==0x24)
+      sensor= "LDS12-LB";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
 	  
