@@ -3,44 +3,6 @@ function decodeUplink(input) {
             data: Decode(input.fPort, input.bytes, input.variables)
         };   
 }
-
-var value=bytes[0]<<16 | bytes[1]<<8 | bytes[2];
-if(bytes[0] & 0x80)
-{
-value |=0xFFFFFF000000;
-}
-var latitude=value/10000;//gps latitude,units: °
-value=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
-if(bytes[3] & 0x80)
-{
-value |=0xFFFFFF000000;
-}
-var longitude=value/10000;//gps longitude,units: °
-var alarm=(bytes[6] & 0x40)?"TRUE":"FALSE";//Alarm status
-value=((bytes[6] & 0x3f) <<8) | bytes[7];
-var batV=value/1000;//Battery,units:V
-value=bytes[8]<<8 | bytes[9];
-if(bytes[8] & 0x80)
-{
-value |=0xFFFF0000;
-}
-var roll=value/100;//roll,units: °
-value=bytes[10]<<8 | bytes[11];
-if(bytes[10] & 0x80)
-{
-value |=0xFFFF0000;
-}
-var pitch=value/100; //pitch,units: °
-return {
-Latitude: latitude,
-Longitude: longitude,
-Roll: roll,
-Pitch:pitch,
-BatV:batV,
-ALARM_status:alarm,
-};
-}*/
-
 function Decode(fPort, bytes, variables) {
 
 	var i;
