@@ -1,3 +1,40 @@
+function datalog(i,bytes){
+  var aa=(bytes[0+i]<<8 |bytes[1+i])/1000
+  var bb=bytes[2+i]<<8 |bytes[3+i]
+  var cc=bytes[4+i]<<8 |bytes[5+i]
+  var dd=(bytes[6+i]&0x01)?"YES":"NO"; 
+  var ee=((bytes[6+i]>>1)&0x01)?"TRUE":"FALSE"; 
+  var ff=(bytes[6+i]&0x40)?"1":"0"; 
+  var gg= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+']'+',';  
+  
+  return string;
+}
+
+function getzf(c_num){ 
+  if(parseInt(c_num) < 10)
+    c_num = '0' + c_num; 
+
+  return c_num; 
+}
+
+function getMyDate(str){ 
+  var c_Date;
+  if(str > 9999999999)
+     c_Date = new Date(parseInt(str));
+  else 
+     c_Date = new Date(parseInt(str) * 1000);
+  
+  var c_Year = c_Date.getFullYear(), 
+  c_Month = c_Date.getMonth()+1, 
+  c_Day = c_Date.getDate(),
+  c_Hour = c_Date.getHours(), 
+  c_Min = c_Date.getMinutes(), 
+  c_Sen = c_Date.getSeconds();
+  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+  
+  return c_Time;
+}
 function Decoder(bytes,port) {
   var bat;
   if(port == 2)
@@ -18,6 +55,34 @@ function Decoder(bytes,port) {
       DALARM_count:dalarm_count,
       Distance_alarm:distance_alarm,
       Interrupt_alarm:inter_alarm
+    };
+  }
+   if(port==0x03)
+  {
+    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    DATALOG:data_sum,
+    PNACKMD:pnack,
+    };
+  }
+  else if(port==0x04)
+  {
+    var tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
+    var stop_timer= bytes[4];
+    var alarm_timer= bytes[5]<<8 | bytes[6];
+    
+    return {
+    TDC:tdc,
+    Stop_Timer:stop_timer,
+    Alarm_Timer:alarm_timer,
     };
   }
   else if(port == 5)
