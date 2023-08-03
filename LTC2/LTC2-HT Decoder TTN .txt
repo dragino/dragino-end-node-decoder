@@ -2,7 +2,9 @@ function Decoder(bytes, port) {
    var poll_message_status=(bytes[2]&0x40)>>6; 
    var decode = {}; 
    decode.Ext= bytes[2]&0x0F; 
- decode.BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000; 
+ var BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;
+ decode.BatV=BatV;
+ decode.BatV_status=parseFloat((((BatV-2.5)/1.1)*100).toFixed(2))+'%';
    if(decode.Ext==0x01) 
  { 
    if((bytes[3]==0x80) && (bytes[4]==0x01))
