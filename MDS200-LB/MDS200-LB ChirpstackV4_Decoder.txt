@@ -1,3 +1,8 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
 function datalog(i,bytes){
   var aa=(bytes[0+i]<<8 |bytes[1+i])/1000
   var bb=bytes[2+i]<<8 |bytes[3+i]
@@ -35,9 +40,9 @@ function getMyDate(str){
   
   return c_Time;
 }
-function Decoder(bytes,port) {
+function Decode(fPort, bytes, variables) {
   var bat;
-  if(port == 2)
+  if(fPort == 2)
   {
     value = (bytes[0]<<8 | bytes[1]);
     bat = value/1000;
@@ -57,7 +62,7 @@ function Decoder(bytes,port) {
       Interrupt_alarm:inter_alarm
     };
   }
-   if(port==0x03)
+   if(fPort==0x03)
   {
     var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
@@ -73,8 +78,7 @@ function Decoder(bytes,port) {
     PNACKMD:pnack,
     };
   }
-
-  else if(port == 5)
+  else if(fPort == 5)
   {
     var model="";
     if(bytes[0]==0x0C)
@@ -110,7 +114,7 @@ function Decoder(bytes,port) {
       Bat:bat
     };
   }
-  else if(port == 4)
+  else if(fPort == 4)
   {
     var tdc = (bytes[0]<<16 | bytes[1]<<8 | bytes[2]);
     var atdc = (bytes[3]);

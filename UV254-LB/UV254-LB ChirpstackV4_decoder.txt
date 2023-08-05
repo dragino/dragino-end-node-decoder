@@ -1,15 +1,11 @@
-function decodeUplink(input) {
-        return { 
-            data: Decode(input.fPort, input.bytes, input.variables)
-        };   
-}
 function datalog(i,bytes){
   var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
   var string='['+ aa +']'+',';  
   return string;
 }
-function Decode(fPort, bytes, variables) {
-  if(fPort==5)
+
+function Decoder(bytes, port) {
+  if(port==5)
   {
   	var freq_band;
   	var sub_band;
@@ -66,7 +62,7 @@ function Decode(fPort, bytes, variables) {
       BAT:bat,
   	}
   }
-  else if(fPort==7)
+  else if(port==7)
   {
     var Bat= (bytes[0]<<8 | bytes[1])/1000;
     for(var i=0;i<bytes.length-2;i=i+2)

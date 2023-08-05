@@ -3,11 +3,6 @@ function decodeUplink(input) {
             data: Decode(input.fPort, input.bytes, input.variables)
         };   
 }
-function datalog(i,bytes){
-  var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
-  var string='['+ aa +']'+',';  
-  return string;
-}
 function Decode(fPort, bytes, variables) {
   if(fPort==5)
   {
@@ -15,8 +10,8 @@ function Decode(fPort, bytes, variables) {
   	var sub_band;
     var sensor;
     
-    if(bytes[0]==0x16)
-      sensor= "PS-LB";
+    if(bytes[0]==0x17)
+      sensor= "SDI12-LB";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
 	  
@@ -66,43 +61,34 @@ function Decode(fPort, bytes, variables) {
       BAT:bat,
   	}
   }
-  else if(fPort==7)
+  else if(fPort==100)
   {
-    var Bat= (bytes[0]<<8 | bytes[1])/1000;
-    for(var i=0;i<bytes.length-2;i=i+2)
-    {
-      var data= datalog(i,bytes);
-      if(i=='0')
-        data_sum=data;
-      else
-        data_sum+=data;
-    }
-    return{
-    Bat_V:Bat,
-    DATALOG:data_sum
-    };    
-  }
-  else
-  {
-    var decode={};
-    decode.Bat_V= (bytes[0]<<8 | bytes[1])/1000;
-    decode.Probe_mod= bytes[2];   
-    decode.IDC_intput_mA= (bytes[4]<<8 | bytes[5])/1000;  
-    decode.VDC_intput_V= (bytes[6]<<8 | bytes[7])/1000; 
-    decode.IN1_pin_level= (bytes[8] & 0x08)? "High":"Low";   
-    decode.IN2_pin_level= (bytes[8] & 0x04)? "High":"Low";   
-    decode.Exti_pin_level= (bytes[8] & 0x02)? "High":"Low";  
-    decode.Exti_status= (bytes[8] & 0x01)? "True":"False";
-    decode.Absorbance= (bytes[6]<<8 | bytes[7])/1000+'mw/cm ²'; 
-    var Absorbance= (bytes[6]<<8 | bytes[7])/1000;
-    if (Absorbance>5)
-    {
+      var datas_sum={};
+      for(var j=0;j<bytes.length;j++)
+      {
+        var datas= String.fromCharCode(bytes[j]);
+        if(j=='0')
+          datas_sum.datas_sum=datas;
+        else
+          datas_sum.datas_sum+=datas;
+      }
       
-      decode.Absorbance= "invalid data"
-    };
-    if(bytes.length!=1)
-    {
-      return decode;
-    }
+      return datas_sum;
+  }
+  else  
+  {
+      var decode={};
+      decode.EXTI_Trigger= (bytes[0] & 0x80)? "TRUE":"FALSE";    
+      decode.BatV= ((bytes[0]<<8 | bytes[1])&0x7FFF)/1000;
+      decode.Payver= bytes[2];
+      for(var i=3;i<bytes.length;i++)
+      {
+        var data= String.fromCharCode(bytes[i]);
+        if(i=='3')
+          decode.data_sum=data;
+        else
+          decode.data_sum+=data;
+      }
+      return decode;   
   }
 }

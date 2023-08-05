@@ -1,0 +1,177 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+function datalog(i,bytes){
+  var aa=(bytes[0+i]<<8 |bytes[1+i])/1000
+  var bb=bytes[2+i]<<8 |bytes[3+i]
+  var cc=bytes[4+i]<<8 |bytes[5+i]
+  var dd=((bytes[6+i]>>1)&0x01)?"TRUE":"FALSE"; 
+  var ee=(bytes[6+i]&0x40)?"1":"0"; 
+  var ff= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+']'+',';  
+  
+  return string;
+}
+
+function getzf(c_num){ 
+  if(parseInt(c_num) < 10)
+    c_num = '0' + c_num; 
+
+  return c_num; 
+}
+
+function getMyDate(str){ 
+  var c_Date;
+  if(str > 9999999999)
+     c_Date = new Date(parseInt(str));
+  else 
+     c_Date = new Date(parseInt(str) * 1000);
+  
+  var c_Year = c_Date.getFullYear(), 
+  c_Month = c_Date.getMonth()+1, 
+  c_Day = c_Date.getDate(),
+  c_Hour = c_Date.getHours(), 
+  c_Min = c_Date.getMinutes(), 
+  c_Sen = c_Date.getSeconds();
+  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+  
+  return c_Time;
+}
+function Decode(fPort, bytes, variables) {
+  var bat;
+  if(fPort == 2)
+  {
+    value = (bytes[0]<<8 | bytes[1]);
+    bat = value/1000;
+    value = (bytes[2]<<8 | bytes[3]);
+    var dis1 = value;
+    value = (bytes[4]<<8 | bytes[5]);
+    var dis2 =value;
+    var dalarm_count = (bytes[6]>>2)&0x3F;
+    var distance_alarm = (bytes[6]>>1)&0x01;
+    var inter_alarm = (bytes[6])&0x01;
+    return {
+      Bat:bat,
+      dis1:dis1,
+      dis2:dis2,
+      DALARM_count:dalarm_count,
+      Distance_alarm:distance_alarm,
+      Interrupt_alarm:inter_alarm
+    };
+  }
+   if(fPort==0x03)
+  {
+    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    DATALOG:data_sum,
+    PNACKMD:pnack,
+    };
+  }
+  else if(fPort==0x04)
+  {
+    var tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
+    var stop_timer= bytes[4];
+    var alarm_timer= bytes[5]<<8 | bytes[6];
+    
+    return {
+    TDC:tdc,
+    Stop_Timer:stop_timer,
+    Alarm_Timer:alarm_timer,
+    };
+  }
+ else if(fPort==0x05)
+  {
+  	var freq_band;
+  	var sub_band;
+    var sensor;
+    
+    if(bytes[0]==0x03)
+      sensor= "MDS120-LB";
+      
+	  var firm_ver= (bytes[3]);
+	  
+    if(bytes[1]==0x01)
+        freq_band="EU868";
+  	else if(bytes[1]==0x02)
+        freq_band="US915";
+  	else if(bytes[1]==0x03)
+        freq_band="IN865";
+  	else if(bytes[1]==0x04)
+        freq_band="AU915";
+  	else if(bytes[1]==0x05)
+        freq_band="KZ865";
+  	else if(bytes[1]==0x06)
+        freq_band="RU864";
+  	else if(bytes[1]==0x07)
+        freq_band="AS923";
+  	else if(bytes[1]==0x08)
+        freq_band="AS923_1";
+  	else if(bytes[1]==0x09)
+        freq_band="AS923_2";
+  	else if(bytes[1]==0x0A)
+        freq_band="AS923_3";
+  	else if(bytes[1]==0x0F)
+        freq_band="AS923_4";
+  	else if(bytes[1]==0x0B)
+        freq_band="CN470";
+  	else if(bytes[1]==0x0C)
+        freq_band="EU433";
+  	else if(bytes[1]==0x0D)
+        freq_band="KR920";
+  	else if(bytes[1]==0x0E)
+        freq_band="MA869";
+  	
+    if(bytes[2]==0xff)
+      sub_band="NULL";
+	  else
+      sub_band=bytes[2];
+
+   var sensor_type= (bytes[4]);
+	  
+    if(bytes[4]==0x01)
+        sensor_type="LSE01";
+  	else if(bytes[4]==0x02)
+        sensor_type="LDDS75";
+  	else if(bytes[4]==0x03)
+        sensor_type="LDDS20";
+  	else if(bytes[4]==0x04)
+        sensor_type="LLMS01";
+  	else if(bytes[4]==0x05)
+        sensor_type="LSPH01";
+  	else if(bytes[4]==0x06)
+        sensor_type="LSNPK01";
+  	else if(bytes[4]==0x07)
+        sensor_type="LDDS45";
+    else if(bytes[4]==0x08)
+        sensor_type="LSLP01";
+	else if(bytes[4]==0x18)
+        sensor_type="LMDS120";
+	
+        
+        
+       var Message_Type 
+    if(bytes[10]==0x02)
+      Message_Type="right";
+	  else
+      Message_Type="error";
+    
+  	return {
+  	  SENSOR_MODEL:sensor,
+      FIRMWARE_VERSION:firm_ver,
+      FREQUENCY_BAND:freq_band,
+      SUB_BAND:sub_band,
+      sensor_type:sensor_type,
+      Message_Type:Message_Type,
+  	}
+  }  
+}

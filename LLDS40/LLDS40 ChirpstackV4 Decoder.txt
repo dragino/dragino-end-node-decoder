@@ -1,0 +1,47 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+function Decode(fPort, bytes, variables) {
+  // Decode an uplink message from a buffer
+  // (array) of bytes to an object of fields.
+ var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
+ var batV=value/1000;//Battery,units:V
+
+ var temp_DS18B20;
+ if((bytes[2]==0x7f)&&(bytes[3]==0xff))
+ {
+   temp_DS18B20="NULL";
+ }
+ else
+ { 
+   value=(bytes[2]<<24>>16) | bytes[3];
+   temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+ }   
+ 
+  value=bytes[4]<<8 | bytes[5];
+  var Distance_cm=(value/10);  
+ 
+ value=bytes[6]<<8 | bytes[7];
+ var Distance_signal_strength=value; 
+
+ value=bytes[9]<<24>>24;
+ var Lidar_temp=value; 
+ 
+ var i_flag = bytes[8];
+ var mes_type = bytes[10];
+ 
+  if((bytes[0]!=0x03)&&(bytes[10]!=0x02))
+  {
+   return {
+            Bat:batV,
+            TempC_DS18B20:temp_DS18B20,
+            Lidar_distance:Distance_cm,
+            Lidar_signal:Distance_signal_strength,
+            Lidar_temp:Lidar_temp,
+           Interrupt_flag:i_flag,
+           Message_type:mes_type
+          };       
+  }
+}
