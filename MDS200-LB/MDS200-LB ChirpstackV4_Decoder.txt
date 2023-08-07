@@ -81,7 +81,7 @@ function Decode(fPort, bytes, variables) {
   else if(fPort == 5)
   {
     var model="";
-    if(bytes[0]==0x0C)
+    if(bytes[0]==0x2B)
       model="MDS200-LB";
     var version=(bytes[1]<<8 | bytes[2]).toString(16);
     version = parseInt(version,10);
