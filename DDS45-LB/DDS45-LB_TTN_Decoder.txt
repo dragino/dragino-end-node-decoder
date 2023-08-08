@@ -1,15 +1,30 @@
+function datalog(i,bytes){
+   var aa=(bytes[0+i]<<8 |bytes[1+i])
+  var bb=bytes[2+i]<<8 |bytes[3+i]
+  var cc=(bytes[4+i]<<8 |bytes[5+i])/10
+  var dd=(bytes[6+i]&0x01)?"YES":"NO"; 
+  var ee=((bytes[6+i]>>1)&0x01)?"TRUE":"FALSE"; 
+  var ff=(bytes[6+i]&0x40)?"1":"0"; 
+  var gg= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+']'+',';  
+  
+  
+  return string;
+}
+
 function getzf(c_num){ 
   if(parseInt(c_num) < 10)
     c_num = '0' + c_num; 
 
   return c_num; 
 }
+
 function getMyDate(str){ 
   var c_Date;
   if(str > 9999999999)
-    c_Date = new Date(parseInt(str));
+     c_Date = new Date(parseInt(str));
   else 
-    c_Date = new Date(parseInt(str) * 1000);
+     c_Date = new Date(parseInt(str) * 1000);
   
   var c_Year = c_Date.getFullYear(), 
   c_Month = c_Date.getMonth()+1, 
@@ -21,7 +36,9 @@ function getMyDate(str){
   
   return c_Time;
 }
+
 function Decoder(bytes, port) {
+  if(port==0x02){
   // Decode an uplink message from a buffer
   // (array) of bytes to an object of fields.
   var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
@@ -36,7 +53,6 @@ function Decoder(bytes, port) {
   if(bytes[5] & 0x80)
   {value |= 0xFFFF0000;}
   var temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature  
-  var time=getMyDate(bytes[7]<<24 |bytes[8]<<16 |bytes[9]<<8 | bytes[10]);
   var s_flag = bytes[7];	
   return {
        Bat:batV,
@@ -44,6 +60,77 @@ function Decoder(bytes, port) {
 	   Interrupt_flag:i_flag,
 	   TempC_DS18B20:temp_DS18B20,
 	   Sensor_flag:s_flag,
-	   time:time,
+	   
   };
+  }
+    if(port==0x03)
+  {
+    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";   
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    DATALOG:data_sum,
+    PNACKMD:pnack,
+    };
+  }
+  else if(port==0x05)
+  {
+    var sub_band;
+    var freq_band;
+    var sensor;
+    
+    if(bytes[0]==0x28)
+       sensor= "DDS45-LB";
+      
+    if(bytes[4]==0xff)
+      sub_band="NULL";
+    else
+      sub_band=bytes[4];
+    
+    if(bytes[3]==0x01)
+      freq_band="EU868";
+    else if(bytes[3]==0x02)
+      freq_band="US915";
+    else if(bytes[3]==0x03)
+      freq_band="IN865";
+    else if(bytes[3]==0x04)
+      freq_band="AU915";
+    else if(bytes[3]==0x05)
+      freq_band="KZ865";
+    else if(bytes[3]==0x06)
+      freq_band="RU864";
+    else if(bytes[3]==0x07)
+      freq_band="AS923";
+    else if(bytes[3]==0x08)
+      freq_band="AS923_1";
+    else if(bytes[3]==0x09)
+      freq_band="AS923_2";
+    else if(bytes[3]==0x0A)
+      freq_band="AS923_3";
+    else if(bytes[3]==0x0B)
+      freq_band="CN470";
+    else if(bytes[3]==0x0C)
+      freq_band="EU433";
+    else if(bytes[3]==0x0D)
+      freq_band="KR920";
+    else if(bytes[3]==0x0E)
+      freq_band="MA869";
+      
+    var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    var bat= (bytes[5]<<8 | bytes[6])/1000;
+    
+    return {
+    SENSOR_MODEL:sensor,
+    FIRMWARE_VERSION:firm_ver,
+    FREQUENCY_BAND:freq_band,
+    SUB_BAND:sub_band,
+    BAT:bat,
+    };
+  }
 }
