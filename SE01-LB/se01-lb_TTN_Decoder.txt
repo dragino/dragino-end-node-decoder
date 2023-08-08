@@ -16,10 +16,10 @@ function str_pad(byte){
 
 
 function datalog(i,bytes){
-  var Ext= bytes[6]&0x0F;
   var bb= parseFloat(((bytes[0+i]<<24>>16 | bytes[1+i])/100).toFixed(2));
   var cc= parseFloat(((bytes[2+i]<<24>>16 | bytes[3+i])/100).toFixed(2));
   var dd= parseFloat((((bytes[4+i]<<8 | bytes[5+i])&0xFFF)/10).toFixed(1));
+  
   var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
   var string='['+bb+','+cc+','+dd+','+ee+']'+',';  
   
@@ -93,22 +93,25 @@ function Decoder(bytes, port) {
 	decode.s_flag = (bytes[10]>>4)&0x01;
 	decode.i_flag = bytes[10]&0x0F;
 	decode.Mod=mod
-	
+	 return decode;
      }
   
-   if(port==0x03)
+  else if(port==3)  
   {
+    var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
     {
-      var da= datalog(i,bytes);
+      var data= datalog(i,bytes);
       if(i=='0')
-      {
-        decode.DATALOG=da;
-      }
+        data_sum=data;
       else
-        decode.DATALOG+=da;
+        data_sum+=data;
     }
-}
+    return{
+    DATALOG:data_sum,
+    PNACKMD:pnack,
+    };    
+  }
 else if(port==0x05)
   {
     var sub_band;
