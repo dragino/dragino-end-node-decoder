@@ -3,7 +3,8 @@ function decodeUplink(input) {
             data: Decode(input.fPort, input.bytes, input.variables)
         };   
 }
-function datalog(i,bytes){
+
+  function datalog(i,bytes){
   var aa=(bytes[0+i]<<8 | bytes[1+i]).toString(10)/10;
   var bb=((bytes[2+i]<<8 | bytes[3+i]).toString(10)/32768.0*180).toFixed(2);
   var cc=((bytes[4+i]<<8 | bytes[5+i]).toString(10)/32768.0*180).toFixed(2);
@@ -96,35 +97,58 @@ function Decode(fPort, bytes, variables) {
     DATALOG:data_sum,
     };
   }
-  else if(fPort == 5)
+  else if(fPort==0x05)
   {
-    var model="TS01-LB";
-    if(bytes[5]==0x99)
-      model="ANGLE";
-    var version=(bytes[3]<<8 | bytes[4]).toString(16);
-    version = parseInt(version,10);
-    var fre_band="";
-    switch(bytes[1])
-    {
-      case 0x01:fre_band="EU868";break;
-      case 0x02:fre_band="US915";break;
-      case 0x03:fre_band="IN865";break;
-      case 0x04:fre_band="AU915";break;
-      case 0x05:fre_band="KZ865";break;
-      case 0x06:fre_band="RU864";break;
-      case 0x07:fre_band="AS923";break;
-      case 0x08:fre_band="AS923-1";break;
-      case 0x09:fre_band="AS923-2";break;
-      case 0x0a:fre_band="AS923-3";break;
-      case 0x0b:fre_band="AS923-4";break;
-    }
-    var sub_band = bytes[2];
+    var sub_band;
+    var freq_band;
+    var sensor;
+    
+    if(bytes[0]==0x2F)
+       sensor= "TS01-LB";
+      
+    if(bytes[4]==0xff)
+      sub_band="NULL";
+    else
+      sub_band=bytes[4];
+    
+    if(bytes[3]==0x01)
+      freq_band="EU868";
+    else if(bytes[3]==0x02)
+      freq_band="US915";
+    else if(bytes[3]==0x03)
+      freq_band="IN865";
+    else if(bytes[3]==0x04)
+      freq_band="AU915";
+    else if(bytes[3]==0x05)
+      freq_band="KZ865";
+    else if(bytes[3]==0x06)
+      freq_band="RU864";
+    else if(bytes[3]==0x07)
+      freq_band="AS923";
+    else if(bytes[3]==0x08)
+      freq_band="AS923_1";
+    else if(bytes[3]==0x09)
+      freq_band="AS923_2";
+    else if(bytes[3]==0x0A)
+      freq_band="AS923_3";
+    else if(bytes[3]==0x0B)
+      freq_band="CN470";
+    else if(bytes[3]==0x0C)
+      freq_band="EU433";
+    else if(bytes[3]==0x0D)
+      freq_band="KR920";
+    else if(bytes[3]==0x0E)
+      freq_band="MA869";
+      
+    var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    var bat= (bytes[5]<<8 | bytes[6])/1000;
     
     return {
-      Sensor_model:model,
-      Ver:version,
-      Fre_band:fre_band,
-      Sub_band:sub_band,
+    SENSOR_MODEL:sensor,
+    FIRMWARE_VERSION:firm_ver,
+    FREQUENCY_BAND:freq_band,
+    SUB_BAND:sub_band,
+    BAT:bat,
     };
   }
 }
