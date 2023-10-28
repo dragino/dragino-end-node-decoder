@@ -38,7 +38,14 @@ function Decoder(bytes, port) {
   {
     var decode = {};
     var mode=(bytes[6] & 0x7C)>>2;
-    if(mode==0)
+   if(mode==31)
+    {
+      decode.SHTEMP_MIN= bytes[7]<<24>>24;
+      decode.SHTEMP_MAX= bytes[8]<<24>>24;
+      decode.SHHUM_MIN= bytes[9];
+      decode.SHHUM_MAX= bytes[10];         
+    }
+    else 
     {
       decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
       decode.EXTI_Trigger=(bytes[6] & 0x01)? "TRUE":"FALSE";
@@ -47,13 +54,7 @@ function Decoder(bytes, port) {
       decode.Hum_SHT31=parseFloat(((bytes[9]<<8 | bytes[10])/10).toFixed(1));
       decode.Data_time= getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10));         
     }
-    else if(mode==31)
-    {
-      decode.SHTEMP_MIN= bytes[7]<<24>>24;
-      decode.SHTEMP_MAX= bytes[8]<<24>>24;
-      decode.SHHUM_MIN= bytes[9];
-      decode.SHHUM_MAX= bytes[10];         
-    }
+    
     
     if(bytes.length==11)
       return decode;
