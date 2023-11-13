@@ -1,7 +1,7 @@
 function decodeUplink(input) {
         return { 
             data: Decode(input.fPort, input.bytes, input.variables)
-        };   
+        }   
 }
 function Decode(fPort, bytes, variables) {
    var decode = {}; 
@@ -10,7 +10,7 @@ function Decode(fPort, bytes, variables) {
    decode.EXTI_Trigger=(bytes[0] & 0x80)? "TRUE":"FALSE";
    decode.distance1_cm=(bytes[2]<<8 | bytes[3])/10;
    decode.distance2_cm=(bytes[4]<<8 | bytes[5])/10;
-   decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10
+   decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10;
    decode.distance4_cm=(bytes[8]<<8 | bytes[9])/10;
    decode.mes_type= bytes[10];
 
