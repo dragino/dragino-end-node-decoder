@@ -78,17 +78,31 @@ function Decode(fPort, bytes, variables) {
   else  
   {
       var decode={};
-      decode.EXTI_Trigger= (bytes[0] & 0x80)? "TRUE":"FALSE";    
+      var first=0;
+      decode.EXTI_Trigger= (bytes[0] & 0x80)? "TRUE":"FALSE";  
       decode.BatV= ((bytes[0]<<8 | bytes[1])&0x7FFF)/1000;
       decode.Payver= bytes[2];
       for(var i=3;i<bytes.length;i++)
       {
         var data= String.fromCharCode(bytes[i]);
-        if(i=='3')
-          decode.data_sum=data;
-        else
-          decode.data_sum+=data;
+        if(bytes[i]>=0xF0)
+        {
+          i=i+1;
+        }
+        else if(((bytes[i]==0x0D)||(bytes[i]==0x0A))||(bytes[i]>=0x20)&&(bytes[i]<=0x7E))
+        {
+          if(first===0)
+          {
+            decode.data_sum=data;
+            first=1;
+          }
+          else
+          {
+           decode.data_sum+=data;
+          }
+        }
       }
       return decode;   
   }
+  
 }
