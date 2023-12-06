@@ -11,6 +11,13 @@ function datalog(i,bytes){
   
   return string;
 }
+function Detect(i,bytes){
+   var aa=(bytes[0+i]<<8 |bytes[1+i])
+  var string='['+aa+']'+',';  
+  
+  
+  return string;
+}
 
 function getzf(c_num){ 
   if(parseInt(c_num) < 10)
@@ -131,6 +138,21 @@ function Decoder(bytes, port) {
     FREQUENCY_BAND:freq_band,
     SUB_BAND:sub_band,
     BAT:bat,
+    };
+  }
+  else if(port==0x06)
+  {
+    
+    for(var i=0;i<bytes.length;i=i+2)
+    {
+      var data= Detect(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    Detect_Mode_Data:data_sum,
     };
   }
 }
