@@ -97,7 +97,7 @@ var retransmission_Status=((bytes[6]>>7)&0x01);
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
 var data = {};
-if((fPort==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==0x04))){
+if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==0x04))){
 	var array1=[]
 	var bytes1="0x"
 	var str1=Str1(bytes)
@@ -187,7 +187,8 @@ else if(fPort==5)
     BAT:bat,
   };
 }
-
+if (retransmission_Status==0)
+{
 switch (poll_message_status) {		
 case 0:	
 { 
@@ -303,7 +304,9 @@ default:
       errors: ["unknown"]
     }
 }
-
+}
+else
+{
 switch (retransmission_Status) {
   case 1:
   {
@@ -324,5 +327,6 @@ default:
     return {
       errors: ["unknown"]
     }
+}
 }
 }

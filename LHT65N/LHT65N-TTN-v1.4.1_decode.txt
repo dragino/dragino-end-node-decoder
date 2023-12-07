@@ -181,7 +181,8 @@ else if(port==5)
     BAT:bat,
   };
 }
-
+if (retransmission_Status==0)
+{
 switch (poll_message_status) {		
 case 0:	
 { 
@@ -297,7 +298,9 @@ default:
       errors: ["unknown"]
     }
 }
-
+}
+else
+{
 switch (retransmission_Status) {
   case 1:
   {
@@ -318,5 +321,6 @@ default:
     return {
       errors: ["unknown"]
     }
+}
 }
 }
