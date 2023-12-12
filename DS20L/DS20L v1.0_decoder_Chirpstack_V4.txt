@@ -1,0 +1,146 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+function Decode(fPort, bytes, variables) {
+// Decode an uplink message from a buffer
+// (array) of bytes to an object of fields.
+	var i;
+	var batV=0;//Battery,units:V
+	var mod = 0;
+	var Firmware = 0;  // Firmware version; 5 bits   
+  var sub_band;
+  var freq_band;
+  var sensor; 
+  var firm_ver;	
+  var distance;
+  var distance_state;
+  var interrupt_count;
+  var interrupt;
+  var alarm;
+  var dout;
+  var toilet_paper;
+  var limit;
+  var upper_limit;
+  var lower_limit;
+  var do_flag;
+  if(fPort==0x02)
+  {
+    batV= (bytes[0]<<8 | bytes[1])/1000;
+    distance = (bytes[3]<<8 | bytes[4]);
+    distance_state = bytes[5];
+    interrupt = (bytes[2] >> 7) & 0x01;
+    mod = (bytes[2] >> 6);
+    if(mod == 1)
+    {
+     alarm = (bytes[2] >> 5) & 0x01; 
+     interrupt =  (bytes[2] >> 4) & 0x01;
+     interrupt_count = (bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9]);
+  		return {
+  		BatV:batV,
+  		Distance_mm:distance,
+  		distance_state:distance_state,
+  		Interrupt_count:interrupt_count,
+  		Interrupt:interrupt, 
+  		alarm:alarm,
+  		MOD:mod,
+  		};       
+    }
+    else
+    {
+      dout = (bytes[2] >> 4) & 0x01;
+      limit = (bytes[2] >>2) & 0x01;
+      alarm = (bytes[2] >> 5) & 0x01; 
+      do_flag = (bytes[2] >> 3) & 0x01; 
+      if(do_flag==1) 
+      {
+        interrupt_count = (bytes[3]<<24 | bytes[4]<<16 | bytes[5]<<8 | bytes[6]);
+        upper_limit = bytes[7]<<8 | bytes[8];
+        lower_limit = bytes[9]<<8 | bytes[10];  
+        return {
+    		BatV:batV,
+    		Interrupt_count:interrupt_count,
+    		MOD:mod,
+    		Threshold_Flag_for_Alarm:limit,
+    		Upper_limit:upper_limit,
+    		lower_limit:lower_limit,
+    		};         
+      }
+      else
+      {
+        distance = (bytes[3]<<8 | bytes[4]);
+        upper_limit = bytes[5]<<8 | bytes[6];
+        lower_limit = bytes[7]<<8 | bytes[8];
+        return {
+    		BatV:batV,
+    		Distance_mm:distance,
+    		MOD:mod,
+    		alarm:alarm,
+    		DO:dout,
+    		DO_Flag:do_flag,
+    		Threshold_Flag_for_Alarm:limit,
+    		Upper_limit:upper_limit,
+    		lower_limit:lower_limit,
+    		};         
+      }	
+      
+    }
+  
+  }
+  
+	if(fPort==0x05)
+	{
+		if(bytes[0]==0x21)
+		  sensor_mode="DS20L";
+		else
+		  sensor_mode="NULL"; 
+		   
+		if(bytes[4]==0xff)
+		  sub_band="NULL";
+		else
+		  sub_band=bytes[4];
+		
+		if(bytes[3]==0x01)
+		  freq_band="EU868";
+		else if(bytes[3]==0x02)
+		  freq_band="US915";
+		else if(bytes[3]==0x03)
+		  freq_band="IN865";
+		else if(bytes[3]==0x04)
+		  freq_band="AU915";
+		else if(bytes[3]==0x05)
+		  freq_band="KZ865";
+		else if(bytes[3]==0x06)
+		  freq_band="RU864";
+		else if(bytes[3]==0x07)
+		  freq_band="AS923";
+		else if(bytes[3]==0x08)
+		  freq_band="AS923_1";
+		else if(bytes[3]==0x09)
+		  freq_band="AS923_2";
+		else if(bytes[3]==0x0A)
+		  freq_band="AS923_3";
+		else if(bytes[3]==0x0B)
+		  freq_band="CN470";
+		else if(bytes[3]==0x0C)
+		  freq_band="EU433";
+		else if(bytes[3]==0x0D)
+		  freq_band="KR920";
+		else if(bytes[3]==0x0E)
+		  freq_band="MA869";
+		  
+		firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+		alarm = bytes[5];
+		batV= (bytes[6]<<8 | bytes[7])/1000;
+   
+		return {
+		BatV:batV,
+		SENSOR_MODEL:sensor_mode,
+		FIRMWARE_VERSION:firm_ver,
+		FREQUENCY_BAND:freq_band,
+		SUB_BAND:sub_band, 
+		SMODE:sensor,
+		};
+	}	
+}
