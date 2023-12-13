@@ -42,7 +42,7 @@ def dict_from_payload(base64_input: str, fport: int = None):
           }
     else:
       Ext = decoded[6] & 0x0F
-      poll_message_status=((decoded[6]>>6) & 0x01)
+      poll_message_status=((decoded[6]>>7) & 0x01)
       Connect=(decoded[6] & 0x80)>>7
       if poll_message_status == 0:
           if Ext == 9:
