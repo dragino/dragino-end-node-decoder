@@ -26,11 +26,12 @@ function Decoder(bytes, port) {
    } 
    else if((bytes[5]<<8 | bytes[6])>=0xE4A8)
    {
-   decode.Temp_Channel2=parseFloat(((bytes[5]<<8 | bytes[6])/100).toFixed(2));   
+   decode.Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/100).toFixed(2));
+    
    }
    else
    {
-   decode.Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/100).toFixed(2));
+   decode.Temp_Channel2=parseFloat(((bytes[5]<<8 | bytes[6])/100).toFixed(2));  
    }
  } 
  else if(decode.Ext==0x02) 
