@@ -97,7 +97,7 @@ var retransmission_Status=((bytes[6]>>7)&0x01);
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
 var data = {};
-if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==0x04))){
+if((fPort==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==0x04))){
 	var array1=[]
 	var bytes1="0x"
 	var str1=Str1(bytes)
@@ -131,7 +131,7 @@ if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==
     return decode;
   }
 }	
-else if(fPort==5)
+else if(f==5)
 {
   var sub_band;
   var freq_band;
