@@ -131,7 +131,7 @@ if((fPort==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]=
     return decode;
   }
 }	
-else if(f==5)
+else if(fPort==5)
 {
   var sub_band;
   var freq_band;
