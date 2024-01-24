@@ -40,7 +40,7 @@ function getMyDate(str){
 }
 
 function Decode(fPort, bytes, variables) {
-  if(port==0x02)
+  if(fPort==0x02)
   {
     var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
 	var batV=value/1000;//Battery,units:V
