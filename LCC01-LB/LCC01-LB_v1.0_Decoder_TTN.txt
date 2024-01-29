@@ -1,0 +1,106 @@
+//The function is :
+function Decoder(bytes, port) {
+// Decode an uplink message from a buffer
+// (array) of bytes to an object of fields.
+	var i;
+	var batV=0;//Battery,units:V
+	var mod = 0;
+	var Firmware = 0;  // Firmware version; 5 bits   
+  var sub_band;
+  var freq_band;
+  var sensor; 
+  var firm_ver;	
+  var weight_g;
+  var weight_state;
+  var weight_reading;
+  var scale_factor;
+  var weight_flag;
+  if(port==0x02)
+  {
+    batV= (bytes[0]<<8 | bytes[1])/1000;
+    mod = bytes[2] ;
+    weight_reading = (bytes[3]<<16 | bytes[4]<<8| bytes[5]);
+    weight_state = bytes[6];
+    scale_factor = bytes[7]<<8| bytes[8];
+    weight_flag = bytes[9];
+    weight_g = weight_reading*scale_factor;
+    if(mod == 1)
+    {
+  		return {
+  		BatV:batV,
+  		Actual_Weight_g:weight_g,
+  		Weight_Reading:weight_reading,
+  		Weight_state:weight_state,
+  		Scale_Factor:scale_factor,
+  		MOD:mod,
+  		};        
+    }
+		if(mod == 2)
+		{
+  		return {
+  		BatV:batV,
+  		Actual_Weight_g:weight_g,
+  		Weight_Reading:weight_reading,
+  		Weight_state:weight_state,
+  		Scale_Factor:scale_factor,
+  		MOD:mod,
+  		Weight_flag:weight_flag,
+  		};  		  
+		}
+  
+  }
+  
+	if(port==0x05)
+	{
+		if(bytes[0]==0x32)
+		  sensor_mode="LCC";
+		else
+		  sensor_mode="NULL"; 
+		   
+		if(bytes[4]==0xff)
+		  sub_band="NULL";
+		else
+		  sub_band=bytes[4];
+		
+		if(bytes[3]==0x01)
+		  freq_band="EU868";
+		else if(bytes[3]==0x02)
+		  freq_band="US915";
+		else if(bytes[3]==0x03)
+		  freq_band="IN865";
+		else if(bytes[3]==0x04)
+		  freq_band="AU915";
+		else if(bytes[3]==0x05)
+		  freq_band="KZ865";
+		else if(bytes[3]==0x06)
+		  freq_band="RU864";
+		else if(bytes[3]==0x07)
+		  freq_band="AS923";
+		else if(bytes[3]==0x08)
+		  freq_band="AS923_1";
+		else if(bytes[3]==0x09)
+		  freq_band="AS923_2";
+		else if(bytes[3]==0x0A)
+		  freq_band="AS923_3";
+		else if(bytes[3]==0x0B)
+		  freq_band="CN470";
+		else if(bytes[3]==0x0C)
+		  freq_band="EU433";
+		else if(bytes[3]==0x0D)
+		  freq_band="KR920";
+		else if(bytes[3]==0x0E)
+		  freq_band="MA869";
+		  
+		firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+		batV= (bytes[5]<<8 | bytes[6])/1000;
+   
+		return {
+		BatV:batV,
+		SENSOR_MODEL:sensor_mode,
+		FIRMWARE_VERSION:firm_ver,
+		FREQUENCY_BAND:freq_band,
+		SUB_BAND:sub_band, 
+		SMODE:sensor,
+		};
+	}	
+}
