@@ -1,0 +1,177 @@
+function Decoder(payload, payloadB64) {
+    // payload is the decoded payload
+    // payloadB64 is base64-encoded
+
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {  // Check the MSB
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            
+            return value;
+        }
+
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var mod = toInt(hex.substr(offset, 2)); offset += 2;
+        var tempDS18B20 = toInt(hex.substr(offset, 4), 16); offset += 4;
+        var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
+        var adc = toInt(hex.substr(offset, 4)); offset += 4;
+        var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
+        var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        
+        try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+        var dataSet = [];
+
+        while (offset < hex.length) {
+            var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
+            var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataSet.push({ shtTemp: shtTemp, shtHum: shtHum, timestamp: timestampLog });
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            mod: mod,
+            tempDS18B20: tempDS18B20,
+            interrupt: interrupt,
+            adc: adc,
+            shtTemp: shtTemp,
+            shtHum: shtHum,
+            timestamp: timestamp,
+            dataSet: dataSet
+        };
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    
+    payload = parsedData
+
+    // Extract the deviceID from the incoming data
+    var deviceID = payload.deviceID;
+
+    // Preparing to return data to Datacake...
+    // Extract main attributes
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainMod = payload.mod;
+    var mainTempDS18B20 = payload.tempDS18B20;
+    var mainInterrupt = payload.interrupt;
+    var mainAdc = payload.adc;
+    var mainShtTemp = payload.shtTemp;
+    var mainShtHum = payload.shtHum;
+    var mainTimestamp = payload.timestamp;
+    console.log(mainTimestamp)
+    // Initialize result array
+    var result = [];
+
+    // Add main attributes to result array
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "MOD",
+        value: mainMod,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "TEMPDS18B20",
+        value: mainTempDS18B20,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "INTERRUPT",
+        value: mainInterrupt,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "ADC",
+        value: mainAdc,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SHTTEMP",
+        value: mainShtTemp,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SHTHUM",
+        value: mainShtHum,
+        timestamp: mainTimestamp
+    });
+
+    // Extract data from dataSet array
+    var dataSet = payload.dataSet;
+    
+    for (var i = 0; i < dataSet.length; i++) {
+        var data = dataSet[i];
+        var shtTemp = data.shtTemp;
+        var shtHum = data.shtHum;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+        result.push({
+            field: "SHTTEMP",
+            value: shtTemp,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "SHTHUM",
+            value: shtHum,
+            timestamp: timestamp
+        });
+    }
+
+    return result;
+}

@@ -1,0 +1,202 @@
+function Decoder(payload, payloadB64) {
+    // payload is the decoded payload
+    // payloadB64 is base64-encoded
+
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {  // Check the MSB
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            
+            return value;
+        }
+
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var Mod = toInt(hex.substr(offset, 2)); offset += 2;
+        var Calculate_Flag = toInt(hex.substr(offset, 2)); offset += 2;
+        var Contact_Status = toInt(hex.substr(offset, 2)); offset += 2;
+        var Alarm = toInt(hex.substr(offset, 2)); offset += 2;
+        var Total_pulse = toInt(hex.substr(offset, 6)); offset += 6;
+        var last_open_duration = toInt(hex.substr(offset, 6)); offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        
+         try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+    
+
+        
+        
+        var dataset = [];
+
+        while (offset < hex.length) {
+            var Contact_Status = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var Total_pulse = toInt(hex.substr(offset, 6)); offset += 6;
+            var last_open_duration = toInt(hex.substr(offset, 6)); offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ Contact_Status: Contact_Status, Total_pulse: Total_pulse,last_open_duration: last_open_duration, timestamp: timestampLog });
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            Mod: Mod,
+            Calculate_Flag: Calculate_Flag,
+            Contact_Status: Contact_Status,
+            Alarm: Alarm,
+            Total_pulse: Total_pulse,
+            last_open_duration: last_open_duration,
+            timestamp: timestamp,
+            dataset: dataset
+        };
+    }
+
+        
+        
+      
+        
+       
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    
+    payload = parsedData
+
+    // Extract the deviceID from the incoming data
+    var deviceID = payload.deviceID;
+
+    // Preparing to return data to Datacake...
+    // Extract main attributes
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainMod = payload.Mod;
+    var mainCalculate_Flag = payload.Calculate_Flag;
+    var mainContact_Status = payload.Contact_Status;
+    var mainAlarm = payload.Alarm;
+    var mainTotal_pulse = payload.Total_pulse;
+    var mainlast_open_duration = payload.last_open_duration;
+    var mainTimestamp=payload.timestamp
+    console.log(mainTimestamp)
+    // Initialize result array
+    var result = [];
+    var mod = payload.mod;
+    
+    // Add main attributes to result array
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Mod",
+        value: mainMod,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Calculate_Flag",
+        value: mainCalculate_Flag,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "Contact_Status",
+        value: mainContact_Status,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Alarm",
+        value: mainAlarm,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Total_pulse",
+        value: mainTotal_pulse,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Alarm",
+        value: mainAlarm,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "last_open_duration",
+        value: mainlast_open_duration,
+        timestamp: mainTimestamp
+    });
+    
+ 
+    var dataset = payload.dataset;
+    
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var Contact_Status = data.Contact_Status;
+        var Total_pulse = data.Total_pulse;
+        var last_open_duration = data.last_open_duration;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+    result.push({
+        field: "Contact_Status",
+        value: Contact_Status,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "Total_pulse",
+        value: Total_pulse,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "last_open_duration",
+        value: last_open_duration,
+        timestamp: timestamp
+    });
+    
+   
+  }
+    
+    
+    return result;
+}
