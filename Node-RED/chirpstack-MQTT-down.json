@@ -1,0 +1,160 @@
+[
+    {
+        "id": "7b3ba7f3b90d2298",
+        "type": "tab",
+        "label": "流程 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "07c718c226b10b9d",
+        "type": "base64",
+        "z": "7b3ba7f3b90d2298",
+        "name": "",
+        "action": "",
+        "property": "payload",
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "a0c0c6b1831bf474"
+            ]
+        ]
+    },
+    {
+        "id": "2d057231722512d6",
+        "type": "function",
+        "z": "7b3ba7f3b90d2298",
+        "name": "function 4",
+        "func": "const str = msg.payload\nmsg.payload = Buffer.from(str,'hex')\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 120,
+        "wires": [
+            [
+                "07c718c226b10b9d"
+            ]
+        ]
+    },
+    {
+        "id": "988f3d1abf04d61a",
+        "type": "inject",
+        "z": "7b3ba7f3b90d2298",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "01000078",
+        "payloadType": "str",
+        "x": 200,
+        "y": 120,
+        "wires": [
+            [
+                "2d057231722512d6"
+            ]
+        ]
+    },
+    {
+        "id": "a0c0c6b1831bf474",
+        "type": "function",
+        "z": "7b3ba7f3b90d2298",
+        "name": "function 5",
+        "func": "const datastr = msg.payload\nconst payloadobj = {\n    \"devEui\": \"0000000000988965\",\n    \"confirmed\": true,                       \n    \"fPort\": 10,\n    \"data\": datastr                              \n}\nmsg.payload = payloadobj\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 260,
+        "wires": [
+            [
+                "b342373b962ad69a",
+                "a9de26841361082e"
+            ]
+        ]
+    },
+    {
+        "id": "b342373b962ad69a",
+        "type": "mqtt out",
+        "z": "7b3ba7f3b90d2298",
+        "name": "",
+        "topic": "application/917a7cfd-187c-4c26-aeb1-4bc584c7a665/device/0000000000988965/command/down",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "440637ac42b90983",
+        "x": 740,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "a9de26841361082e",
+        "type": "debug",
+        "z": "7b3ba7f3b90d2298",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "440637ac42b90983",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
