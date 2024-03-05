@@ -1,0 +1,341 @@
+[
+    {
+        "id": "fa2f37ae2eecef70",
+        "type": "tab",
+        "label": "LT-22222-L-TTNV3-MQTT-down",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9373cba3c7e2327b",
+        "type": "ui_switch",
+        "z": "fa2f37ae2eecef70",
+        "name": "Control the switch of RO",
+        "label": "switch",
+        "tooltip": "",
+        "group": "fe8955d51099922d",
+        "order": 1,
+        "width": "3",
+        "height": "2",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 390,
+        "y": 400,
+        "wires": [
+            [
+                "3436367ccf92f0ef"
+            ]
+        ]
+    },
+    {
+        "id": "3436367ccf92f0ef",
+        "type": "function",
+        "z": "fa2f37ae2eecef70",
+        "name": "function 25",
+        "func": "if(msg.payload==true){\n    msg.payload = {\n    \"downlinks\": [{\n    \"f_port\": 15,\n    \"frm_payload\": \"AwAB\",\n    \"priority\": \"NORMAL\",\n    //\"confirmed\": true\n  }]\n}\n    return msg\n}\nelse{\n    msg.payload = {\n        \"downlinks\": [{\n        \"f_port\": 15,\n        \"frm_payload\": \"AwAA\",\n        \"priority\": \"NORMAL\",\n        //\"confirmed\": true\n        }]\n    }\n    return msg\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 400,
+        "wires": [
+            [
+                "ca29deb958c0c396",
+                "bce0c77461f35dc2"
+            ]
+        ]
+    },
+    {
+        "id": "ca29deb958c0c396",
+        "type": "debug",
+        "z": "fa2f37ae2eecef70",
+        "name": "debug 173",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "bce0c77461f35dc2",
+        "type": "mqtt out",
+        "z": "fa2f37ae2eecef70",
+        "name": "",
+        "topic": "v3/1999@ttn/devices/eui-a84041a731825300/down/push",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "91c9b010c3e42767",
+        "x": 1070,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "d8384fc0e09ae0d4",
+        "type": "base64",
+        "z": "fa2f37ae2eecef70",
+        "name": "",
+        "action": "",
+        "property": "payload",
+        "x": 880,
+        "y": 260,
+        "wires": [
+            [
+                "d24a1bda81042338"
+            ]
+        ]
+    },
+    {
+        "id": "3528456851d3af2e",
+        "type": "function",
+        "z": "fa2f37ae2eecef70",
+        "name": "function 26",
+        "func": "var s = msg.payload\nvar reg = /.{2}/g;\nvar rs = s.match(reg);\nrs.push(s.substring(rs.join('').length))\nrs.pop()\nvar data = []\nfor (var i=0;i<rs.length;i++){\n    let number = parseInt('0x'+rs[i])\n    data.push(number)\n}\nmsg.payload = Buffer.from(data)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 260,
+        "wires": [
+            [
+                "d8384fc0e09ae0d4"
+            ]
+        ]
+    },
+    {
+        "id": "c024eb88bf950914",
+        "type": "inject",
+        "z": "fa2f37ae2eecef70",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "030001",
+        "payloadType": "str",
+        "x": 410,
+        "y": 260,
+        "wires": [
+            [
+                "3528456851d3af2e"
+            ]
+        ]
+    },
+    {
+        "id": "d24a1bda81042338",
+        "type": "debug",
+        "z": "fa2f37ae2eecef70",
+        "name": "debug 175",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "963f8e8db3e83969",
+        "type": "ui_switch",
+        "z": "fa2f37ae2eecef70",
+        "name": "Control the switch of DO",
+        "label": "switch",
+        "tooltip": "",
+        "group": "1098a8566745911a",
+        "order": 1,
+        "width": "3",
+        "height": "2",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 390,
+        "y": 560,
+        "wires": [
+            [
+                "9241ad0a1a5f4a1d"
+            ]
+        ]
+    },
+    {
+        "id": "9241ad0a1a5f4a1d",
+        "type": "function",
+        "z": "fa2f37ae2eecef70",
+        "name": "function 27",
+        "func": "if(msg.payload==true){\n    msg.payload = {\n    \"downlinks\": [{\n    \"f_port\": 15,\n    \"frm_payload\": \"AgEBAA==\",\n    \"priority\": \"NORMAL\",\n    //\"confirmed\": true\n  }]\n}\n    return msg\n}\nelse{\n    msg.payload = {\n        \"downlinks\": [{\n        \"f_port\": 15,\n        \"frm_payload\": \"AgAAAA==\",\n        \"priority\": \"NORMAL\",\n        //\"confirmed\": true\n        }]\n    }\n    return msg\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 560,
+        "wires": [
+            [
+                "bce0c77461f35dc2",
+                "07ccbe7758a0d014"
+            ]
+        ]
+    },
+    {
+        "id": "07ccbe7758a0d014",
+        "type": "debug",
+        "z": "fa2f37ae2eecef70",
+        "name": "debug 176",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "96607801969eeb53",
+        "type": "comment",
+        "z": "fa2f37ae2eecef70",
+        "name": "Convert hexadecimal string to base64",
+        "info": "",
+        "x": 750,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "1bcc0d32e96ad8bf",
+        "type": "comment",
+        "z": "fa2f37ae2eecef70",
+        "name": "Modifying the value of base64 can send all downstream instructions",
+        "info": "",
+        "x": 680,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "4e2eb12f78586518",
+        "type": "comment",
+        "z": "fa2f37ae2eecef70",
+        "name": "MQTT downlink topic for TTN",
+        "info": "",
+        "x": 1060,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "fe8955d51099922d",
+        "type": "ui_group",
+        "name": "Control the switch of RO",
+        "tab": "aae3eb3833f989c1",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "91c9b010c3e42767",
+        "type": "mqtt-broker",
+        "name": "TTN下发测试",
+        "broker": "eu1.cloud.thethings.network",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "1098a8566745911a",
+        "type": "ui_group",
+        "name": "Control the switch of DO",
+        "tab": "aae3eb3833f989c1",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "aae3eb3833f989c1",
+        "type": "ui_tab",
+        "name": "button",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

@@ -3,7 +3,7 @@ function decodeUplink(input) {
             data: Decode(input.fPort, input.bytes, input.variables)
         };   
 }
-function Decoder(bytes, fPort) {
+function Decode(fPort, bytes, variables) {
 //RS485-BL Decode   
   if(fPort==0x02)
   {  
