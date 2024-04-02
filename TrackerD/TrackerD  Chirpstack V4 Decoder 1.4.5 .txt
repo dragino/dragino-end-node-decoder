@@ -296,9 +296,11 @@ if(fPort==0x05)
 
 		con = "";
 		for(i = 0 ; i < 16 ; i++) {
+			if(bytes[i]<0x10)
+				con+=0;
 		  	con += bytes[i].toString(16);
-		  	
 		}
+
 		value =  con;
 		var uuid = value;	
 		alarm=(bytes[24] & 0x40)?"TRUE":"FALSE";//Alarm status
