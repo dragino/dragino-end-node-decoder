@@ -81,7 +81,7 @@ function Decode(fPort, bytes, variables) {
     if(bytes.length==11)
       return decode;
   }
-  else if(port==3)  
+  else if(fPort==3)  
   {
     var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
