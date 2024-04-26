@@ -1,0 +1,334 @@
+function Decoder(payload, payloadB64) {
+    // payload is the decoded payload
+    // payloadB64 is base64-encoded
+
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {  // Check the MSB
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            
+            return value;
+        }
+
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var mod = toInt(hex.substr(offset, 2)); offset += 2;
+        if (mod == 1)
+        {
+            
+        
+        var Door_Status_pb14 = toInt(hex.substr(offset, 2)); offset += 2;
+        var Alarm_Status_pb14 = toInt(hex.substr(offset, 2)); offset += 2;
+        var door_open_num_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var last_open_time_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var dataset = [];
+
+        while (offset < hex.length) {
+            var Door_Status_pb14 = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var door_open_num_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var last_open_time_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ Door_Status_pb14: Door_Status_pb14, door_open_num_pb14: door_open_num_pb14,last_open_time_pb14: last_open_time_pb14, timestamp: timestampLog });
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            mod: mod,
+            Door_Status_pb14: Door_Status_pb14,
+            door_open_num_pb14: door_open_num_pb14,
+            last_open_time_pb14: last_open_time_pb14,
+            timestamp: timestamp,
+            dataset: dataset
+        };
+    }
+
+        
+        
+        if (mod == 2)
+        {
+        var Door_Status_pb14 = toInt(hex.substr(offset, 2)); offset += 2;
+        var Alarm_Status_pb14 = toInt(hex.substr(offset, 2)); offset += 2;
+        var door_open_num_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var last_open_time_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var Door_Status_pb15 = toInt(hex.substr(offset, 2)); offset += 2;
+        var Alarm_Status_pb15 = toInt(hex.substr(offset, 2)); offset += 2;
+        var door_open_num_pb15 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var last_open_time_pb15 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var dataset = [];
+
+        while (offset < hex.length) {
+            var Door_Status_pb14 = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var door_open_num_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var last_open_time_pb14 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var Door_Status_pb15 = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var door_open_num_pb15 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var last_open_time_pb15 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ Door_Status_pb14: Door_Status_pb14, door_open_num_pb14: door_open_num_pb14,last_open_time_pb14: last_open_time_pb14,Door_Status_pb15: Door_Status_pb15, door_open_num_pb15: door_open_num_pb15,last_open_time_pb15: last_open_time_pb15, timestamp: timestampLog });
+			}
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            mod: mod,
+            Door_Status_pb14: Door_Status_pb14, 
+            door_open_num_pb14: door_open_num_pb14,
+            last_open_time_pb14: last_open_time_pb14,
+            Door_Status_pb15: Door_Status_pb15,
+            door_open_num_pb15: door_open_num_pb15,
+            last_open_time_pb15: last_open_time_pb15,
+            timestamp: timestamp,
+            dataset : dataset,
+        };
+        
+        }
+        
+        try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    
+    payload = parsedData
+
+    // Extract the deviceID from the incoming data
+    var deviceID = payload.deviceID;
+
+    // Preparing to return data to Datacake...
+    // Extract main attributes
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainMod = payload.mod;
+    var mainDoor_Status_pb14 = payload.Door_Status_pb14;
+    var mainAlarm_Status_pb14 = payload.Alarm_Status_pb14;
+    var mainlast_open_time_pb14 = payload.last_open_time_pb14;
+    var maindoor_open_num_pb14 = payload.door_open_num_pb14;
+    var mainDoor_Status_pb15 = payload.Door_Status_pb15;
+    var mainAlarm_Status_pb15 = payload.Alarm_Status_pb15;
+    var mainlast_open_time_pb15 = payload.last_open_time_pb15;
+    var maindoor_open_num_pb15 = payload.door_open_num_pb15;
+    var mainTimestamp=payload.timestamp
+    console.log(mainTimestamp)
+    // Initialize result array
+    var result = [];
+    var mod = payload.mod;
+    if (mod == 1)
+    {
+    // Add main attributes to result array
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "MOD",
+        value: mainMod,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "Door_Status_pb14",
+        value: mainDoor_Status_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Alarm_Status_pb14",
+        value: mainAlarm_Status_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "door_open_num_pb14",
+        value: maindoor_open_num_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "last_open_time_pb14",
+        value: mainlast_open_time_pb14,
+        timestamp: mainTimestamp
+    });
+    }
+   if (mod == 2)
+   {
+     result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "MOD",
+        value: mainMod,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "Door_Status_pb14",
+        value: mainDoor_Status_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Alarm_Status_pb14",
+        value: mainAlarm_Status_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "door_open_num_pb14",
+        value: maindoor_open_num_pb14,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "last_open_time_pb14",
+        value: mainlast_open_time_pb14,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "Door_Status_pb15",
+        value: mainDoor_Status_pb15,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Alarm_Status_pb15",
+        value: mainAlarm_Status_pb15,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "door_open_num_pb15",
+        value: maindoor_open_num_pb15,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "last_open_time_pb15",
+        value: mainlast_open_time_pb15,
+        timestamp: mainTimestamp
+    });
+   }
+    var dataset = payload.dataset;
+    if (mod == 1){
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var Door_Status_pb14 = data.Door_Status_pb14;
+        var door_open_num_pb14 = data.door_open_num_pb14;
+        var last_open_time_pb14 = data.last_open_time_pb14;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+    result.push({
+        field: "Door_Status_pb14",
+        value: Door_Status_pb14,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "door_open_num_pb14",
+        value: door_open_num_pb14,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "last_open_time_pb14",
+        value: last_open_time_pb14,
+        timestamp: timestamp
+    });
+    }
+    var dataset = payload.dataset;
+    }
+    if (mod == 2){
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var Door_Status_pb14 = data.Door_Status_pb14;
+        var door_open_num_pb14 = data.door_open_num_pb14;
+        var last_open_time_pb14 = data.last_open_time_pb14;
+        var Door_Status_pb15 = data.Door_Status_pb15;
+        var door_open_num_pb15 = data.door_open_num_pb15;
+        var last_open_time_pb15 = data.last_open_time_pb15;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+    result.push({
+        field: "Door_Status_pb14",
+        value: Door_Status_pb14,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "door_open_num_pb14",
+        value: door_open_num_pb14,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "last_open_time_pb14",
+        value: last_open_time_pb14,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "Door_Status_pb15",
+        value: Door_Status_pb15,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "door_open_num_pb15",
+        value: door_open_num_pb15,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "last_open_time_pb15",
+        value: last_open_time_pb15,
+        timestamp: timestamp
+    });
+    }
+    var dataset = payload.dataset;    
+    }
+    
+    
+    return result;
+}
