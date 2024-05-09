@@ -11,8 +11,7 @@ function Decoder(payload, payloadB64) {
         }
         return hex;
     }
-    
-    
+
     function parsePayload(hex) {
         var offset = 0;
 
@@ -31,14 +30,10 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var mod = toInt(hex.substr(offset, 2)); offset += 2;
-        var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
-        var Soil_Moisture = toInt(hex.substr(offset, 4))/100; offset += 4;
-        var Soil_Temperature = toInt(hex.substr(offset, 4), 16)/100; offset += 4;
-        var Soil_EC = toInt(hex.substr(offset, 4), 16)/10; offset += 4;
-        var Soil_dielectric_constant = toInt(hex.substr(offset, 4), 16)/10; offset += 4;
+        var GPIO_EXIT_Level  = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXIT_Flag = toInt(hex.substr(offset, 2)); offset += 2;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
-        
+        var Payload_version = toInt(hex.substr(offset, 2)); offset += 2;
         try {
             
             // Parse the higher byte for sensor model
@@ -62,30 +57,17 @@ function Decoder(payload, payloadB64) {
             console.log(JSON.stringify(e))
         }
 
-        var dataSet = [];
-
-        while (offset < hex.length) {
-            var Soil_Moisture1 = toInt(hex.substr(offset, 4), 16)/ 100; offset += 4;
-            var Soil_Temperature1 = toInt(hex.substr(offset, 4), 16)/ 100; offset += 4;
-            var Soil_EC1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
-            var Soil_dielectric_constant1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
-            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({  Soil_Moisture1: Soil_Moisture, Soil_Temperature1: Soil_Temperature,Soil_EC1: Soil_EC,Soil_dielectric_constant1: Soil_dielectric_constant,timestamp: timestampLog });
-        }
+        
 
         return {
             deviceID: deviceID,
             version: version,
             battery: battery,
             signal: signal,
-            mod: mod,
-            interrupt: interrupt,
-            Soil_Moisture: Soil_Moisture,
-            Soil_Temperature: Soil_Temperature,
-            Soil_EC: Soil_EC,
-            Soil_dielectric_constant: Soil_dielectric_constant,
+            GPIO_EXIT_Level: GPIO_EXIT_Level,
+            GPIO_EXIT_Flag: GPIO_EXIT_Flag,
             timestamp: timestamp,
-            dataSet: dataSet
+            Payload_version: Payload_version
         };
     }
 
@@ -101,12 +83,9 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
-    var mainMod = payload.mod;
-    var mainInterrupt = payload.interrupt;
-    var mainSoil_Moisture = payload.Soil_Moisture;
-    var mainSoil_Temperature = payload.Soil_Temperature;
-    var mainSoil_EC = payload.Soil_EC;
-    var mainSoil_dielectric_constant = payload.Soil_dielectric_constant;
+    var mainGPIO_EXIT_Level = payload.GPIO_EXIT_Level;
+    var mainGPIO_EXIT_Flag = payload.GPIO_EXIT_Flag;
+    var mainPayload_version = payload.Payload_version;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -123,70 +102,27 @@ function Decoder(payload, payloadB64) {
         value: mainSignal,
         timestamp: mainTimestamp
     });
+   
     result.push({
-        field: "MOD",
-        value: mainMod,
+        field: "GPIO_EXIT_Level",
+        value: mainGPIO_EXIT_Level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Soil_Temperature",
-        value: mainSoil_Temperature,
+        field: "GPIO_EXIT_Flag",
+        value: mainGPIO_EXIT_Flag,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "INTERRUPT",
-        value: mainInterrupt,
+        field: "Payload_version",
+        value: mainPayload_version,
         timestamp: mainTimestamp
     });
-    result.push({
-        field: "Soil_Moisture",
-        value: mainSoil_Moisture,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "Soil_EC",
-        value: mainSoil_EC,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "Soil_dielectric_constant",
-        value: mainSoil_dielectric_constant,
-        timestamp: mainTimestamp
-    });
-
+   
     // Extract data from dataSet array
     var dataSet = payload.dataSet;
     
-    for (var i = 0; i < dataSet.length; i++) {
-        var data = dataSet[i];
-        var Soil_Moisture1 = data.Soil_Moisture1;
-        var Soil_Temperature1 = data.Soil_Temperature1;
-        var Soil_EC1 = data.Soil_EC1;
-        var Soil_dielectric_constant1 = data.Soil_dielectric_constant1;
-        var timestamp = data.timestamp;
-        console.log(timestamp)
-        
-        result.push({
-        field: "Soil_Moisture",
-        value: Soil_Moisture1,
-        timestamp: timestamp
-    });
-    result.push({
-        field: "Soil_Temperature",
-        value: Soil_Temperature1,
-        timestamp: timestamp
-    });
-    result.push({
-        field: "Soil_EC",
-        value: Soil_EC1,
-        timestamp: timestamp
-    });
-    result.push({
-        field: "Soil_dielectric_constant",
-        value: Soil_dielectric_constant1,
-        timestamp: timestamp
-    });
-    }
+   
 
     return result;
 }
