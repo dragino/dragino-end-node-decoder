@@ -1,3 +1,8 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
 function datalog(i,bytes){
   var aa= bytes[3+i];
   var bb= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/100).toFixed(2));
@@ -34,9 +39,9 @@ function getMyDate(str){
   return c_Time;
 }
 
-function Decoder(bytes, port) {
+function Decode(fPort, bytes, variables) {
   //TC01-LB Decode   
-  if(port==0x02)
+  if(fPort==0x02)
   {
     var decode = {};
     decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
@@ -51,7 +56,7 @@ function Decoder(bytes, port) {
     if(bytes.length==10)
       return decode;
   }
-  else if(port==3)  
+  else if(fPort==3)  
   {
     var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
@@ -67,7 +72,7 @@ function Decoder(bytes, port) {
     PNACKMD:pnack,
     };    
   }
-  else if(port==5)
+  else if(fPort==5)
   {
   	var freq_band;
   	var sub_band;
