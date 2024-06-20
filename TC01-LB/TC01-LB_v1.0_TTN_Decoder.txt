@@ -1,6 +1,6 @@
 function datalog(i,bytes){
   var aa= bytes[3+i];
-  var bb= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/100).toFixed(2));
+  var bb= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/10).toFixed(2));
   var cc= (bytes[6+i]&0x02) ? "High":"Low";
   var dd= (bytes[6+i]&0x01) ? "True":"False";
   var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
@@ -41,7 +41,7 @@ function Decoder(bytes, port) {
     var decode = {};
     decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
     decode.Type= bytes[2];
-    decode.TempC= parseFloat(((bytes[3]<<24>>16 | bytes[4])/100).toFixed(2));
+    decode.TempC= parseFloat(((bytes[3]<<24>>16 | bytes[4])/10).toFixed(2));
     decode.Interrupt_flag=(bytes[5] & 0x01)? "TRUE":"FALSE";
     decode.Interrupt_level=(bytes[5] & 0x02)? "HIGH":"LOW";      
     decode.TEMPH_flag= (bytes[5] &0x04)? "True":"False";
