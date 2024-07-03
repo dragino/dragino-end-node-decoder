@@ -87,8 +87,8 @@ function getMyDate(str){
 function Decoder(bytes, port) {
 var Ext= bytes[6]&0x0F;
 var button = bytes[6]&0x10;
-var poll_message_status=((bytes[6]>>6)&0x01);
-var retransmission_Status=((bytes[6]>>7)&0x01);
+var poll_message_status=((bytes[6]>>6)&0x03);
+
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
 var data = {};
@@ -307,33 +307,33 @@ case 1:
       else
         decode.DATALOG+=da;
     }
+
 }
 {
 return decode;
 }
 break;
-default:
-    return {
-      errors: ["unknown"]
-    }
-}
 
-switch (retransmission_Status) {
-  case 1:
+case 2:
   {
     for(var i=0;i<bytes.length;i=i+11)
     {
       var da= datalog(i,bytes);
       if(i=='0')
-        data.retransmission_message=da;
+        data.DATALOG=da;
       else
-        data.retransmission_message+=da;
+        data.DATALOG+=da;
     }
 }
 {
-return data;
+return{
+    data:da,
+    retransmission_Status:"retransmission_Status",
+    };
 }
 break;
+
+
 default:
     return {
       errors: ["unknown"]
