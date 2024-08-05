@@ -30,14 +30,11 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var direction = toInt(hex.substr(offset, 2)); offset += 2;
-        var alarm  = toInt(hex.substr(offset, 2)); offset += 2;
-        var Level_PA4 = toInt(hex.substr(offset, 2)); offset += 2;
-        var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
-        var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
-        var ds18b201 = toInt(hex.substr(offset, 4))/10; offset += 4;
-        var roll1 = toInt(hex.substr(offset, 4))/100; offset += 4;
-        var pitch1 = toInt(hex.substr(offset, 4))/100; offset += 4;
+        var Mod = toInt(hex.substr(offset, 2)); offset += 2;
+        var Dorr_status1 = toInt(hex.substr(offset, 2)); offset += 2;
+        var Alarm_status = toInt(hex.substr(offset, 2)); offset += 2;
+        var Door_open_num1 = toInt(hex.substr(offset, 6)); offset += 6;
+        var Last_open_times1 = toInt(hex.substr(offset, 6)); offset += 6;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
@@ -66,11 +63,11 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
-            var ds18b20 = toInt(hex.substr(offset, 4))/10; offset += 4;
-            var roll = toInt(hex.substr(offset, 4))/100; offset += 4;
-            var pitch = toInt(hex.substr(offset, 4))/100; offset += 4;
+            var Dorr_status = toInt(hex.substr(offset, 2)); offset += 2;
+            var Door_open_num = toInt(hex.substr(offset, 6)); offset += 6;
+            var Last_open_times = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ ds18b20: ds18b20,roll: roll,pitch: pitch,  timestamp: timestampLog });
+            dataSet.push({Dorr_status:Dorr_status, Door_open_num: Door_open_num, Last_open_times: Last_open_times, timestamp: timestampLog });
         }
 
         return {
@@ -78,18 +75,14 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
-            direction: direction,
-            alarm: alarm,
-            Level_PA4: Level_PA4,
-            interrupt: interrupt,
-            Interrupt_level: Interrupt_level,
-            ds18b20: ds18b20,
-            roll: roll,
-            pitch: pitch,
-            ds18b201: ds18b201,
-            roll1: roll1,
-            pitch: pitch1,
-            times1tamp: timestamp,
+            Mod: Mod,
+            Dorr_status1: Dorr_status1,
+            Door_open_num1: Door_open_num1,
+            Last_open_times1: Last_open_times1,
+            Dorr_status: Dorr_status,
+            Alarm_status: Alarm_status,
+            Door_open_num: Door_open_num,
+            Last_open_times: Last_open_times,
             dataSet: dataSet
         };
     }
@@ -106,25 +99,17 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
-    var maindirection = payload.direction;
-    var mainLevel_PA4 = payload.Level_PA4;
-    var maininterrupt = payload.interrupt;
-    var mainInterrupt_level = payload.Interrupt_level;
-    var mainds18b20 = payload.ds18b201;
-    var mainalarm = payload.alarm;
-    var mainroll = payload.roll1;
-    var mainpitch = payload.pitch1;
+    var mainMod = payload.Mod;
+    var mainDorr_status = payload.Dorr_status1;
+    var mainAlarm_status = payload.Alarm_status;
+    var mainLast_open_times = payload.Last_open_times1;
+    var mainDoor_open_num = payload.Door_open_num1;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
     var result = [];
 
     // Add main attributes to result array
-    result.push({
-        field: "DeviceID",
-        value: deviceID,
-        timestamp: mainTimestamp
-    });
     result.push({
         field: "BATTERY",
         value: mainBattery,
@@ -136,71 +121,56 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "direction",
-        value: maindirection,
+        field: "MOD",
+        value: mainMod,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "alarm",
-        value: mainalarm,
+        field: "Dorr_status",
+        value: mainDorr_status,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Level_PA4",
-        value: mainLevel_PA4,
+        field: "Last_open_times",
+        value: mainLast_open_times,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "interrupt",
-        value: maininterrupt,
+        field: "Alarm_status",
+        value: mainAlarm_status,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Interrupt_level",
-        value: mainInterrupt_level,
+        field: "Door_open_num",
+        value: mainDoor_open_num,
         timestamp: mainTimestamp
     });
-    result.push({
-        field: "ds18b20",
-        value: mainds18b20,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "roll",
-        value: mainroll,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "pitch",
-        value: mainpitch,
-        timestamp: mainTimestamp
-    });
-   
+    
 
     // Extract data from dataSet array
     var dataSet = payload.dataSet;
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
-        var ds18b20 = data.ds18b20;
-        var roll = data.roll;
-        var pitch = data.pitch;
+        var Dorr_status = data.Dorr_status;
+        var Last_open_times = data.Last_open_times;
+        var Door_open_num = data.Door_open_num;
         var timestamp = data.timestamp;
         console.log(timestamp)
         
         result.push({
-            field: "ds18b20",
-            value: ds18b20,
+            field: "Dorr_status",
+            value: Dorr_status,
             timestamp: timestamp
         });
         result.push({
-            field: "roll",
-            value: roll,
+            field: "Last_open_times",
+            value: Last_open_times,
             timestamp: timestamp
         });
         result.push({
-            field: "pitch",
-            value: pitch,
+            field: "Door_open_num",
+            value: Door_open_num,
             timestamp: timestamp
         });
     }

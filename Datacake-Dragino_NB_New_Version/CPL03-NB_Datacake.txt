@@ -1,0 +1,290 @@
+function Decoder(payload, payloadB64) {
+    // payload is the decoded payload
+    // payloadB64 is base64-encoded
+
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {  // Check the MSB
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            
+            return value;
+        }
+
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var PA8_status = toInt(hex.substr(offset, 2)); offset += 2;
+        var TTRchannel = toInt((hex.substr(27, 1)>>3)&0x0F);
+
+        if (TTRchannel == 0)
+        {
+        var PA8_door_open_num = toInt(hex.substr(offset, 6)); offset += 6;
+        var PA8_last_open_time = toInt(hex.substr(offset, 6)); offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var dataset = [];
+
+        while (offset < hex.length) {
+            var PA8_status = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var PA8_door_open_num = toInt(hex.substr(offset, 6)); offset += 6;
+            var PA8_last_open_time = toInt(hex.substr(offset, 6)); offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ PA8_status: PA8_status, PA8_door_open_num: PA8_door_open_num,PA8_last_open_time: PA8_last_open_time, timestamp: timestampLog });
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            TTRchannel: TTRchannel,
+            PA8_status: PA8_status,
+            PA8_door_open_num: PA8_door_open_num,
+            PA8_last_open_time: PA8_last_open_time,
+            timestamp: timestamp,
+            dataset: dataset
+        };
+    }
+
+        
+        
+        if (TTRchannel == 1)
+        {
+        var count_time1 = toInt(hex.substr(offset, 6)); offset += 6;
+        var count_time2 = toInt(hex.substr(offset, 6)); offset += 6;
+        var count_time3 = toInt(hex.substr(offset, 6)) ; offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var dataset = [];
+
+        while (offset < hex.length) {
+            var PA8_status = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var count_time1 = toInt(hex.substr(offset, 6)); offset += 6;
+            var count_time2 = toInt(hex.substr(offset, 6)); offset += 6;
+            var count_time3 = toInt(hex.substr(offset, 6)) ; offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ PA8_status: PA8_status, count_time1: count_time1,count_time2: count_time2,count_time3: count_time3,  timestamp: timestampLog });
+			}
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            mod: mod,
+            TTRchannel: TTRchannel,
+            PA8_status: PA8_status, 
+            count_time1: count_time1,
+            count_time2: count_time2,
+            count_time3: count_time3,
+            timestamp: timestamp,
+            dataset : dataset,
+        };
+        
+        }
+        
+        
+        try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    
+    payload = parsedData
+
+    // Extract the deviceID from the incoming data
+    var deviceID = payload.deviceID;
+
+    // Preparing to return data to Datacake...
+    // Extract main attributes
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainPA8_status = payload.PA8_status;
+    var mainTTRchannel = payload.TTRchannel;
+    var mainPA8_door_open_num = payload.PA8_door_open_num;
+    var mainPA8_last_open_time = payload.PA8_last_open_time;
+    var maincount_time1 = payload.count_time1;
+    var maincount_time2 = payload.count_time2;
+    var maincount_time3 = payload.count_time3;
+    var mainTimestamp=payload.timestamp
+    console.log(mainTimestamp)
+    // Initialize result array
+    var result = [];
+    var mod = payload.mod;
+    if (mainTTRchannel == 0)
+    {
+    // Add main attributes to result array
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_status",
+        value: mainPA8_status,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_door_open_num",
+        value: mainPA8_door_open_num,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "TTRchannel",
+        value: mainTTRchannel,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_last_open_time",
+        value: mainPA8_last_open_time,
+        timestamp: mainTimestamp
+    });
+    
+    }
+   if (mainTTRchannel == 1)
+   {
+     result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+   
+    result.push({
+        field: "PA8_status",
+        value: mainPA8_status,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "TTRchannel",
+        value: mainTTRchannel,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "count_time1",
+        value: maincount_time1,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "count_time2",
+        value: maincount_time2,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "count_time3",
+        value: maincount_time3,
+        timestamp: mainTimestamp
+    });
+    
+   }
+    var dataset = payload.dataset;
+    if  (mainTTRchannel == 0){
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var PA8_status = data.PA8_status;
+        var PA8_door_open_num = data.PA8_door_open_num;
+        var PA8_last_open_time = data.PA8_last_open_time;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+    result.push({
+        field: "PA8_status",
+        value: PA8_status,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "PA8_door_open_num",
+        value: PA8_door_open_num,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "PA8_last_open_time",
+        value: PA8_last_open_time,
+        timestamp: timestamp
+    });
+    }
+    var dataset = payload.dataset;
+    }
+    if (mainTTRchannel == 1){
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var PA8_status = data.PA8_status;
+        var count_time1 = data.count_time1;
+        var count_time2 = data.count_time2;
+        var count_time3 = data.count_time3;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+    result.push({
+        field: "PA8_status",
+        value: PA8_status,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "count_time1",
+        value: count_time1,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "count_time2",
+        value: count_time2,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "count_time3",
+        value: count_time3,
+        timestamp: timestamp
+    });
+   
+    }
+    var dataset = payload.dataset;    
+    }
+    
+    
+    return result;
+}

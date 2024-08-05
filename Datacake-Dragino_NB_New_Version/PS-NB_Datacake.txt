@@ -30,14 +30,13 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var direction = toInt(hex.substr(offset, 2)); offset += 2;
-        var alarm  = toInt(hex.substr(offset, 2)); offset += 2;
-        var Level_PA4 = toInt(hex.substr(offset, 2)); offset += 2;
-        var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
-        var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
-        var ds18b201 = toInt(hex.substr(offset, 4))/10; offset += 4;
-        var roll1 = toInt(hex.substr(offset, 4))/100; offset += 4;
-        var pitch1 = toInt(hex.substr(offset, 4))/100; offset += 4;
+        var Probe_Model = toInt(hex.substr(offset, 4)); offset += 4;
+        var interrupt1 = toInt(hex.substr(offset, 2)); offset += 2;
+        var interrupt2 = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXTI_level = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXTI_flag = toInt(hex.substr(offset, 2)); offset += 2;
+        var IDC_intput_mA = toInt(hex.substr(offset, 4)); offset += 4;
+        var VDC_intput_V = toInt(hex.substr(offset, 4)); offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
@@ -66,11 +65,10 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
-            var ds18b20 = toInt(hex.substr(offset, 4))/10; offset += 4;
-            var roll = toInt(hex.substr(offset, 4))/100; offset += 4;
-            var pitch = toInt(hex.substr(offset, 4))/100; offset += 4;
+            var IDC_intput_mA = toInt(hex.substr(offset, 4)); offset += 4;
+            var VDC_intput_V = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ ds18b20: ds18b20,roll: roll,pitch: pitch,  timestamp: timestampLog });
+            dataSet.push({ IDC_intput_mA: IDC_intput_mA,VDC_intput_V:VDC_intput_V,  timestamp: timestampLog });
         }
 
         return {
@@ -78,18 +76,14 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
-            direction: direction,
-            alarm: alarm,
-            Level_PA4: Level_PA4,
-            interrupt: interrupt,
-            Interrupt_level: Interrupt_level,
-            ds18b20: ds18b20,
-            roll: roll,
-            pitch: pitch,
-            ds18b201: ds18b201,
-            roll1: roll1,
-            pitch: pitch1,
-            times1tamp: timestamp,
+            Probe_Model: Probe_Model,
+            interrupt1: interrupt1,
+            interrupt2: interrupt2,
+            GPIO_EXTI_level:GPIO_EXTI_level,
+            GPIO_EXTI_flag: GPIO_EXTI_flag,
+            IDC_intput_mA: IDC_intput_mA,
+            VDC_intput_V: VDC_intput_V,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }
@@ -106,14 +100,13 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
-    var maindirection = payload.direction;
-    var mainLevel_PA4 = payload.Level_PA4;
-    var maininterrupt = payload.interrupt;
-    var mainInterrupt_level = payload.Interrupt_level;
-    var mainds18b20 = payload.ds18b201;
-    var mainalarm = payload.alarm;
-    var mainroll = payload.roll1;
-    var mainpitch = payload.pitch1;
+    var mainProbe_Model = payload.Probe_Model;
+    var maininterrupt1 = payload.interrupt1;
+    var maininterrupt2 = payload.interrupt2;
+    var mainGPIO_EXTI_level = payload.GPIO_EXTI_level;
+    var mainGPIO_EXTI_flag = payload.GPIO_EXTI_flag;
+    var mainIDC_intput_mA = payload.IDC_intput_mA;
+    var mainVDC_intput_V = payload.VDC_intput_V;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -136,45 +129,41 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "direction",
-        value: maindirection,
+        field: "Probe_Model",
+        value: mainProbe_Model,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "alarm",
-        value: mainalarm,
+        field: "interrupt1",
+        value: maininterrupt1,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Level_PA4",
-        value: mainLevel_PA4,
+        field: "interrupt2",
+        value: maininterrupt2,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "interrupt",
-        value: maininterrupt,
+        field: "GPIO_EXTI_level",
+        value: mainGPIO_EXTI_level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Interrupt_level",
-        value: mainInterrupt_level,
+        field: "GPIO_EXTI_level",
+        value: mainGPIO_EXTI_level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "ds18b20",
-        value: mainds18b20,
+        field: "IDC_intput_mA",
+        value: mainIDC_intput_mA,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "roll",
-        value: mainroll,
+        field: "VDC_intput_V",
+        value: mainVDC_intput_V,
         timestamp: mainTimestamp
     });
-    result.push({
-        field: "pitch",
-        value: mainpitch,
-        timestamp: mainTimestamp
-    });
+    
    
 
     // Extract data from dataSet array
@@ -182,27 +171,22 @@ function Decoder(payload, payloadB64) {
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
-        var ds18b20 = data.ds18b20;
-        var roll = data.roll;
-        var pitch = data.pitch;
+        var IDC_intput_mA = data.IDC_intput_mA;
+        var VDC_intput_V = data.VDC_intput_V;
         var timestamp = data.timestamp;
         console.log(timestamp)
         
-        result.push({
-            field: "ds18b20",
-            value: ds18b20,
+         result.push({
+            field: "IDC_intput_mA",
+            value: IDC_intput_mA,
             timestamp: timestamp
         });
         result.push({
-            field: "roll",
-            value: roll,
+            field: "VDC_intput_V",
+            value: VDC_intput_V,
             timestamp: timestamp
         });
-        result.push({
-            field: "pitch",
-            value: pitch,
-            timestamp: timestamp
-        });
+       
     }
 
     return result;

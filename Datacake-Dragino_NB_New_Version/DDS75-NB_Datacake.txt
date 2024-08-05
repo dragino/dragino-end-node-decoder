@@ -30,14 +30,10 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var direction = toInt(hex.substr(offset, 2)); offset += 2;
-        var alarm  = toInt(hex.substr(offset, 2)); offset += 2;
-        var Level_PA4 = toInt(hex.substr(offset, 2)); offset += 2;
+        var mod = toInt(hex.substr(offset, 2)); offset += 2;
         var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
-        var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
-        var ds18b201 = toInt(hex.substr(offset, 4))/10; offset += 4;
-        var roll1 = toInt(hex.substr(offset, 4))/100; offset += 4;
-        var pitch1 = toInt(hex.substr(offset, 4))/100; offset += 4;
+        var interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
+        var Distance = toInt(hex.substr(offset, 4)); offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
@@ -66,11 +62,9 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
-            var ds18b20 = toInt(hex.substr(offset, 4))/10; offset += 4;
-            var roll = toInt(hex.substr(offset, 4))/100; offset += 4;
-            var pitch = toInt(hex.substr(offset, 4))/100; offset += 4;
+            var Distance1 = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ ds18b20: ds18b20,roll: roll,pitch: pitch,  timestamp: timestampLog });
+            dataSet.push({ Distance1: Distance1,  timestamp: timestampLog });
         }
 
         return {
@@ -78,18 +72,11 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
-            direction: direction,
-            alarm: alarm,
-            Level_PA4: Level_PA4,
+            mod: mod,
             interrupt: interrupt,
-            Interrupt_level: Interrupt_level,
-            ds18b20: ds18b20,
-            roll: roll,
-            pitch: pitch,
-            ds18b201: ds18b201,
-            roll1: roll1,
-            pitch: pitch1,
-            times1tamp: timestamp,
+            interrupt_level: interrupt_level,
+            Distance: Distance,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }
@@ -106,14 +93,10 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
-    var maindirection = payload.direction;
-    var mainLevel_PA4 = payload.Level_PA4;
+    var mainmod = payload.mod;
     var maininterrupt = payload.interrupt;
-    var mainInterrupt_level = payload.Interrupt_level;
-    var mainds18b20 = payload.ds18b201;
-    var mainalarm = payload.alarm;
-    var mainroll = payload.roll1;
-    var mainpitch = payload.pitch1;
+    var maininterrupt_level = payload.interrupt_level;
+    var mainDistance = payload.Distance;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -136,18 +119,8 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "direction",
-        value: maindirection,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "alarm",
-        value: mainalarm,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "Level_PA4",
-        value: mainLevel_PA4,
+        field: "Mod",
+        value: mainmod,
         timestamp: mainTimestamp
     });
     result.push({
@@ -156,23 +129,13 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Interrupt_level",
-        value: mainInterrupt_level,
+        field: "interrupt_level",
+        value: maininterrupt_level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "ds18b20",
-        value: mainds18b20,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "roll",
-        value: mainroll,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "pitch",
-        value: mainpitch,
+        field: "Distance",
+        value: mainDistance,
         timestamp: mainTimestamp
     });
    
@@ -182,25 +145,13 @@ function Decoder(payload, payloadB64) {
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
-        var ds18b20 = data.ds18b20;
-        var roll = data.roll;
-        var pitch = data.pitch;
+        var Distance1 = data.Distance1;
         var timestamp = data.timestamp;
         console.log(timestamp)
         
         result.push({
-            field: "ds18b20",
-            value: ds18b20,
-            timestamp: timestamp
-        });
-        result.push({
-            field: "roll",
-            value: roll,
-            timestamp: timestamp
-        });
-        result.push({
-            field: "pitch",
-            value: pitch,
+            field: "Distance",
+            value: Distance1,
             timestamp: timestamp
         });
     }
