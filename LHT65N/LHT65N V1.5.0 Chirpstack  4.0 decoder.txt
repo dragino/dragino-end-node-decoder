@@ -53,7 +53,7 @@ function datalog(i,bytes){
 {
 	bb=bytes[0+i]<<8 | bytes[1+i];
 }
-else if((Ext=='11')||(Ext=='12'))
+else if(Ext=='11')
 {
   bb=parseFloat(((bytes[0+i]<<24>>16 | bytes[1+i])/100).toFixed(2));  
 }
@@ -91,7 +91,6 @@ function getMyDate(str){
 }
 
 function Decode(fPort, bytes, variables) {
-
 var Ext= bytes[6]&0x0F;
 var button = bytes[6]&0x10;
 var poll_message_status=((bytes[6]>>6)&0x03);
@@ -227,7 +226,6 @@ else if(Ext=='1')
 {
   decode.Ext_sensor ="Temperature Sensor";
   decode.TempC_DS=parseFloat(((bytes[7]<<24>>16 | bytes[8])/100).toFixed(2));
-  decode.Simulated_temp=parseFloat(((bytes[9]<<24>>16 | bytes[10])/100).toFixed(2));
 }
 else if(Ext=='2')
 {
@@ -278,12 +276,6 @@ else if(Ext=='11')
   decode.Ext_TempC_SHT=parseFloat(((bytes[7]<<24>>16 | bytes[8])/100).toFixed(2));
   decode.Ext_Hum_SHT=parseFloat((((bytes[9]<<8 | bytes[10])&0xFFF)/10).toFixed(1));  
 }
-else if(Ext=='12')
-{
-  decode.Work_mode="TC0 Sensor";
-  decode.TempC= parseFloat(((bytes[7]<<24>>16 | bytes[8])/100).toFixed(2));
-  decode.Type= bytes[9];
-}
 else if(Ext=='14')
 {
   decode.Work_mode="PIR Sensor";
@@ -296,7 +288,6 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
- decode.Button_flag=button ? "True":"False";
  
   if((bytes.length==11)||(bytes.length==15))
   {
