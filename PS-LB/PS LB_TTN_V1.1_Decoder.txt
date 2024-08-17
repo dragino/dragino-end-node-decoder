@@ -135,6 +135,64 @@ function Decoder(bytes, port) {
       else if(bytes[3]==12)
         decode.Water_pressure_kPa= parseFloat(((decode.IDC_intput_mA-4.0)*6.25).toFixed(3));         
     }
+    else if(decode.Probe_mod==0x02)
+    {
+      if(decode.IDC_intput_mA<=4.0)
+        decode.Differential_pressure_Pa= 0;
+      else if(bytes[3]==1)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*6.25).toFixed(3));
+      else if(bytes[3]==2)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*12.5).toFixed(3));   
+      else if(bytes[3]==3)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*18.75).toFixed(3)); 
+      else if(bytes[3]==4)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*62.5).toFixed(3));
+      else if(bytes[3]==5)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*125).toFixed(3));  
+      else if(bytes[3]==6)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*187.5).toFixed(3));   
+      else if(bytes[3]==7)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*250).toFixed(3));  
+      else if(bytes[3]==8)
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*312.5).toFixed(3));    
+      else if(bytes[3]==9)
+      {
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*625).toFixed(3));
+      }
+      else if(bytes[3]==10)
+      {
+        if(decode.IDC_intput_mA<=12.0)
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-12.5).toFixed(3));
+        }
+        else
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*12.5).toFixed(3));
+        }
+      }
+      else if(bytes[3]==11)
+      {
+        if(decode.IDC_intput_mA<=12.0)
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-25).toFixed(3));
+        }
+        else
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*25).toFixed(3));
+        }
+      }
+      else if(bytes[3]==12)
+      {
+        if(decode.IDC_intput_mA<=12.0)
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-125).toFixed(3));
+        }
+        else
+        {
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*125).toFixed(3));
+        }
+      }  
+    }
     
     if(bytes.length!=1)
     {
