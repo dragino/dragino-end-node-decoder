@@ -226,8 +226,7 @@ else if(Ext=='4')
   decode.Work_mode="Interrupt Sensor send";
   decode.Exti_pin_level=bytes[7] ? "High":"Low";  
   decode.Exti_status=bytes[8] ? "True":"False";
-  decode.Exit_count= bytes[9]<<16 | bytes[10]<<8 | bytes[11];
-  decode.Exit_duration= bytes[12]<<16 | bytes[13]<<8 | bytes[14];
+  
 }
 else if(Ext=='5')
 {
