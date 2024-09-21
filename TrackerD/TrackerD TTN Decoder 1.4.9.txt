@@ -38,6 +38,20 @@ function Decoder(bytes, port) {
   var intwk;
   var BG;
   var location_tago = {};
+  function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+function datalog(i,bytes){
+  var aa= bytes[2+i]<<8|bytes[3+i];
+  var bb= bytes[4+i]<<8|bytes[5+i];
+  var cc= bytes[6+i]<<24>>24;
+  var string='['+'MAJOR:'+aa+','+'MAJOR:'+bb+','+'MAJOR:'+cc+']'+',';  
+  
+  return string;
+}
+
 	if(port == 2 || port == 3)
 	{
 		bat =(((bytes[8] & 0x3f) <<8) | bytes[9]);//Battery,units:V
@@ -344,4 +358,22 @@ function Decoder(bytes, port) {
 		  POWER:power,
 		  };			
 	}
+	if(port==9)  
+  {
+    var batV=(((bytes[0] & 0x3f) <<8) | bytes[1])/1000;//
+    var mod=bytes[0] & 0x01
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    Beacons:data_sum,
+    Mod:mod,
+    BatV:batV,
+    };   
+  }
 }
