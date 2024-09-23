@@ -1,0 +1,263 @@
+function Decoder(payload, payloadB64) {
+    // payload is the decoded payload
+    // payloadB64 is base64-encoded
+
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+    
+    
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {  // Check the MSB
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            
+            return value;
+        }
+
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var mod = toInt(hex.substr(offset, 2)); offset += 2;
+        var adc = toInt(hex.substr(offset, 4)); offset += 4;
+        var PA4_level = toInt(hex.substr(offset, 2)); offset += 2;
+        var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
+        var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
+        var flag1=hex.substr(offset, 1);
+            if (flag1 === "f")
+            {
+               
+               var temp11 = "-"+(toInt(hex.substr(offset, 4), 16)&0x0fff)/10;offset += 4;
+            }
+            else 
+            {
+              temp11 = toInt(hex.substr(offset, 4), 16)/10; offset += 4;
+            }
+             var flag2=hex.substr(offset, 2);
+            if (flag2 === "f")
+            {
+               
+               var temp22 = "-"+(toInt(hex.substr(offset, 4), 16)&0x0fff)/10;offset += 4;
+            }
+            else 
+            {
+              temp22 = toInt(hex.substr(offset, 4), 16)/10; offset += 4;
+            }
+            var flag3=hex.substr(offset, 2);
+            if (flag3 === "f")
+            {
+                offset += 2;
+               var temp33 = "-"+(toInt(hex.substr(offset, 4), 16)&0x0fff)/10;offset += 4;
+            }
+            else 
+            {
+              temp33 = toInt(hex.substr(offset, 4), 16)/10; offset += 4;
+            }
+        
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var Latitude = toInt(hex.substr(offset, 8)); offset += 8;
+        var Longitude = toInt(hex.substr(offset, 8)); offset += 8;
+        var gps_timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        
+        try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+        var dataSet = [];
+
+        while (offset < hex.length) {
+            var temp1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
+            var temp2 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
+            var temp3 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataSet.push({  temp1: temp1, temp2: temp2,temp3: temp3,timestamp: timestampLog });
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            mod: mod,
+            PA4_level: PA4_level,
+            Interrupt_level: Interrupt_level,
+            interrupt: interrupt,
+            adc: adc,
+            temp11: temp11,
+            temp22: temp22,
+            temp33: temp33,
+            temp1: temp1,
+            temp2: temp2,
+            temp3: temp3,
+            flag1: flag1,
+            Latitude: Latitude,
+            Longitude: Longitude,
+            timestamp: timestamp,
+            gps_timestamp: gps_timestamp,
+            dataSet: dataSet,
+        };
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    
+    payload = parsedData
+
+    // Extract the deviceID from the incoming data
+    var deviceID = payload.deviceID;
+
+    // Preparing to return data to Datacake...
+    // Extract main attributes
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainMod = payload.mod;
+    var mainPA4_level = payload.PA4_level;
+    var mainInterrupt = payload.interrupt;
+    var mainInterrupt_level = payload.Interrupt_level;
+    var mainAdc = payload.adc;
+    var maintemp11 = payload.temp11;
+    var maintemp22 = payload.temp22;
+    var maintemp33 = payload.temp33;
+    var mainflag1  = payload.flag1;
+    var mainLatitude  = payload.Latitude;
+    var mainLongitude  = payload.Longitude;
+    var maingps_timestamp  = payload.gps_timestamp;
+    var mainTimestamp = payload.timestamp;
+    console.log(mainTimestamp)
+    // Initialize result array
+    var result = [];
+
+    // Add main attributes to result array
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "MOD",
+        value: mainMod,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "temp1",
+        value: maintemp11,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "INTERRUPT",
+        value: mainInterrupt,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "ADC",
+        value: mainAdc,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA4_level",
+        value: mainPA4_level,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Interrupt_level",
+        value: mainInterrupt_level,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "temp2",
+        value: maintemp22,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "temp3",
+        value: maintemp33,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "flag1",
+        value: mainflag1,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Latitude",
+        value: mainLatitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Longitude",
+        value: mainLongitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "gps_timestamp",
+        value: maingps_timestamp,
+        timestamp: mainTimestamp
+    });
+
+    // Extract data from dataSet array
+    var dataSet = payload.dataSet;
+    
+    for (var i = 0; i < dataSet.length; i++) {
+        var data = dataSet[i];
+        var temp1_log = data.temp1;
+        var temp2_log = data.temp2;
+        var temp3_log = data.temp3;
+        var timestamp = data.timestamp;
+        console.log(timestamp)
+        
+        result.push({
+        field: "temp1_log",
+        value: temp1_log,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "temp2_log",
+        value: temp2_log,
+        timestamp: timestamp
+    });
+    result.push({
+        field: "temp3_log",
+        value: temp3_log,
+        timestamp: timestamp
+    });
+    }
+
+    return result;
+}
