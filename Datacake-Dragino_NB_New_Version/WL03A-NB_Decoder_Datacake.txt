@@ -33,8 +33,9 @@ function Decoder(payload, payloadB64) {
         var Alarm = toInt(hex.substr(offset, 2)); offset += 2;
         var Mod = toInt(hex.substr(offset, 2)); offset += 2;
         var Tdc_flag = toInt(hex.substr(offset, 2)); offset += 2;
-        var Leak_times = toInt(hex.substr(offset, 6)); offset += 6;
-        var Last_leak_duration = toInt(hex.substr(offset, 6)); offset += 6;
+        var Leak_status1 = toInt(hex.substr(offset, 2)); offset += 2;
+        var Leak_times1 = toInt(hex.substr(offset, 6)); offset += 6;
+        var Last_leak_duration1 = toInt(hex.substr(offset, 6)); offset += 6;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
@@ -63,6 +64,7 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
+            var Leak_status = toInt(hex.substr(offset, 2)); offset += 2;
             var Leak_times = toInt(hex.substr(offset, 6)); offset += 6;
             var Last_leak_duration = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
@@ -74,11 +76,15 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
+            Alarm: Alarm,
             Mod: Mod,
             Tdc_flag: Tdc_flag,
+            Leak_status: Leak_status,
             Leak_times: Leak_times,
-            Alarm: Alarm,
             Last_leak_duration: Last_leak_duration,
+            Leak_status1: Leak_status1,
+            Leak_times1: Leak_times1,
+            Last_leak_duration1: Last_leak_duration1,
             timestamp: timestamp,
             dataSet: dataSet
         };
@@ -96,11 +102,12 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
+    var mainAlarm = payload.Alarm;
     var mainMod = payload.Mod;
     var mainTdc_flag = payload.Tdc_flag;
-    var mainLeak_times = payload.Leak_times;
-    var mainAlarm = payload.Alarm;
-    var mainLast_leak_duration = payload.Last_leak_duration;
+    var mainLeak_status = payload.Leak_status1;
+    var mainLeak_times = payload.Leak_times1;
+    var mainLast_leak_duration = payload.Last_leak_duration1;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -128,6 +135,11 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
+        field: "Leak_status",
+        value: mainLeak_status,
+        timestamp: mainTimestamp
+    });
+    result.push({
         field: "Leak_times",
         value: mainLeak_times,
         timestamp: mainTimestamp
@@ -149,11 +161,17 @@ function Decoder(payload, payloadB64) {
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
+        var Leak_status = data.Leak_status;
         var Leak_times = data.Leak_times;
         var Last_leak_duration = data.Last_leak_duration;
         var timestamp = data.timestamp;
         console.log(timestamp)
         
+        result.push({
+            field: "Leak_status",
+            value: Leak_status,
+            timestamp: timestamp
+        });
         result.push({
             field: "Leak_times",
             value: Leak_times,
