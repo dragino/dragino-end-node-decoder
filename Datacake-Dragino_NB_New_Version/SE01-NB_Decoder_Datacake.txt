@@ -135,7 +135,7 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Soil_Temperature",
+        field: "Temperature",
         value: mainSoil_Temperature,
         timestamp: mainTimestamp
     });
