@@ -197,6 +197,8 @@ function Decode(fPort, bytes, variables) {
           decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*125).toFixed(3));
         }
       }  
+    }
+    
     if(bytes.length!=1)
     {
       return decode;
