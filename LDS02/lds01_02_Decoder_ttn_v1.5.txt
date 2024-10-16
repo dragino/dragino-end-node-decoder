@@ -13,7 +13,7 @@ function Decoder(bytes, port) {
   if(mod==1){
     var open_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
     var open_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
-    if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
+    if(bytes.length==10)
     return {
       BAT_V:bat,
       MOD:mod,
@@ -27,7 +27,7 @@ function Decoder(bytes, port) {
   {
   var leak_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
   var leak_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
-  if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
+  if(bytes.length==10)
   return {
       BAT_V:bat,
       MOD:mod,
@@ -37,7 +37,7 @@ function Decoder(bytes, port) {
   };
   }
   else if(mod==3)
-  if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
+ if(bytes.length==10)
   {
   return {
       BAT_V:bat,
