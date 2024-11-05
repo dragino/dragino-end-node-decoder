@@ -72,6 +72,7 @@ function Decoder(bytes, port) {
 		BatV:batV,
 		Data_Time:Data_time,
 		Reading:reading,
+                "lora node":"AIS01-LB"
 		};        
   }
   if(port==0x03)
