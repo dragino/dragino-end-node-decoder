@@ -53,7 +53,8 @@ function Decode(fPort, bytes, variables) {
       CALCULATE_FLAG:calculate_flag,
       TOTAL_PULSE:total_pulse,
       LAST_DISCONNECT_DURATION:disconnect_duration,
-      TIME:data_time
+      TIME:data_time,
+      "lora node": "CPL01",
       }
     }
   }
