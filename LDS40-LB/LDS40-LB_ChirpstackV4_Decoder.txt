@@ -41,7 +41,7 @@ function getMyDate(str){
 }
 
 function Decode(fPort, bytes, variables) {
-  if(port==0x02)
+  if(fPort==0x02)
   {
     var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
     var batV=value/1000;//Battery,units:V
@@ -77,7 +77,7 @@ function Decode(fPort, bytes, variables) {
             };       
     }
   }
-  else if(port==0x03)  
+  else if(fPort==0x03)  
   {
     var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
@@ -93,7 +93,7 @@ function Decode(fPort, bytes, variables) {
     PNACKMD:pnack,
     };    
   }  
-  else if(port==0x05)
+  else if(fPort==0x05)
   {
   	var freq_band;
   	var sub_band;
