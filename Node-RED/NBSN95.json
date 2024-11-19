@@ -1,0 +1,1470 @@
+[
+    {
+        "id": "8874ee1ca233de29",
+        "type": "tab",
+        "label": "NBSN95",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a732d250ab01ce5a",
+        "type": "udp in",
+        "z": "8874ee1ca233de29",
+        "name": "8999",
+        "iface": "",
+        "port": "8999",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "buffer",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "3c7919d0da7b17b4"
+            ]
+        ]
+    },
+    {
+        "id": "c1a892d5bbf76557",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Check to see if the table exists",
+        "func": "var data=msg.payload\nvar name = \"N95\"+data[0]\nmsg.topic=\"SELECT name FROM sqlite_master WHERE type='table' AND name='\"+name+\"';\"\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 200,
+        "wires": [
+            [
+                "03f33c0ce16c7355"
+            ]
+        ]
+    },
+    {
+        "id": "03f33c0ce16c7355",
+        "type": "sqlite",
+        "z": "8874ee1ca233de29",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 1030,
+        "y": 200,
+        "wires": [
+            [
+                "66c00f0e657c257b"
+            ]
+        ]
+    },
+    {
+        "id": "66c00f0e657c257b",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Create tables if they don't exist, save data if they exist",
+        "func": "var data=flow.get(\"data\")\n\nif (msg.payload.length==1 && data[3]==1){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[10]+\",\"+data[5]+\",\"+data[6]+\",\"+data[7]+\",\"+data[8]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+\"'\"+data[9]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==1 && data[3]==2){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[9]+\",\"+data[5]+\",\"+data[6]+\",\"+null+\",\"+null+\",\"+data[7]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+\"'\"+data[8]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==1 && data[3]==3){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[11]+\",\"+data[5]+\",\"+null+\",\"+data[8]+\",\"+data[9]+\",\"+null+\",\"+data[6]+\",\"+data[7]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+\"'\"+data[10]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==1 && data[3]==4){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[10]+\",\"+data[8]+\",\"+data[5]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+data[6]+\",\"+data[7]+\",\"+null+\",\"+null+\",\"+\"'\"+data[9]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==1 && data[3]==5){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[9]+\",\"+data[5]+\",\"+data[6]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+data[7]+\",\"+null+\",\"+\"'\"+data[8]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==1 && data[3]==6){\n    msg.topic = \"INSERT OR IGNORE INTO N95\"+data[0]+\"(bat,adc1,dstemp1,temp,hum,juli,adc2,adc3,dstemp2,dstemp3,weight,count,TIMEDATA) SELECT \"\n                +data[6]+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+null+\",\"+data[4]+\",\"+\"'\"+data[5]+\"'\"+\" \"\n    return msg;\n}\nelse if (msg.payload.length==0){\n    msg.topic=\"CREATE TABLE N95\"+data[0]+\"(bat FLOAT,adc1 INTEGER,dstemp1 FLOAT,temp FLOAT,hum FLOAT,juli INTEGER,adc2 INTEGER,adc3 INTEGER,dstemp2 FLOAT,dstemp3 FLOAT,weight INTEGER,count INTEGER,TIMEDATA VARCHAR UNIQUE);\"\n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 300,
+        "wires": [
+            [
+                "a8a464f753309eab"
+            ]
+        ]
+    },
+    {
+        "id": "a8a464f753309eab",
+        "type": "sqlite",
+        "z": "8874ee1ca233de29",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 590,
+        "y": 300,
+        "wires": [
+            [
+                "5c13ad994d4cbe26"
+            ]
+        ]
+    },
+    {
+        "id": "5c13ad994d4cbe26",
+        "type": "delay",
+        "z": "8874ee1ca233de29",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 780,
+        "y": 300,
+        "wires": [
+            [
+                "32b7afd15e253696"
+            ]
+        ]
+    },
+    {
+        "id": "32b7afd15e253696",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Reading data from tables",
+        "func": "var data=flow.get(\"data\");\nmsg.topic=\"SELECT * FROM N95\"+data[0]+\";\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 300,
+        "wires": [
+            [
+                "c59fa7185ed75133"
+            ]
+        ]
+    },
+    {
+        "id": "c59fa7185ed75133",
+        "type": "sqlite",
+        "z": "8874ee1ca233de29",
+        "mydb": "d7ab97b4130894e3",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 1270,
+        "y": 300,
+        "wires": [
+            [
+                "2f7882aad1d3e767"
+            ]
+        ]
+    },
+    {
+        "id": "2f7882aad1d3e767",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Get all the data for the table",
+        "func": "var data = msg.payload\n// 排序方法\nfunction compare(property) {//property:根据什么属性排序\n return function(a,b){\n  var value1 = a[property];\n  var value2 = b[property];\n  /*\n  * value2 - value1; ——> 降序\n  * value1 - value2; ——> 升序\n  */\n  return value1 - value2;//升序排序\n}\n}\ndata.sort(compare('TIMEDATA'))//根据时间戳的大小进行排序\nvar data2=[]\nfor (var i1=0;i1<data.length;i1++){//利用for循环 将时间戳为0的数据筛选掉\n    if (data[i1][\"TIMEDATA\"]=='0'){\n        continue\n    }\n    else {\n        var data3={\n          'bat':data[i1]['bat'],\n          'adc1':data[i1]['adc1'],\n          'adc2':data[i1]['adc2'],\n          'adc3':data[i1]['adc3'],\n          'dstemp1':data[i1]['dstemp1'],\n          'dstemp2':data[i1]['dstemp2'],\n          'dstemp3':data[i1]['dstemp3'],\n          'shttemp':data[i1][\"temp\"],\n          'shthum':data[i1][\"hum\"],\n          \"distance\":data[i1][\"juli\"],\n          'weight':data[i1][\"weight\"],\n          'count':data[i1]['count'],\n          'TIMEDATA':data[i1]['TIMEDATA']\n        }\n        data2[i1]=data3\n    }\n    \n}\nvar newArr = data2.filter(function (s) { //利用filter函数去掉空的数组元素\n    return s;\n });\nfunction add0(m){return m<10?'0'+m:m }//如果月份少于10月份就在前面加0 为了美观\nfunction format(shijianchuo)//时间戳转换为格式化的时间字符串\n{\n//shijianchuo是整数，否则要parseInt转换\nvar time = new Date(shijianchuo);\nvar y = time.getFullYear();\nvar m = time.getMonth()+1;\nvar d = time.getDate();\nvar h = time.getHours();\nvar mm = time.getMinutes();\nvar s = time.getSeconds();\nreturn y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);\n}\nvar bat = []\nvar adc1=[],adc2=[],adc3=[]\nvar shthum = []\nvar dstemp1=[],dstemp2=[],dstemp3=[]\nvar shttemp= []\nvar distance=[],weight=[],count=[]\nvar timedata = []\nvar data1 = {bat,adc1,adc2,adc3,dstemp1,dstemp2,dstemp3,shttemp,shthum,distance,weight,count,timedata}\nfor (var i=0;i<newArr.length;i++){//将数组对象拆分为数组为echarts提供数据\n   shthum[i] = newArr[i]['shthum']\n   dstemp1[i]=newArr[i]['dstemp1']\n   dstemp2[i]=newArr[i]['dstemp2']\n   dstemp2[i]=newArr[i]['dstemp3']\n   shttemp[i]=newArr[i]['shttemp']\n   adc1[i]=newArr[i]['adc1']\n   adc2[i]=newArr[i]['adc2']\n   adc3[i]=newArr[i]['adc3']\n   distance[i]=newArr[i]['distance']\n   weight[i]=newArr[i]['weight']\n   count[i]=newArr[i]['count']\n   bat[i] = newArr[i]['bat']\n   timedata[i] = format((parseInt(newArr[i]['TIMEDATA']))*1000)\n}\n\ndata4 = {payload:data1}\nreturn data4;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 400,
+        "wires": [
+            [
+                "64d43147b27a7f86",
+                "658dd5cfddb79d58",
+                "7852ea97c5c19b80",
+                "be9186a221301bfe",
+                "b476db5bf9687e94",
+                "4c02d48237b60a08",
+                "90af3532a7a4fe29",
+                "b3701ea8327b4181",
+                "dcbb0e084e3ace2f",
+                "4aea33677223fa19",
+                "64d0219e17237520",
+                "31d21f7dc061ec41",
+                "674d485c5e5933c7"
+            ]
+        ]
+    },
+    {
+        "id": "658dd5cfddb79d58",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "sht-temp",
+        "func": "var xdata = msg.payload['timedata']\nvar data = msg.payload\nvar array=[]\nfor (var i=0;i<data[\"shttemp\"].length;i++){//过滤电压为空的数据\n    if (data[\"shttemp\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"shttemp\":data[\"shttemp\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar shttemp=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   shttemp[i1]=newArr[i1][\"shttemp\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'SHT-TEMP Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['SHT-TEMP(℃)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'SHT-TEMP(℃)',\n      type: 'line',\n      stack: 'Total',\n      data: shttemp\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 400,
+        "wires": [
+            [
+                "4084725a5fdc42a0"
+            ]
+        ]
+    },
+    {
+        "id": "d77c7207e2a7bd73",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart1\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart1\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1060,
+        "y": 400,
+        "wires": [
+            [
+                "9b9608fc4c78827b"
+            ]
+        ]
+    },
+    {
+        "id": "4084725a5fdc42a0",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 400,
+        "wires": [
+            [
+                "d77c7207e2a7bd73"
+            ]
+        ]
+    },
+    {
+        "id": "9b9608fc4c78827b",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "a12f73515c79805b",
+        "name": "SHT-TEMP",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3c7919d0da7b17b4",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Get parsed data",
+        "func": "function ID(data){\n    var id\n    if (data<0x10)\n    id =\"0\"+data.toString(16)\n    else\n    id = data.toString(16)\n    return id \n}\nvar data = msg.payload\n//下面是对原始字节进行解析\nif (data[13]==0x01){\n// var id1\n// if (data[0]<0x10)\n// id1 = '0'+data[0]\n// else\n// id1 = data[0].toString(16)\n//var id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar id = ID(data[0])+ID(data[1])+ID(data[2])+ID(data[3])+ID(data[4])+ID(data[5])+ID(data[6])+ID(data[7])\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar dstemp\nif (data[14]>=0xf0)\ndstemp =0-(((data[14]-0xf0)<<8|data[15])/10)\nelse \ndstemp = (data[14]<<8|data[15])/10\nvar interrupt_flag=data[16]\nvar adc=data[17]<<8|data[18]\nvar shttemp\nif (data[19]>=0xf0)\nshttemp =0-(((data[19]-0xf0)<<8|data[20])/10)\nelse \nshttemp = (data[19]<<8|data[20])/10\nvar shthum=(data[21]<<8|data[22])/10\nvar date=data[23]<<24|data[24]<<16|data[25]<<8|data[26]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=interrupt_flag\nobj2[5]=adc\nobj2[6]=dstemp\nobj2[7]=shttemp\nobj2[8]=shthum\nobj2[9]=date\nobj2[10]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}\nelse if (data[13]==0x02){\nvar id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar dstemp\nif (data[14]>=0xf0)\ndstemp =0-(((data[14]-0xf0)<<8|data[15])/10)\nelse \ndstemp = (data[14]<<8|data[15])/10\nvar interrupt_flag=data[16]\nvar adc=data[17]<<8|data[18]\nvar juli=data[19]<<8|data[20]\nvar date=data[21]<<24|data[22]<<16|data[23]<<8|data[24]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=interrupt_flag\nobj2[5]=adc\nobj2[6]=dstemp\nobj2[7]=juli\nobj2[8]=date\nobj2[9]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}\nelse if (data[13]==0x03){\nvar id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar adc = (data[14]<<8|data[15])\nvar interrupt_flag=data[16]\nvar adc2=data[17]<<8|data[18]\nvar shttemp\nif (data[19]>=0xf0)\nshttemp =0-(((data[19]-0xf0)<<8|data[20])/10)\nelse \nshttemp = (data[19]<<8|data[20])/10\nvar shthum=(data[21]<<8|data[22])/10\nvar adc3=data[23]<<8|data[24]\nvar date=data[25]<<24|data[26]<<16|data[27]<<8|data[28]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=interrupt_flag\nobj2[5]=adc\nobj2[6]=adc2\nobj2[7]=adc3\nobj2[8]=shttemp\nobj2[9]=shthum\nobj2[10]=date\nobj2[11]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}\nelse if (data[13]==0x04){\nvar id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar dstemp1\nif (data[14]>=0xf0)\ndstemp1 =0-(((data[14]-0xf0)<<8|data[15])/10)\nelse \ndstemp1 = (data[14]<<8|data[15])/10\nvar interrupt_flag=data[18]\nvar adc=data[16]<<8|data[17]\nvar dstemp2\nif (data[19]>=0xf0)\ndstemp2 =0-(((data[19]-0xf0)<<8|data[20])/10)\nelse \ndstemp2 = (data[19]<<8|data[20])/10\nvar dstemp3\nif (data[21]>=0xf0)\ndstemp3 =0-(((data[21]-0xf0)<<8|data[22])/10)\nelse \ndstemp3 = (data[21]<<8|data[22])/10\nvar date=data[23]<<24|data[24]<<16|data[25]<<8|data[26]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=interrupt_flag\nobj2[5]=dstemp1\nobj2[6]=dstemp2\nobj2[7]=dstemp3\nobj2[8]=adc\nobj2[9]=date\nobj2[10]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}\nelse if (data[13]==0x05){\nvar id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar dstemp\nif (data[14]>=0xf0)\ndstemp =0-(((data[14]-0xf0)<<8|data[15])/10)\nelse \ndstemp = (data[14]<<8|data[15])/10\nvar interrupt_flag=data[18]\nvar adc=data[16]<<8|data[17]\nvar weight=data[19]<<8|data[20]\nvar date=data[21]<<24|data[22]<<16|data[23]<<8|data[24]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=interrupt_flag\nobj2[5]=adc\nobj2[6]=dstemp\nobj2[7]=weight\nobj2[8]=date\nobj2[9]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}\nelse if (data[13]==0x06){\nvar id = data[0].toString(16)+data[1].toString(16)+data[2].toString(16)+data[3].toString(16)+data[4].toString(16)+data[5].toString(16)+data[6].toString(16)+data[7].toString(16)\nvar ver = (data[8]<<8|data[9])+\"\"\nif (ver<0x64){\n    ver = ver+\"0\"\n}\nvar bat = (data[10]<<8|data[11])/1000\nvar signal = data[12]\nvar mod =data[13]\nvar count = data[14]<<24|data[15]<<16|data[16]<<8|data[17]\nvar date=data[18]<<24|data[19]<<16|data[20]<<8|data[21]+\"\"\nvar obj2=[]\nobj2[0]=id.substring(1,)\nobj2[1]=\"V\"+ver.substring(0,1)+\".\"+ver.substring(1,2)+\".\"+ver.substring(2,)\nobj2[2]=signal\nobj2[3]=mod\nobj2[4]=count\nobj2[5]=date\nobj2[6]=bat\nflow.set(\"data\",obj2)\nmsg.payload=obj2\nreturn msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 200,
+        "wires": [
+            [
+                "c1a892d5bbf76557"
+            ]
+        ]
+    },
+    {
+        "id": "64d43147b27a7f86",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Label",
+        "func": "var data=flow.get(\"data\")\noption = {\n  series: [\n    {\n      type: 'scatter',\n      data: [[0, 0]],\n      symbolSize: 1,\n      label: {\n        normal: {\n          show: true,\n          formatter: [\n            'IMEI: {term|'+data[0] +'}',\n            'VER: {fragment1|'+ data[1]+'}',\n            'Signal: {fragment1|'+ data[2]+'}',\n            'MOD: {fragment1|'+ data[3]+'}',\n            'Interrupt_flag: {fragment1|'+ data[4]+'}'\n          ].join('\\n'),\n          backgroundColor: '#eee',\n          // borderColor: '#333',\n          borderColor: 'rgb(199,86,83)',\n          borderWidth: 2,\n          borderRadius: 5,\n          padding: 10,\n          color: '#000',\n          fontSize: 14,\n          shadowBlur: 3,\n          shadowColor: '#888',\n          shadowOffsetX: 0,\n          shadowOffsetY: 3,\n          lineHeight: 30,\n          rich: {\n            term: {\n              backgroundColor: '#339911',\n              color: '#fff',\n              borderRadius: 15,\n              padding: 5\n            },\n            fragment1: {\n              backgroundColor: '#339911',\n              color: '#fff',\n              borderRadius: 15,\n              padding: 5\n            }\n          }\n        }\n      }\n    }\n  ],\n  xAxis: {\n    axisLabel: { show: false },\n    axisLine: { show: false },\n    splitLine: { show: false },\n    axisTick: { show: false },\n    min: -1,\n    max: 1\n  },\n  yAxis: {\n    axisLabel: { show: false },\n    axisLine: { show: false },\n    splitLine: { show: false },\n    axisTick: { show: false },\n    min: -1,\n    max: 1\n  }\n};\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 580,
+        "wires": [
+            [
+                "44d24bcc412b0ce8"
+            ]
+        ]
+    },
+    {
+        "id": "ebb0b0476056ba27",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 460,
+        "wires": [
+            [
+                "9cf1bce7cfe991f5"
+            ]
+        ]
+    },
+    {
+        "id": "44d24bcc412b0ce8",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 580,
+        "wires": [
+            [
+                "9876e1d52b57d319"
+            ]
+        ]
+    },
+    {
+        "id": "9cf1bce7cfe991f5",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart2\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart2\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1080,
+        "y": 460,
+        "wires": [
+            [
+                "72fec7284365b31e"
+            ]
+        ]
+    },
+    {
+        "id": "72fec7284365b31e",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "6cbdca81d74300c4",
+        "name": "BAT",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1330,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9876e1d52b57d319",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart3\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart3\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1080,
+        "y": 580,
+        "wires": [
+            [
+                "feab150d60071165"
+            ]
+        ]
+    },
+    {
+        "id": "feab150d60071165",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "1d4e3cae1c917729",
+        "name": "Label",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7852ea97c5c19b80",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "BAT",
+        "func": "var data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"bat\"].length;i++){//过滤电压为空的数据\n    if (data[\"bat\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"bat\":data[\"bat\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar bat=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   bat[i1]=newArr[i1][\"bat\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'BAT Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['BAT(V)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: time\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'BAT(V)',\n      type: 'line',\n      stack: 'Total',\n      data: bat\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 460,
+        "wires": [
+            [
+                "ebb0b0476056ba27"
+            ]
+        ]
+    },
+    {
+        "id": "be9186a221301bfe",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "SHT-HUM",
+        "func": "var xdata = msg.payload['timedata']\nvar data = msg.payload\nvar array=[]\nfor (var i=0;i<data[\"shthum\"].length;i++){//过滤电压为空的数据\n    if (data[\"shthum\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"shthum\":data[\"shthum\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar shthum=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   shthum[i1]=newArr[i1][\"shthum\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'SHT-HUM Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['SHT-HUM(%)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'SHT-HUM(%)',\n      type: 'line',\n      stack: 'Total',\n      data: shthum\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 640,
+        "wires": [
+            [
+                "2a0ea4b1e102beec"
+            ]
+        ]
+    },
+    {
+        "id": "2a0ea4b1e102beec",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 640,
+        "wires": [
+            [
+                "c92affced3393914"
+            ]
+        ]
+    },
+    {
+        "id": "c92affced3393914",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart4\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart4\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1080,
+        "y": 640,
+        "wires": [
+            [
+                "920ff6b3ab98bba0"
+            ]
+        ]
+    },
+    {
+        "id": "920ff6b3ab98bba0",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "e889607f8d438641",
+        "name": "SHT-HUM",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1330,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "39db8f9a1dc38c99",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 520,
+        "wires": [
+            [
+                "ca0a1beb8e93a25a"
+            ]
+        ]
+    },
+    {
+        "id": "ca0a1beb8e93a25a",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart5\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart5\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1060,
+        "y": 520,
+        "wires": [
+            [
+                "94c17e31edcca7a4"
+            ]
+        ]
+    },
+    {
+        "id": "94c17e31edcca7a4",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "ab520dc2b3da917e",
+        "name": "DSTEMP",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1320,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b476db5bf9687e94",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "DSTEMP",
+        "func": "var data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"dstemp1\"].length;i++){//过滤电压为空的数据\n    if (data[\"dstemp1\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"dstemp1\":data[\"dstemp1\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar dstemp=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   dstemp[i1]=newArr[i1][\"dstemp1\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'DSTEMP Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['DSTEMP(℃)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: time\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'DSTEMP(℃)',\n      type: 'line',\n      stack: 'Total',\n      data: dstemp\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 520,
+        "wires": [
+            [
+                "39db8f9a1dc38c99"
+            ]
+        ]
+    },
+    {
+        "id": "f8a5a3c6c184f256",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "获取解析数据",
+        "info": "",
+        "x": 430,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "5d9315560abedfd2",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "查看表是否存在",
+        "info": "",
+        "x": 700,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "35812d576e357941",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "如果表不存在则创建存在则存数据",
+        "info": "",
+        "x": 290,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "32d98e3bfab241e7",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "读取表的数据",
+        "info": "",
+        "x": 1050,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "45b48d7cd344ea9e",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "获取表的所有数据",
+        "info": "",
+        "x": 250,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "9212188828b16c6b",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "echarts代码",
+        "info": "",
+        "x": 490,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "4f7d0302ea95bb75",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "JSON转字符串",
+        "info": "",
+        "x": 820,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "4e623efd3a73462e",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "UI构建模板",
+        "info": "",
+        "x": 1060,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "dd8627d8d23dd70e",
+        "type": "comment",
+        "z": "8874ee1ca233de29",
+        "name": "可视化",
+        "info": "",
+        "x": 1290,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "90af3532a7a4fe29",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "DSTEMP3",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"dstemp3\"].length;i++){//过滤电压为空的数据\n    if (data[\"dstemp3\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"dstemp3\":data[\"dstemp3\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar dstemp3=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   dstemp3[i1]=newArr[i1][\"dstemp3\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'DSTEMP3 Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['DSTEMP3(℃)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'DSTEMP3(℃)',\n      type: 'line',\n      stack: 'Total',\n      data: dstemp3\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 760,
+        "wires": [
+            [
+                "d2b62b5c05f019f3"
+            ]
+        ]
+    },
+    {
+        "id": "d2b62b5c05f019f3",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 760,
+        "wires": [
+            [
+                "0a600c51c88228ae"
+            ]
+        ]
+    },
+    {
+        "id": "0a600c51c88228ae",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart6\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart6\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 760,
+        "wires": [
+            [
+                "7f24468ce4a16dc5"
+            ]
+        ]
+    },
+    {
+        "id": "7f24468ce4a16dc5",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "5cede5b1e6267d38",
+        "name": "DSTEMP3",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1330,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b3701ea8327b4181",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "ADC1",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"adc1\"].length;i++){//过滤电压为空的数据\n    if (data[\"adc1\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"adc1\":data[\"adc1\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar adc1=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   adc1[i1]=newArr[i1][\"adc1\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'ADC1 Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['ADC1(mv)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'ADC1(mv)',\n      type: 'line',\n      stack: 'Total',\n      data: adc1\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 820,
+        "wires": [
+            [
+                "4f29ea0e10a431b7"
+            ]
+        ]
+    },
+    {
+        "id": "4f29ea0e10a431b7",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 820,
+        "wires": [
+            [
+                "8ae275a2fbaab18f"
+            ]
+        ]
+    },
+    {
+        "id": "8ae275a2fbaab18f",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart7\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart7\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1080,
+        "y": 820,
+        "wires": [
+            [
+                "ebf7dc20e08f3173"
+            ]
+        ]
+    },
+    {
+        "id": "ebf7dc20e08f3173",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "eeccaee44a1109e1",
+        "name": "ADC1",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dcbb0e084e3ace2f",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "ADC2",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"adc2\"].length;i++){//过滤电压为空的数据\n    if (data[\"adc2\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"adc2\":data[\"adc2\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar adc2=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   adc2[i1]=newArr[i1][\"adc2\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'ADC2 Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['ADC2(mv)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'ADC2(mv)',\n      type: 'line',\n      stack: 'Total',\n      data: adc2\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 880,
+        "wires": [
+            [
+                "520c070d7edca98c"
+            ]
+        ]
+    },
+    {
+        "id": "520c070d7edca98c",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 880,
+        "wires": [
+            [
+                "17d00141edf76e7d"
+            ]
+        ]
+    },
+    {
+        "id": "17d00141edf76e7d",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart8\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart8\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 880,
+        "wires": [
+            [
+                "c54e5d156e78e578"
+            ]
+        ]
+    },
+    {
+        "id": "c54e5d156e78e578",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "117c1647c0991b70",
+        "name": "ADC2",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4aea33677223fa19",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "ADC3",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"adc3\"].length;i++){//过滤电压为空的数据\n    if (data[\"adc3\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"adc3\":data[\"adc3\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar adc3=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   adc3[i1]=newArr[i1][\"adc3\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'ADC3(mv) Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['ADC3(mv)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'ADC3(mv)',\n      type: 'line',\n      stack: 'Total',\n      data: adc3\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 940,
+        "wires": [
+            [
+                "8f5e0a3dcd4ab1eb"
+            ]
+        ]
+    },
+    {
+        "id": "8f5e0a3dcd4ab1eb",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 940,
+        "wires": [
+            [
+                "1da84781963e11e9"
+            ]
+        ]
+    },
+    {
+        "id": "1da84781963e11e9",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart9\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart9\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 940,
+        "wires": [
+            [
+                "0eaa1f21e1d345be"
+            ]
+        ]
+    },
+    {
+        "id": "0eaa1f21e1d345be",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "eeee1b5c9c800453",
+        "name": "ADC3",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "64d0219e17237520",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Distance",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"distance\"].length;i++){//过滤电压为空的数据\n    if (data[\"distance\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"distance\":data[\"distance\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar distance=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   distance[i1]=newArr[i1][\"distance\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'Distance Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['Distance(cm)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'Distance(cm)',\n      type: 'line',\n      stack: 'Total',\n      data: distance\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 1000,
+        "wires": [
+            [
+                "f3e20bd485f99120"
+            ]
+        ]
+    },
+    {
+        "id": "f3e20bd485f99120",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 1000,
+        "wires": [
+            [
+                "3e7c456caf5e75e7"
+            ]
+        ]
+    },
+    {
+        "id": "3e7c456caf5e75e7",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart10\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart10\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 1000,
+        "wires": [
+            [
+                "02241f2080c15424"
+            ]
+        ]
+    },
+    {
+        "id": "02241f2080c15424",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "f1c096d9607cdfc9",
+        "name": "Distance",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1320,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "31d21f7dc061ec41",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "weight",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"weight\"].length;i++){//过滤电压为空的数据\n    if (data[\"weight\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"weight\":data[\"weight\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar weight=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   weight[i1]=newArr[i1][\"weight\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'weight Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['weight(g)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'weight(g)',\n      type: 'line',\n      stack: 'Total',\n      data: weight\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1060,
+        "wires": [
+            [
+                "02993a5e34baca88"
+            ]
+        ]
+    },
+    {
+        "id": "02993a5e34baca88",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 1060,
+        "wires": [
+            [
+                "bf2756b54a353b55"
+            ]
+        ]
+    },
+    {
+        "id": "bf2756b54a353b55",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart11\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart11\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 1060,
+        "wires": [
+            [
+                "677bf4a21671449c"
+            ]
+        ]
+    },
+    {
+        "id": "677bf4a21671449c",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "0db484b7962b5544",
+        "name": "weight",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1310,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "674d485c5e5933c7",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "Count",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"count\"].length;i++){//过滤电压为空的数据\n    if (data[\"count\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"count\":data[\"count\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar count=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   count[i1]=newArr[i1][\"count\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'count Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['count','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'count',\n      type: 'line',\n      stack: 'Total',\n      data: count\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1120,
+        "wires": [
+            [
+                "c3495827d42add99"
+            ]
+        ]
+    },
+    {
+        "id": "c3495827d42add99",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 1120,
+        "wires": [
+            [
+                "da65b967410c190f"
+            ]
+        ]
+    },
+    {
+        "id": "da65b967410c190f",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart12\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart12\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 1120,
+        "wires": [
+            [
+                "35ed0804e1ba42ef"
+            ]
+        ]
+    },
+    {
+        "id": "35ed0804e1ba42ef",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "827a880ab2c786cc",
+        "name": "Count",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1330,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4c02d48237b60a08",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "DSTEMP2",
+        "func": "var xdata = msg.payload['timedata']\nvar data=msg.payload\nvar array=[]\nfor (var i=0;i<data[\"dstemp2\"].length;i++){//过滤电压为空的数据\n    if (data[\"dstemp2\"][i]==null){\n     continue\n    }\n    else {\n        var array1={\n        \"dstemp2\":data[\"dstemp2\"][i],\n        \"timedata\":data[\"timedata\"][i]\n    }\n    array[i]=array1\n}\n}\nvar newArr = array.filter(function (s) {//去掉元素为空的\n    return s;\n });\nvar dstemp2=[]\nvar time=[]\nfor (var i1=0;i1<newArr.length;i1++){//重新生成新的数组数据给echarts\n   dstemp2[i1]=newArr[i1][\"dstemp2\"] \n   time[i1]=newArr[i1][\"timedata\"] \n}\noption = {\n  title: {\n    text: 'DSTEMP2(℃) Line'\n  },\n  tooltip: {\n    trigger: 'axis'\n  },\n  legend: {\n    data: ['DSTEMP2(℃)','timedata']\n  },\n  grid: {\n    left: '3%',\n    right: '4%',\n    bottom: '3%',\n    containLabel: true\n  },\n  toolbox: {\n      show: true,\n      feature: {\n      dataZoom: {\n        yAxisIndex: 'none'\n      },\n      dataView: { readOnly: false },\n      magicType: { type: ['line', 'bar'] },\n      restore: {},\n      saveAsImage: {}\n    }\n  },\n  xAxis: {\n    type: 'category',\n    boundaryGap: false,\n    data: xdata\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: [\n    {\n      name: 'DSTEMP2(℃)',\n      type: 'line',\n      stack: 'Total',\n      data: dstemp2\n    },\n  ]\n};\n\nmsg.payload= option\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 700,
+        "wires": [
+            [
+                "102b5bc784dabda9"
+            ]
+        ]
+    },
+    {
+        "id": "102b5bc784dabda9",
+        "type": "function",
+        "z": "8874ee1ca233de29",
+        "name": "JSON to String",
+        "func": "msg.option = JSON.stringify(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 700,
+        "wires": [
+            [
+                "949ba16fefcf9df8"
+            ]
+        ]
+    },
+    {
+        "id": "949ba16fefcf9df8",
+        "type": "template",
+        "z": "8874ee1ca233de29",
+        "name": "UI Build",
+        "field": "template",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n<div id=\"divChart13\" style=\"height:100%;width:100%;background-color:white;\"></div>\n<script type=\"text/javascript\">\n    var dom = document.getElementById(\"divChart13\");\n    var myChart =null;\n    myChart = echarts.init(dom);\n    option = null;\n    option= {{{option}}};\n\n    if (option && typeof option === \"object\") \n    { \n        myChart.setOption(option, true); \n    }\n</script>",
+        "output": "str",
+        "x": 1100,
+        "y": 700,
+        "wires": [
+            [
+                "46b66a5f90c01989"
+            ]
+        ]
+    },
+    {
+        "id": "46b66a5f90c01989",
+        "type": "ui_template",
+        "z": "8874ee1ca233de29",
+        "group": "c3728db2c595e0b3",
+        "name": "DSTEMP2",
+        "order": 1,
+        "width": "10",
+        "height": "4",
+        "format": "<script src=\"/echarts.min.js\"></script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1330,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d7ab97b4130894e3",
+        "type": "sqlitedb",
+        "db": "/root/test.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "a12f73515c79805b",
+        "type": "ui_group",
+        "name": "SHT-TEMP",
+        "tab": "550aa231cfb079c6",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6cbdca81d74300c4",
+        "type": "ui_group",
+        "name": "BAT",
+        "tab": "550aa231cfb079c6",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1d4e3cae1c917729",
+        "type": "ui_group",
+        "name": "Label",
+        "tab": "550aa231cfb079c6",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e889607f8d438641",
+        "type": "ui_group",
+        "name": "SHT-HUM",
+        "tab": "550aa231cfb079c6",
+        "order": 5,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ab520dc2b3da917e",
+        "type": "ui_group",
+        "name": "DSTEMP",
+        "tab": "550aa231cfb079c6",
+        "order": 3,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5cede5b1e6267d38",
+        "type": "ui_group",
+        "name": "DSTEMP3",
+        "tab": "550aa231cfb079c6",
+        "order": 7,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "eeccaee44a1109e1",
+        "type": "ui_group",
+        "name": "ADC1",
+        "tab": "550aa231cfb079c6",
+        "order": 8,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "117c1647c0991b70",
+        "type": "ui_group",
+        "name": "ADC2",
+        "tab": "550aa231cfb079c6",
+        "order": 9,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "eeee1b5c9c800453",
+        "type": "ui_group",
+        "name": "ADC3",
+        "tab": "550aa231cfb079c6",
+        "order": 10,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1c096d9607cdfc9",
+        "type": "ui_group",
+        "name": "Distance",
+        "tab": "550aa231cfb079c6",
+        "order": 11,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0db484b7962b5544",
+        "type": "ui_group",
+        "name": "weight",
+        "tab": "550aa231cfb079c6",
+        "order": 12,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "827a880ab2c786cc",
+        "type": "ui_group",
+        "name": "Count",
+        "tab": "550aa231cfb079c6",
+        "order": 13,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c3728db2c595e0b3",
+        "type": "ui_group",
+        "name": "DSTEMP2",
+        "tab": "550aa231cfb079c6",
+        "order": 6,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "550aa231cfb079c6",
+        "type": "ui_tab",
+        "name": "NBSN95",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
