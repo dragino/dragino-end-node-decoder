@@ -109,7 +109,7 @@ function Decoder(bytes, port) {
 		if(mod !== 1 && BG == 0) 
 		{
 		 hum=(bytes[11]<<8 | bytes[12])/10;//hum,units: °
-		 tem=(bytes[13]<<8 | bytes[14])/10; //tem,units: °   
+		 tem=(bytes[13]<<24>>16 | bytes[14])/10; //tem,units: °   
 		}
 		led_updown=(bytes[10] & 0x20)?"ON":"OFF";//LED status for position,uplink and downlink
 	    intwk = (bytes[10] & 0x10)?"MOVE":"STILL";
@@ -341,7 +341,7 @@ function Decoder(bytes, port) {
 		if(bytes[26] & 0xC0==0x40) 
 		{
 			hum=(bytes[27]<<8 | bytes[28])/10;//hum,units: °
-			tem=(bytes[29]<<8 | bytes[30])/10; //tem,units: °
+			tem=(bytes[29]<<24>>16 | bytes[30])/10; //tem,units: °
 		}
 		return {
 		  BatV:batV,
