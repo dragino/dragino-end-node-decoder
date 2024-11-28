@@ -73,7 +73,7 @@ function Decode(fPort, bytes) {
     }
     else if(mode=='6')
     {
-      decode.Work_mode= "Exit mode"; 
+      decode.Work_mode= "Trigger mode"; 
       decode.Mode_status= bytes[9] ? "True":"False";
       decode.AV1L_flag= (bytes[0] &0x80)? "True":"False";
       decode.AV1H_flag= (bytes[0] &0x40)? "True":"False";
