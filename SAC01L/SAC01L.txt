@@ -1,0 +1,238 @@
+function datalog(i,bytes){
+  var aa= parseFloat(((bytes[3+i]<<24>>16 | bytes[4+i])/10).toFixed(1));
+  var bb= parseFloat(((bytes[5+i]<<8 | bytes[6+i])/10).toFixed(1));
+  var cc= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string='['+aa+','+bb+','+cc+']'+',';  
+  
+  return string;
+}
+
+function getzf(c_num){ 
+  if(parseInt(c_num) < 10)
+    c_num = '0' + c_num; 
+
+  return c_num; 
+}
+
+function getMyDate(str){ 
+  var c_Date;
+  if(str > 9999999999)
+    c_Date = new Date(parseInt(str));
+  else 
+    c_Date = new Date(parseInt(str) * 1000);
+  
+  var c_Year = c_Date.getFullYear(), 
+  c_Month = c_Date.getMonth()+1, 
+  c_Day = c_Date.getDate(),
+  c_Hour = c_Date.getHours(), 
+  c_Min = c_Date.getMinutes(), 
+  c_Sen = c_Date.getSeconds();
+  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+  
+  return c_Time;
+}
+
+function Decoder(bytes, port) {
+// Decode an uplink message from a buffer
+// (array) of bytes to an object of fields.
+	var i;
+	var batV=0;//Battery,units:V
+	var mod = 0;
+	var Firmware = 0;  // Firmware version; 5 bits   
+  var sub_band;
+  var freq_band;
+  var sensor; 
+  var firm_ver;	
+  var integer;
+  var decimal;
+  var reading;
+  var scale_factor;
+  var Data_time;
+  var subcontracting_count;
+  var total_packages;
+  var int;
+  var out;
+  if(port==0x02)
+  {
+    batV= (bytes[0]<<8 | bytes[1])/1000;
+    mod=(bytes[2]);
+    Data_time= getMyDate((bytes[3]<<24 | bytes[4]<<16 | bytes[5]<<8 | bytes[6]).toString(10)); 
+		int=bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10];
+		out=bytes[3]<<24 | bytes[4]<<16 | bytes[5]<<8 | bytes[6];
+		if(decimal<100000)
+		{
+		 reading =integer+(decimal/100000);
+		}	
+		else if(decimal>99999&&decimal<1000000)
+		{
+		 reading =integer+(decimal/1000000);
+		}
+		else if(decimal>999999&&decimal<10000000)
+		{
+		  reading =integer+(decimal/10000000);
+		}
+		return {
+		BatV:batV,
+		//Data_Time:Data_time,
+		Mod:mod,
+		Int:int,
+		Out:out,
+		
+		};        
+  }
+  if(port==0x03)
+  {
+    batV= (bytes[4]<<8 | bytes[5])/1000;
+    Data_time= getMyDate((bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]).toString(10)); 
+		total_packages=bytes[6];
+		subcontracting_count=bytes[7];
+		if(decimal<10000)
+		{
+		 reading =integer+(decimal/10000);
+		}	
+		else if(decimal>99999&&decimal<1000000)
+		{
+		 reading =integer+(decimal/1000000);
+		}
+		else if(decimal>999999&&decimal<10000000)
+		{
+		  reading =integer+(decimal/10000000);
+		}
+		return {
+		BatV:batV,
+		Data_Time:Data_time,
+		total_packages:total_packages,
+		subcontracting_count:subcontracting_count,
+		};        
+  }  
+  
+if (port === 0x04)
+{
+     batV= (bytes[0]<<8 | bytes[1])/1000;
+    var dataTimes = [];
+    var integers = [];
+    var decimals = [];
+    var readings = [];
+
+    // Process Data_time and initialize integers & decimals
+    for (let i = 0; i < 32; i++) {
+        let startIndex = 2 + i * 12; // Calculate starting index for each set
+        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
+        integers.push((bytes[startIndex + 7]<< 24) | (bytes[startIndex + 6] << 16) | (bytes[startIndex + 5] << 8) | bytes[startIndex + 4]);
+        decimals.push((bytes[startIndex + 11] << 24) | (bytes[startIndex + 10] << 16) | (bytes[startIndex + 9] << 8) | bytes[startIndex + 8]);
+    }
+
+    // Process readings based on conditions
+    for (let i = 0; i < 32; i++) {
+        if (decimals[i] < 100000) {
+            readings.push(integers[i] + (decimals[i] / 1000));
+        } else if (decimals[i] > 99999 && decimals[i] < 1000000) {
+            readings.push(integers[i] + (decimals[i] / 1000000));
+        } else if (decimals[i] > 9999999 && decimals[i] < 10000000) {
+            readings.push(integers[i] + (decimals[i] / 10000000));
+        }
+    }
+    // Prepare the result object
+    var result = {};
+    if (dataTimes.some(time => time !== null)) { // Assuming getMyDate returns null or a valid date object/time
+        result.Data_Times = dataTimes.filter(time => time !== "1970-01-01 00:00:00");
+    }
+    if (readings.some(reading => reading !== 0)) {
+        result.Readings = readings.filter(reading => reading !== 0);
+    }
+    return result; // This will only include properties with non-zero values
+}
+  
+	if(port==0x05)
+	{
+		if(bytes[0]==0x38)
+		  sensor_mode="SAC01L";
+		else
+		  sensor_mode="NULL"; 
+		   
+		if(bytes[4]==0xff)
+		  sub_band="NULL";
+		else
+		  sub_band=bytes[4];
+		
+		if(bytes[3]==0x01)
+		  freq_band="EU868";
+		else if(bytes[3]==0x02)
+		  freq_band="US915";
+		else if(bytes[3]==0x03)
+		  freq_band="IN865";
+		else if(bytes[3]==0x04)
+		  freq_band="AU915";
+		else if(bytes[3]==0x05)
+		  freq_band="KZ865";
+		else if(bytes[3]==0x06)
+		  freq_band="RU864";
+		else if(bytes[3]==0x07)
+		  freq_band="AS923";
+		else if(bytes[3]==0x08)
+		  freq_band="AS923_1";
+		else if(bytes[3]==0x09)
+		  freq_band="AS923_2";
+		else if(bytes[3]==0x0A)
+		  freq_band="AS923_3";
+		else if(bytes[3]==0x0B)
+		  freq_band="CN470";
+		else if(bytes[3]==0x0C)
+		  freq_band="EU433";
+		else if(bytes[3]==0x0D)
+		  freq_band="KR920";
+		else if(bytes[3]==0x0E)
+		  freq_band="MA869";
+		  
+		firm_ver= (bytes[1]&0x0f)/10+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+		batV= (bytes[5]<<8 | bytes[6])/1000;
+   
+		return {
+		BatV:batV,
+		SENSOR_MODEL:sensor_mode,
+		FIRMWARE_VERSION:firm_ver,
+		FREQUENCY_BAND:freq_band,
+		SUB_BAND:sub_band, 
+		SMODE:sensor,
+		};
+	}	
+	
+	
+	
+	if (port === 0x06)
+{
+    var dataTimes = [];
+    var integers = [];
+    var decimals = [];
+    var readings = [];
+
+    // Process Data_time and initialize integers & decimals
+    for (let i = 0; i < 3324; i++) {
+        let startIndex = i * 12; // Calculate starting index for each set
+        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
+        integers.push((bytes[startIndex + 4]<< 24) | (bytes[startIndex + 5] << 16) | (bytes[startIndex + 6] << 8) | bytes[startIndex + 7]);
+        decimals.push((bytes[startIndex + 8] << 24) | (bytes[startIndex + 9] << 16) | (bytes[startIndex + 10] << 8) | bytes[startIndex + 11]);
+    }
+
+    // Process readings based on conditions
+    for (let i = 0; i < 3324; i++) {
+        if (decimals[i] < 100000) {
+            readings.push(integers[i] + (decimals[i] / 1000));
+        } else if (decimals[i] > 99999 && decimals[i] < 1000000) {
+            readings.push(integers[i] + (decimals[i] / 1000000));
+        } else if (decimals[i] > 9999999 && decimals[i] < 10000000) {
+            readings.push(integers[i] + (decimals[i] / 10000000));
+        }
+    }
+    
+    // Prepare the result object
+var result = {};
+    if (dataTimes.some(time => time !== null)) { // Assuming getMyDate returns null or a valid date object/time
+        result.Data_Times = dataTimes.filter(time => time !== "1970-01-01 00:00:00");
+    }
+    if (readings.some(reading => reading !== 0)) {
+        result.Readings = readings.filter(reading => reading !== 0);
+    }
+    return result; // This will only include properties with non-zero values
+}
+}
