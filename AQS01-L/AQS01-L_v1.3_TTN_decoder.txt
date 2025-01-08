@@ -58,10 +58,7 @@ function Decoder(bytes, port) {
     decode.CO2H_flag= (bytes[10] &0x01)? "True":"False"; 
       
     if(bytes.length==11)
-      return {
-        decode: decode,
-        "lora node": "AQS01-L",
-      }
+       return decode;
   }
   else if(port==3)  
   {
