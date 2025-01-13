@@ -46,8 +46,24 @@ function Decoder(bytes, port) {
     decode.TEMP1L_flag= (bytes[2] &0x20)? "True":"False";
     decode.TEMP2H_flag= (bytes[2] &0x04)? "True":"False";
     decode.TEMP2L_flag= (bytes[2] &0x08)? "True":"False";       
-    decode.Temp_Channel1=parseFloat(((bytes[3]<<24>>16 | bytes[4])/10).toFixed(1)); 
-    decode.Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/10).toFixed(1)); 
+    var Temp_Channel1=parseFloat(((bytes[3]<<24>>16 | bytes[4])/10).toFixed(1)); 
+    if (Temp_Channel1>2000 | Temp_Channel1<-2000)
+    {
+    decode.Temp_Channel1 = 0;
+    }
+   else
+    {
+    decode.Temp_Channel1 = Temp_Channel1;
+    }
+    var Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/10).toFixed(1)); 
+    if (Temp_Channel2>2000 | Temp_Channel2<-2000)
+    {
+    decode.Temp_Channel2 = 0;
+    }
+   else
+    {
+    decode.Temp_Channel2 = Temp_Channel1;
+    }
     decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));         
     
     if(bytes.length==11)
