@@ -1,0 +1,101 @@
+function decodeUplink(input) {
+	var port = input.fPort;
+    var bytes = input.bytes;
+	var data = {};
+	var decode = {};
+	var value;
+	var mod=(bytes[33]>>7)&0x01;
+	var factor=(bytes[33])&0x0F;	
+	var divisor=bytes[34];	 
+switch (input.fPort) {
+    case 2:
+	data.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
+	data.Payload_Ver=bytes[2];
+    data.rain=(bytes[3]<<24 |bytes[4]<<16 |bytes[5]<<8 | bytes[6])*(factor/divisor);	
+	value=bytes[7]<<8 | bytes[8];
+	if(bytes[7] & 0x80)
+	{value |= 0xFFFF0000;}
+    data.temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+ 
+	data.WIND_SPEED=((bytes[9]<<8 | bytes[10])/100).toFixed(2);
+    data.WIND_LEVEL=bytes[11]<<8 | bytes[12];
+    data.WIND_DIRECTION=bytes[13]<<8 | bytes[14];
+	data.WIND_ANGLE=bytes[15]<<8 | bytes[16];
+
+	data.Humidity=((bytes[17]<<8 | bytes[18])/10).toFixed(1);
+	data.Temperature=((bytes[19]<<8 | bytes[20])/10).toFixed(1);
+	
+	data.NOISE=((bytes[21]<<8 | bytes[22])/10).toFixed(1);
+    if(mod===1)
+	{
+	  data.Pm2_5=bytes[23]<<8 | bytes[24];
+	  data.Pm10=bytes[25]<<8 | bytes[26];
+	  data.Pressure=((bytes[27]<<8 | bytes[28])/10).toFixed(1);
+      data.illumination=(bytes[29]<<24 |bytes[30]<<16 |bytes[31]<<8 | bytes[32]) >>>0;	
+	  data.s_flag = (bytes[33]>>6)&0x01;
+	  data.i_flag = (bytes[33]>>5)&0x01;
+	  data.Mod = mod;
+	  data.A1 = bytes[36]<<8 | bytes[37];
+	  data.A2 = bytes[40]<<8 | bytes[41];
+	  data.A3 = bytes[44]<<8 | bytes[45];
+	  data.A4 = bytes[48]<<8 | bytes[49];
+	}
+	
+	 return {
+      data: data,
+    }
+	break;
+
+case 5:
+  { 
+    if(bytes[0]==0x2E)
+      data.SENSOR_MODEL= "WSC2-LB";
+      
+    if(bytes[4]==0xff)
+      data.SUB_BAND="NULL";
+    else
+      data.SUB_BAND=bytes[4];
+    
+    if(bytes[3]==0x01)
+      data.FREQUENCY_BAND="EU868";
+    else if(bytes[3]==0x02)
+      data.FREQUENCY_BAND="US915";
+    else if(bytes[3]==0x03)
+      data.FREQUENCY_BAND="IN865";
+    else if(bytes[3]==0x04)
+      data.FREQUENCY_BAND="AU915";
+    else if(bytes[3]==0x05)
+      data.FREQUENCY_BAND="KZ865";
+    else if(bytes[3]==0x06)
+      data.FREQUENCY_BAND="RU864";
+    else if(bytes[3]==0x07)
+      data.FREQUENCY_BAND="AS923";
+    else if(bytes[3]==0x08)
+      data.FREQUENCY_BAND="AS923_1";
+    else if(bytes[3]==0x09)
+      data.FREQUENCY_BAND="AS923_2";
+    else if(bytes[3]==0x0A)
+      data.FREQUENCY_BAND="AS923_3";
+    else if(bytes[3]==0x0B)
+      data.FREQUENCY_BAND="CN470";
+    else if(bytes[3]==0x0C)
+      data.FREQUENCY_BAND="EU433";
+    else if(bytes[3]==0x0D)
+      data.FREQUENCY_BAND="KR920";
+    else if(bytes[3]==0x0E)
+      data.FREQUENCY_BAND="MA869";
+      
+    data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    data.BAT= (bytes[5]<<8 | bytes[6])/1000;
+  }
+  return {
+      data: data,
+    }
+  break;
+  
+	default:
+    return {
+      errors: ["unknown FPort"]
+    }
+}
+}
