@@ -1,0 +1,270 @@
+function decodeUplink(input) {
+	var port = input.fPort;
+    var bytes = input.bytes;
+	var data = {};
+	var decode = {};
+	var value;
+	var mod=(bytes[33]>>7)&0x01;
+	var factor=(bytes[33])&0x0F;	
+	var divisor=bytes[34];	 
+ switch (input.fPort) {
+	function getzf(c_num){ 
+	  if(parseInt(c_num) < 10)
+		c_num = '0' + c_num; 
+
+	  return c_num; 
+	}
+
+	function getMyDate(str){ 
+	  var c_Date;
+	  if(str > 9999999999)
+		c_Date = new Date(parseInt(str));
+	  else 
+		c_Date = new Date(parseInt(str) * 1000);
+	  
+	  var c_Year = c_Date.getFullYear(), 
+	  c_Month = c_Date.getMonth()+1, 
+	  c_Day = c_Date.getDate(),
+	  c_Hour = c_Date.getHours(), 
+	  c_Min = c_Date.getMinutes(), 
+	  c_Sen = c_Date.getSeconds();
+	  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+	  
+	  return c_Time;
+	}
+
+	function Str1(str2){
+	  var str3 ="";
+	  for (var i=0;i<str2.length;i++){
+		if (str2[i]<=0x0f){
+		str2[i]="0"+str2[i].toString(16)+"";
+		}
+	  str3+= str2[i].toString(16)+"";}
+	  return str3;
+	}
+	function str_pad(byte){
+		var zero = '00';
+		var hex= byte.toString(16);    
+		var tmp  = 2-hex.length;
+		return zero.substr(0,tmp) + hex;
+	}
+
+	function datalog(i,bytes){
+	  var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
+	  var string='['+ aa +']'+',';  
+	  return string;
+	}
+
+	function datalog2(i,bytes){
+	  var aa= str_pad(bytes[i])+str_pad(bytes[1+i]);
+	  var bb= parseFloat(((bytes[2+i]<<8 | bytes[3+i])/1000).toFixed(3)); 
+	  var cc= parseFloat(((bytes[4+i]<<8 | bytes[5+i])/1000).toFixed(3));
+	  var dd= (bytes[6+i]&0x08) ? "High":"Low";
+	  var ee= (bytes[6+i]&0x04) ? "High":"Low";
+	  var ff= (bytes[6+i]&0x02) ? "High":"Low";
+	  var gg= (bytes[6+i]&0x01) ? "True":"False";
+	  var hh= transform(cc,bytes[i],bytes[1+i]);
+	  var ii= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+	  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+','+hh+','+ii+']'+',';  
+	  
+	  return string;
+	}
+		function transform(IDC_intput_mA,bytes2,bytes3)
+	{
+	  var idc_input_convert;
+		if(bytes2===0x00)
+		{
+		  if(IDC_intput_mA<=4.0)
+			idc_input_convert= 0;
+		  else
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*(bytes3*100/16)).toFixed(3));
+		}
+		else if(bytes2==0x01)
+		{
+		  if(IDC_intput_mA<=4.0)
+			idc_input_convert= 0;
+		  else if(bytes3==1)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.0375).toFixed(3));
+		  else if(bytes3==2)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.0625).toFixed(3));   
+		  else if(bytes3==3)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.1).toFixed(3)); 
+		  else if(bytes3==4)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.15625).toFixed(3));
+		  else if(bytes3==5)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.625).toFixed(3));  
+		  else if(bytes3==6)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*2.5).toFixed(3));   
+		  else if(bytes3==7)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*3.75).toFixed(3));  
+		  else if(bytes3==8)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-0.00625).toFixed(3));    
+		  else if(bytes3==9)
+		  {
+			if(IDC_intput_mA<=12.0)
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-0.0125).toFixed(3));
+			}
+			else
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*0.0125).toFixed(3));
+			}
+		  }
+		  else if(bytes3==10)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.3125).toFixed(3));   
+		  else if(bytes3==11)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*3.125).toFixed(3));   
+		  else if(bytes3==12)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*6.25).toFixed(3));         
+		}
+		else if(bytes2==0x02)
+		{
+		  if(IDC_intput_mA<=4.0)
+			idc_input_convert= 0;
+		  else if(bytes3==1)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*6.25).toFixed(3));
+		  else if(bytes3==2)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*12.5).toFixed(3));   
+		  else if(bytes3==3)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*18.75).toFixed(3)); 
+		  else if(bytes3==4)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*62.5).toFixed(3));
+		  else if(bytes3==5)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*125).toFixed(3));  
+		  else if(bytes3==6)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*187.5).toFixed(3));   
+		  else if(bytes3==7)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*250).toFixed(3));  
+		  else if(bytes3==8)
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*312.5).toFixed(3));    
+		  else if(bytes3==9)
+		  {
+			idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*625).toFixed(3));
+		  }
+		  else if(bytes3==10)
+		  {
+			if(IDC_intput_mA<=12.0)
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-12.5).toFixed(3));
+			}
+			else
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*12.5).toFixed(3));
+			}
+		  }
+		  else if(bytes3==11)
+		  {
+			if(IDC_intput_mA<=12.0)
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-25).toFixed(3));
+			}
+			else
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*25).toFixed(3));
+			}
+		  }
+		  else if(bytes3==12)
+		  {
+			if(IDC_intput_mA<=12.0)
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-125).toFixed(3));
+			}
+			else
+			{
+			  idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*125).toFixed(3));
+			}
+		  }  
+		} 
+	  return idc_input_convert;  
+	}
+
+	
+case 5:
+  { 
+    if(bytes[0]==0x16)
+      data.SENSOR_MODEL= "PS-LB";
+      
+    if(bytes[4]==0xff)
+      data.SUB_BAND="NULL";
+    else
+      data.SUB_BAND=bytes[4];
+    
+    if(bytes[3]==0x01)
+      data.FREQUENCY_BAND="EU868";
+    else if(bytes[3]==0x02)
+      data.FREQUENCY_BAND="US915";
+    else if(bytes[3]==0x03)
+      data.FREQUENCY_BAND="IN865";
+    else if(bytes[3]==0x04)
+      data.FREQUENCY_BAND="AU915";
+    else if(bytes[3]==0x05)
+      data.FREQUENCY_BAND="KZ865";
+    else if(bytes[3]==0x06)
+      data.FREQUENCY_BAND="RU864";
+    else if(bytes[3]==0x07)
+      data.FREQUENCY_BAND="AS923";
+    else if(bytes[3]==0x08)
+      data.FREQUENCY_BAND="AS923_1";
+    else if(bytes[3]==0x09)
+      data.FREQUENCY_BAND="AS923_2";
+    else if(bytes[3]==0x0A)
+      data.FREQUENCY_BAND="AS923_3";
+    else if(bytes[3]==0x0B)
+      data.FREQUENCY_BAND="CN470";
+    else if(bytes[3]==0x0C)
+      data.FREQUENCY_BAND="EU433";
+    else if(bytes[3]==0x0D)
+      data.FREQUENCY_BAND="KR920";
+    else if(bytes[3]==0x0E)
+      data.FREQUENCY_BAND="MA869";
+      
+    data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    data.BAT= (bytes[5]<<8 | bytes[6])/1000;
+  }
+  return {
+      data: data,
+    }
+  break;
+case 3:
+   var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data1= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data1;
+      else
+        data_sum+=data1;
+    }
+     
+    data.DATALOG=data_sum;
+    data.PNACKMD=pnack;
+    return {
+      data: data,
+    }
+    
+  break;
+default:
+    data.Bat_V= (bytes[0]<<8 | bytes[1])/1000;
+    data.Probe_mod= str_pad(bytes[2])+str_pad(bytes[3]);   
+    var IDC_intput_mA= (bytes[4]<<8 | bytes[5])/1000;  
+	data IDC_intput_mA=IDC_intput_mA;
+    data.VDC_intput_V= (bytes[6]<<8 | bytes[7])/1000; 
+    data.IN1_pin_level= (bytes[8] & 0x08)? "High":"Low";   
+    data.IN2_pin_level= (bytes[8] & 0x04)? "High":"Low";   
+    data.Exti_pin_level= (bytes[8] & 0x02)? "High":"Low";  
+    data.Exti_status= (bytes[8] & 0x01)? "True":"False";
+    data.IDC_Roc_flagL=(bytes[8]&0x80)?"TRUE":"FALSE";
+    data.IDC_Roc_flagH=(bytes[8]&0x40)?"TRUE":"FALSE";
+    data.VDC_Roc_flagL=(bytes[8]&0x20)?"TRUE":"FALSE"; 
+    data.VDC_Roc_flagH=(bytes[8]&0x10)?"TRUE":"FALSE";
+	 if(bytes[2]===0x00)
+      data.Water_deep_cm= transform(IDC_intput_mA,bytes[2],bytes[3]);
+    else if(bytes[2]==0x01)
+      data.Water_pressure_kPa= transform(IDC_intput_mA,bytes[2],bytes[3]);      
+    else if(bytes[2]==0x02)
+      data.Differential_pressure_Pa= transform(IDC_intput_mA,bytes[2],bytes[3]);
+    return {
+      data: data,
+    }
+}
+}
