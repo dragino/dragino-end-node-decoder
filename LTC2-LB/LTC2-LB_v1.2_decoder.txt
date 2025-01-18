@@ -7,7 +7,7 @@ function decodeUplink(input) {
 	var mod=(bytes[33]>>7)&0x01;
 	var factor=(bytes[33])&0x0F;	
 	var divisor=bytes[34];	 
- switch (input.fPort) {
+
 	function datalog2(i,bytes){
   var aa= parseFloat((bytes[2+i]<<24>>16 | bytes[2+i+1])/10.0).toFixed(1); 
   var bb= parseFloat((bytes[2+i+2]<<24>>16 | bytes[2+i+3])/10.0).toFixed(1); 
@@ -50,6 +50,7 @@ function getMyDate(str){
   
   return c_Time;
 }
+switch (input.fPort) {
 case 2:
     data.BatV=(bytes[0]<<8 | bytes[1])/1000;
     data.Interrupt_flag=(bytes[2] & 0x01)? "TRUE":"FALSE";
