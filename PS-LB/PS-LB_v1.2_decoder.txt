@@ -7,8 +7,7 @@ function decodeUplink(input) {
 	var mod=(bytes[33]>>7)&0x01;
 	var factor=(bytes[33])&0x0F;	
 	var divisor=bytes[34];	 
- switch (input.fPort) {
-	function getzf(c_num){ 
+function getzf(c_num){ 
 	  if(parseInt(c_num) < 10)
 		c_num = '0' + c_num; 
 
@@ -177,8 +176,7 @@ function decodeUplink(input) {
 		} 
 	  return idc_input_convert;  
 	}
-
-	
+switch (input.fPort) {	
 case 5:
   { 
     if(bytes[0]==0x16)
