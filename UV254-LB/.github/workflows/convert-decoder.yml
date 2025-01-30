@@ -3,14 +3,14 @@ name: Convert TTN Decoder to ChirpStack
 on:
   push:
     branches:
-      - main  # 触发工作流的分支
+      - main
     paths:
       - 'UV254-LB/TTN_decoder.txt'  # 只在 TTN_decoder.txt 文件更改时触发
-    workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   convert:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 使用 ubuntu-latest 作为运行环境
 
     steps:
       - name: Checkout repository
@@ -19,11 +19,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # 使用 Python 3.9
 
       - name: Run conversion script
         run: |
-          # 切换到 UV254-LB 目录
           cd UV254-LB
 
           # 创建 Python 脚本
