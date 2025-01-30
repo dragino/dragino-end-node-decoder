@@ -6,6 +6,7 @@ on:
       - main  # 触发工作流的分支
     paths:
       - 'UV254-LB/TTN_decoder.txt'  # 只在 TTN_decoder.txt 文件更改时触发
+    workflow_dispatch:  # 允许手动触发
 
 jobs:
   convert:
