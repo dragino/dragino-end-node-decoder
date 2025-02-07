@@ -16,7 +16,7 @@ function Decode(fPort, bytes, variables) {
     var sensor;
     
     if(bytes[0]==0x16)
-      sensor= "PS-LB";
+      sensor= "PS--LB";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
 	  
