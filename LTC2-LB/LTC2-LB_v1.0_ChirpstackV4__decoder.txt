@@ -67,7 +67,7 @@ function Decode(fPort, bytes, variables) {
     }
    else
     {
-    decode.Temp_Channel2 = Temp_Channel1;
+    decode.Temp_Channel2 = Temp_Channel2;
     }
     decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));         
     
