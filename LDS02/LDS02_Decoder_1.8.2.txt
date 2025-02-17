@@ -1,0 +1,45 @@
+function decodeUplink(input) {
+	var port = input.fPort;
+	var bytes = input.bytes;
+	var data = {};
+
+switch (input.fPort) {
+case 7:
+  
+    data.BatV=((bytes[0]<<8 | bytes[1])&0x3fff)/1000;
+    data.edc_mod=bytes[0]&0x80?"OPEN":"CLOSE";
+    data.times=bytes[2]<<16 | bytes[3]<<8 | bytes[4];
+  return {
+      data: data,
+    }
+  break;
+  
+default:
+data.BatV=((bytes[0]<<8 | bytes[1])&0x3fff)/1000;
+data.door_open_status=bytes[0]&0x80?1:0;//1:open,0:close
+data.water_leak_status=bytes[0]&0x40?1:0;
+var mod=bytes[2];
+data.alarm=bytes[9]&0x01;
+data.mod=mod
+    
+    if(mod==1)
+	{   
+       data.open_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
+       data.open_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
+    }
+    else if(mod==2)
+    {
+    data.leak_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
+    data.leak_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
+	}
+	else if(mod==3)
+    {
+	}
+	
+if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
+    return {
+      data: data,
+    }
+}
+
+}
