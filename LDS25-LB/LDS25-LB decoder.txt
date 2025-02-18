@@ -3,7 +3,7 @@ function decodeUplink(input) {
 	var bytes = input.bytes;
 	var mode=(bytes[6] & 0x7C)>>2;
 	var data = {};
-	function datalog(i,bytes){
+function datalog(i,bytes){
   var aa= (bytes[2+i]<<8 | bytes[3+i])/10;
   var bb= bytes[4+i]<<8 | bytes[5+i];
   var cc= bytes[6+i]<<24>>24;    
@@ -41,89 +41,53 @@ function decodeUplink(input) {
 	}
 switch (input.fPort) {
 case 2:
-	data.batV= (bytes[0]<<8 | bytes[1])/1000;
-    data.Data_time= getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10)); 
-	data.integer=bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9];
-	data.decimal=bytes[10]<<24 | bytes[11]<<16 | bytes[12]<<8 | bytes[13];
-	if(decimal<100000)
-		{
-		 reading =integer+(decimal/100000);
-		}	
-		else if(decimal>99999&&decimal<1000000)
-		{
-		 reading =integer+(decimal/1000000);
-		}
-		else if(decimal>999999&&decimal<10000000)
-		{
-		  reading =integer+(decimal/10000000);
-		}
-	return {
+	data.batV= ((bytes[0]<<8 | bytes[1])&0x3FFF)/1000;
+ 
+  
+    data.temp_DS18B20=parseFloat(((bytes[2]<<24>>16| bytes[3])/10).toFixed(1));
+    data.Distance_cm=(bytes[4]<<8 | bytes[5])/10;
+    data.Distance_signal_strength=bytes[6]<<8 | bytes[7];
+    data.Lidar_temp=bytes[9]<<24>>24;
+    data.i_flag=(bytes[8] & 0x01)? "TRUE":"FALSE";
+    data.i_level=(bytes[8] & 0x02)? "HIGH":"LOW";
+    data.mes_type=bytes[10];
+	if(bytes.length==11)
+return {
       data: data,
     }
 	break;
 case 3:
-    data.batV= (bytes[4]<<8 | bytes[5])/1000;
-    data.Data_time= getMyDate((bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]).toString(10)); 
-	data.total_packages=bytes[6];
-	data.subcontracting_count=bytes[7];
-		if(decimal<10000)
-		{
-		 reading =integer+(decimal/10000);
-		}	
-		else if(decimal>99999&&decimal<1000000)
-		{
-		 reading =integer+(decimal/1000000);
-		}
-		else if(decimal>999999&&decimal<10000000)
-		{
-		  reading =integer+(decimal/10000000);
-		}
+   var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data1= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data1;
+      else
+        data_sum+=data1;
+    }
+     
+    data.DATALOG=data_sum;
+    data.PNACKMD=pnack;
     return {
       data: data,
     }
     
   break;
- case 4:
-    data.batV= (bytes[0]<<8 | bytes[1])/1000;
-    var dataTimes = [];
-    var integers = [];
-    var decimals = [];
-    var readings = [];
-
-    // Process Data_time and initialize integers & decimals
-    for (let i = 0; i < 32; i++) {
-        let startIndex = 2 + i * 12; // Calculate starting index for each set
-        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
-        integers.push((bytes[startIndex + 7]<< 24) | (bytes[startIndex + 6] << 16) | (bytes[startIndex + 5] << 8) | bytes[startIndex + 4]);
-        decimals.push((bytes[startIndex + 11] << 24) | (bytes[startIndex + 10] << 16) | (bytes[startIndex + 9] << 8) | bytes[startIndex + 8]);
-    }
-
-    // Process readings based on conditions
-    for (let i = 0; i < 32; i++) {
-        if (decimals[i] < 100000) {
-            readings.push(integers[i] + (decimals[i] / 1000));
-        } else if (decimals[i] > 99999 && decimals[i] < 1000000) {
-            readings.push(integers[i] + (decimals[i] / 1000000));
-        } else if (decimals[i] > 9999999 && decimals[i] < 10000000) {
-            readings.push(integers[i] + (decimals[i] / 10000000));
-        }
-    }
-    // Prepare the result object
-    var result = {};
-    if (dataTimes.some(time => time !== null)) { // Assuming getMyDate returns null or a valid date object/time
-        result.Data_Times = dataTimes.filter(time => time !== "1970-01-01 00:00:00");
-    }
-    if (readings.some(reading => reading !== 0)) {
-        result.Readings = readings.filter(reading => reading !== 0);
-    }
+  
+ case 6:
+    data.Wiper_workmode=bytes[0];
+    data.Wiper_clean_times=bytes[1];
+    data.Wiper_clean_interval=bytes[2]<<8 | bytes[3];
+    data.Wiper_last_clean_time= getMyDate((bytes[4]<<24 | bytes[5]<<16 | bytes[6]<<8 | bytes[7]).toString(10)); 
     return {
-      data: result,
+      data: data,
     } 
  break;
  case 5:
  { 
-    if(bytes[0]==0x38)
-      data.SENSOR_MODEL= "AIS01_LB";
+    if(bytes[0]==0x3E)
+      data.SENSOR_MODEL= "LDS25-LB";
       
     if(bytes[4]==0xff)
       data.SUB_BAND="NULL";
@@ -166,45 +130,7 @@ case 3:
       data: data,
     }
   break;
-case 6:
- var dataTimes = [];
-    var integers = [];
-    var decimals = [];
-    var readings = [];
-
-    // Process Data_time and initialize integers & decimals
-    for (let i = 0; i < 3324; i++) {
-        let startIndex = i * 12; // Calculate starting index for each set
-        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
-        integers.push((bytes[startIndex + 4]<< 24) | (bytes[startIndex + 5] << 16) | (bytes[startIndex + 6] << 8) | bytes[startIndex + 7]);
-        decimals.push((bytes[startIndex + 8] << 24) | (bytes[startIndex + 9] << 16) | (bytes[startIndex + 10] << 8) | bytes[startIndex + 11]);
-    }
-
-    // Process readings based on conditions
-    for (let i = 0; i < 3324; i++) {
-        if (decimals[i] < 100000) {
-            readings.push(integers[i] + (decimals[i] / 1000));
-        } else if (decimals[i] > 99999 && decimals[i] < 1000000) {
-            readings.push(integers[i] + (decimals[i] / 1000000));
-        } else if (decimals[i] > 9999999 && decimals[i] < 10000000) {
-            readings.push(integers[i] + (decimals[i] / 10000000));
-        }
-    }
-    
-    // Prepare the result object
-var result = {};
-    if (dataTimes.some(time => time !== null)) { // Assuming getMyDate returns null or a valid date object/time
-        result.Data_Times = dataTimes.filter(time => time !== "1970-01-01 00:00:00");
-    }
-    if (readings.some(reading => reading !== 0)) {
-        result.Readings = readings.filter(reading => reading !== 0);
-    }
-return {
-      data: result,
-    } 
- break;
-  
-	default:
+default:
     return {
       errors: ["unknown FPort"]
     }
