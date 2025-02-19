@@ -31,14 +31,15 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var PA4 = toInt(hex.substr(offset, 2)); offset += 2;
-        var PB15 = toInt(hex.substr(offset, 2)); offset += 2;
-        var Alarm = toInt(hex.substr(offset, 2)); offset += 2;
-        var Mod = toInt(hex.substr(offset, 2)); offset += 2;
-        var Calculate_flag = toInt(hex.substr(offset, 4)); offset += 4;
-        var Total_pulse = toInt(hex.substr(offset, 8)); offset += 8;
+        var GPIO_EXIT_Level = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXIT_Flag = toInt(hex.substr(offset, 2)); offset += 2;
+        var Current_alarm = toInt(hex.substr(offset, 2)); offset += 2;
+        var Current_chan1 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+        var Current_chan2 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+        var Current_chan3 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+        var Current_chan4 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
-        var Water_sum =Total_pulse/Calculate_flag
+        
         
         try {
             
@@ -66,10 +67,12 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
-            var Total_pulse = toInt(hex.substr(offset, 8)); offset += 8;
-            var water_sum =Total_pulse/Calculate_flag
-            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Total_pulse:Total_pulse, water_sum:water_sum, timestamp: timestampLog });
+           var Current_Chan1 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+           var Current_Chan2 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+           var Current_Chan3 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+           var Current_Chan4 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
+           var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataSet.push({Current_Chan1:Current_Chan1, Current_Chan2:Current_Chan2,Current_Chan3:Current_Chan3,Current_Chan4:Current_Chan4, timestamp: timestampLog });
         }
 
         return {
@@ -78,15 +81,17 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
-            PA4: PA4,
-            PB15: PB15,
-            Alarm: Alarm,
-            Mod: Mod,
-            Calculate_flag: Calculate_flag,
-            Total_pulse: Total_pulse,
-            Water_sum:Water_sum,
-            water_sum:water_sum,
-            //Total_pulse1:Total_pulse1,
+            GPIO_EXIT_Level: GPIO_EXIT_Level,
+            GPIO_EXIT_Flag: GPIO_EXIT_Flag,
+            Current_alarm: Current_alarm,
+            Current_chan1:Current_chan1,
+            Current_chan2:Current_chan2,
+            Current_chan3:Current_chan3,
+            Current_chan4:Current_chan4,
+            Current_Chan1:Current_Chan1,
+            Current_Chan2:Current_Chan2,
+            Current_Chan3:Current_Chan3,
+            Current_Chan4:Current_Chan4,
             dataSet: dataSet
         };
     }
@@ -103,13 +108,13 @@ function Decoder(payload, payloadB64) {
     // Extract main attributes
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
-    var mainPA4  = payload.PA4 ;
-    var mainPB15 = payload.PB15;
-    var mainAlarm = payload.Alarm;
-    var mainMod = payload.Mod;
-    var mainCalculate_flag = payload.Calculate_flag;
-    var mainTotal_pulse = payload.Total_pulse;
-    var mainWater_sum = payload.Water_sum
+    var mainGPIO_EXIT_Level  = payload.GPIO_EXIT_Level ;
+    var mainGPIO_EXIT_Flag = payload.GPIO_EXIT_Flag;
+    var mainCurrent_alarm = payload.Current_alarm;
+    var mainCurrent_chan1 = payload.Current_chan1;
+    var mainCurrent_chan2 = payload.Current_chan2;
+    var mainCurrent_chan3 = payload.Current_chan3;
+    var mainCurrent_chan4 = payload.Current_chan4
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -131,40 +136,41 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "PA4",
-        value: mainPA4,
+        field: "GPIO_EXIT_Level",
+        value: mainGPIO_EXIT_Level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "PB15",
-        value: mainPB15,
+        field: "GPIO_EXIT_Flag",
+        value: mainGPIO_EXIT_Flag,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Alarm",
-        value: mainAlarm,
+        field: "Current_alarm",
+        value: mainCurrent_alarm,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Mod",
-        value: mainMod,
+        field: "Current_chan1",
+        value: mainCurrent_chan1,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Calculate_flag",
-        value: mainCalculate_flag,
+        field: "Current_chan2",
+        value: mainCurrent_chan2,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Total_pulse",
-        value: mainTotal_pulse,
+        field: "Current_chan3",
+        value: mainCurrent_chan3,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Water_sum",
-        value: mainWater_sum,
+        field: "Current_chan4",
+        value: mainCurrent_chan4,
         timestamp: mainTimestamp
     });
+    
     
 
     // Extract data from dataSet array
@@ -172,19 +178,32 @@ function Decoder(payload, payloadB64) {
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
-        var Total_pulse = data.Total_pulse;
-        var water_sum = data.water_sum;
+        var Current_Chan1 = data.Current_Chan1;
+        var Current_Chan2 = data.Current_Chan2;
+        var Current_Chan3 = data.Current_Chan3;
+        var Current_Chan4 = data.Current_Chan4;
         var timestamp = data.timestamp;
+         
         console.log(timestamp)
         
         result.push({
-            field: "Total_pulse",
-            value: Total_pulse,
+            field: "Current_Chan1",
+            value: Current_Chan1,
             timestamp: timestamp
         });
         result.push({
-            field: "water_sum",
-            value: water_sum,
+            field: "Current_Chan2",
+            value: Current_Chan2,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "Current_Chan3",
+            value: Current_Chan3,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "Current_Chan4",
+            value: Current_Chan4,
             timestamp: timestamp
         });
         
