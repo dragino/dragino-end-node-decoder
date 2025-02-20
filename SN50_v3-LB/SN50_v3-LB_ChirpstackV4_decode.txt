@@ -161,6 +161,31 @@ if(fPort==0x02)
       decode.Dutycycle= 0;
     }
   }
+    else if(mode=='10')
+  {
+    decode.Work_mode="TMP117";
+    
+    if((bytes[7]==0x7f)&&(bytes[8]==0xff))
+      decode.TempC_tmp117= "NULL";
+    else
+      decode.TempC_tmp117= parseFloat(((bytes[7]<<24>>16 | bytes[8])/100).toFixed(2));
+      
+  }
+  else if(mode=='11')
+  {
+    decode.Work_mode="Count+SHT31";
+    if(((bytes[2]==0x7f)&&(bytes[3]==0xff))||((bytes[2]==0xff)&&(bytes[3]==0xff)))
+      decode.TempC_SHT= "NULL";
+    else
+      decode.TempC_SHT= parseFloat(((bytes[2]<<24>>16 | bytes[3])/10).toFixed(1));
+  
+    if((bytes[4]==0xff)&&(bytes[5]==0xff))
+      decode.Hum_SHT= "NULL";
+    else
+      decode.Hum_SHT= parseFloat(((bytes[4]<<8 | bytes[5])/10).toFixed(1));
+ 
+    decode.Count= (bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10])>>>0;    
+  }
   if(bytes.length!=1)
     return decode;
   }
