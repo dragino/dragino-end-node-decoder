@@ -199,7 +199,15 @@ else if(Ext==0x0A)
 else
 {
   decode.BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;
-  decode.Bat_status=bytes[0]>>6;
+  var Bat_status=bytes[0]>>6;
+  if (Bat_status == 3)
+  decode.Bat_status="Good"
+  else if(Bat_status == 2)
+  decode.Bat_status="OK"
+  else if(Bat_status == 1)
+  decode.Bat_status="Low"
+  else if(Bat_status == 0)
+  decode.Bat_status="Ultra Low"
 }
 
 if(Ext!=0x0f)
