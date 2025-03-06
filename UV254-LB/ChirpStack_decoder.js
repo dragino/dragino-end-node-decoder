@@ -11,6 +11,7 @@ function datalog(i,bytes){
 
   var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
   var string='['+ aa +']'+',';  
+
   return string;
 }
 function Decode(fPort, bytes, variables) {
