@@ -1,0 +1,76 @@
+function decodeUplink(input) {
+	var data = {};
+	var decode = {};
+	var value;	 
+case 2:
+	data.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
+	data.Payload_Ver=bytes[2];
+    data.rain=(bytes[3]<<24 |bytes[4]<<16 |bytes[5]<<8 | bytes[6]);	
+	value=bytes[7]<<8 | bytes[8];
+	if(bytes[7] & 0x80)
+	{value |= 0xFFFF0000;}
+    data.temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+	data.Temperature=parseFloat(((bytes[9]<<24>>16 | bytes[10])/10).toFixed(1));
+	data.Humidity=parseFloat(((bytes[11]<<8 | bytes[12])/10).toFixed(1));
+	data.Pressure=((bytes[13]<<8 | bytes[14])/100).toFixed(2);
+    data.illumination=bytes[15]<<8 | bytes[16];	
+	data.i_flag = (bytes[17]>>5)&0x01;
+	
+ return {
+      data: data,
+    }
+	break;
+
+case 5:
+  { 
+    if(bytes[0]==0x4A)
+      data.SENSOR_MODEL= "WSC3-LB";
+      
+    if(bytes[4]==0xff)
+      data.SUB_BAND="NULL";
+    else
+      data.SUB_BAND=bytes[4];
+    
+    if(bytes[3]==0x01)
+      data.FREQUENCY_BAND="EU868";
+    else if(bytes[3]==0x02)
+      data.FREQUENCY_BAND="US915";
+    else if(bytes[3]==0x03)
+      data.FREQUENCY_BAND="IN865";
+    else if(bytes[3]==0x04)
+      data.FREQUENCY_BAND="AU915";
+    else if(bytes[3]==0x05)
+      data.FREQUENCY_BAND="KZ865";
+    else if(bytes[3]==0x06)
+      data.FREQUENCY_BAND="RU864";
+    else if(bytes[3]==0x07)
+      data.FREQUENCY_BAND="AS923";
+    else if(bytes[3]==0x08)
+      data.FREQUENCY_BAND="AS923_1";
+    else if(bytes[3]==0x09)
+      data.FREQUENCY_BAND="AS923_2";
+    else if(bytes[3]==0x0A)
+      data.FREQUENCY_BAND="AS923_3";
+    else if(bytes[3]==0x0B)
+      data.FREQUENCY_BAND="CN470";
+    else if(bytes[3]==0x0C)
+      data.FREQUENCY_BAND="EU433";
+    else if(bytes[3]==0x0D)
+      data.FREQUENCY_BAND="KR920";
+    else if(bytes[3]==0x0E)
+      data.FREQUENCY_BAND="MA869";
+      
+    data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    data.BAT= (bytes[5]<<8 | bytes[6])/1000;
+  }
+  return {
+      data: data,
+    }
+  break;
+  
+	default:
+    return {
+      errors: ["unknown FPort"]
+    }
+}
+}
