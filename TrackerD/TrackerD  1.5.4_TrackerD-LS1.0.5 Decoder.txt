@@ -1,0 +1,117 @@
+function decodeUplink(input) {
+  var port = input.fPort;
+  var bytes = input.bytes;
+  var data = {};
+
+  // 公共工具函数
+  const toSigned = byte => byte << 24 >> 24;
+  const parseCoord = (bytes, offset) => 
+    (bytes[offset]<<24 | bytes[offset+1]<<16 | bytes[offset+2]<<8 | bytes[offset+3])/1e6;
+
+  switch(port) {
+    case 2:
+    case 3:
+      data.latitude = parseCoord(bytes, 0);
+      data.longitude = parseCoord(bytes, 4);
+      data.speed = bytes[8]<<24 | bytes[9]<<16 | bytes[10]<<8 | bytes[11];
+      data.course = bytes[12]<<24 | bytes[13]<<16 | bytes[14]<<8 | bytes[15];
+      data.battery = ((bytes[16] & 0x3f)<<8 | bytes[17])/1000;
+      data.alarm = (bytes[16] & 0x40) ? true : false;
+      data.mode = bytes[18] & 0xC0;
+      data.led = (bytes[18] & 0x20) ? "ON" : "OFF";
+      data.movement = (bytes[18] & 0x10) ? "MOVE" : "STILL";
+
+      if(port === 2 && (bytes[18] & 0xC0) !== 1 && !(bytes[18]>>3 & 1)) {
+        data.temperature = (bytes[19]<<8 | bytes[20])/10;
+        data.humidity = (bytes[21]<<8 | bytes[22])/10;
+      }
+      break;
+
+    case 4:
+      data.latitude = parseCoord(bytes, 0);
+      data.longitude = parseCoord(bytes, 4);
+      data.timestamp = new Date(
+        bytes[8]<<8 | bytes[9], bytes[10]-1, bytes[11],
+        bytes[12], bytes[13], bytes[14]
+      ).toISOString();
+      break;
+
+    case 5:
+      const bands = {
+        1: 'EU868', 2: 'US915', 3: 'IN865', 4: 'AU915', 5: 'KZ865',
+        6: 'RU864', 7: 'AS923', 8: 'AS923_1', 9: 'AS923_2', 10: 'AS923_3',
+        11: 'CN470', 12: 'EU433', 13: 'KR920', 14: 'MA869'
+      };
+      data.model = bytes[0] === 0x21 ? 'TrackerD' : 'Unknown';
+      data.firmware = `${bytes[1]&0xF}.${bytes[2]>>4&0xF}.${bytes[2]&0xF}`;
+      data.band = bands[bytes[3]] || 'Unknown';
+      data.subBand = bytes[4] === 0xFF ? null : bytes[4];
+      data.battery = (bytes[5]<<8 | bytes[6])/1000;
+      data.sensorMode = ['GPS', 'BLE', 'Hybrid'][(bytes[7]>>6) & 3] || 'Unknown';
+      data.led = !!(bytes[8] & 0x02);
+      data.motion = !!(bytes[8] & 0x01);
+      break;
+
+    case 6:
+      data.uuid = bytes.slice(0,16).map(b => b.toString(16).padStart(2,'0')).join('');
+      data.major = bytes[16]<<8 | bytes[17];
+      data.minor = bytes[18]<<8 | bytes[19];
+      data.power = bytes[15];
+      data.rssi = toSigned(bytes[23]);
+      data.battery = ((bytes[24] & 0x3f)<<8 | bytes[25])/1000;
+      data.alarm = !!(bytes[24] & 0x40);
+      data.mode = (bytes[26] >> 6) & 3;
+      data.led = !!(bytes[26] & 0x20);
+      break;
+
+    case 7:
+      data.battery = ((bytes[0] & 0x3f)<<8 | bytes[1])/1000;
+      data.alarm = !!(bytes[0] & 0x40);
+      data.mode = bytes[2] & 0xC0;
+      data.led = !!(bytes[2] & 0x20);
+      break;
+
+    case 8:
+      data.ssid = String.fromCharCode(...bytes.slice(0,6));
+      data.rssi = toSigned(bytes[6]);
+      data.battery = ((bytes[7] & 0x3f)<<8 | bytes[8])/1000;
+      data.alarm = !!(bytes[7] & 0x40);
+      data.mode = (bytes[9] >> 6) & 3;
+      data.led = !!(bytes[9] & 0x20);
+      break;
+
+    case 9:
+      data.beacons = [];
+      for(let i=3; i<bytes.length; i+=5) {
+        data.beacons.push({
+          major: bytes[i]<<8 | bytes[i+1],
+          minor: bytes[i+2]<<8 | bytes[i+3],
+          rssi: toSigned(bytes[i+4])
+        });
+      }
+      data.battery = ((bytes[0] & 0x3f)<<8 | bytes[1])/1000;
+      data.alarm = !!(bytes[0] & 0x40);
+      break;
+
+    case 10:
+      if(bytes.length !== 38) return { errors: ["Invalid length"] };
+      data.beacons = [];
+      for(let i=0; i<35; i+=7) {
+        data.beacons.push({
+          mac: bytes.slice(i,i+6).map(b => b.toString(16).padStart(2,'0')).join(':'),
+          rssi: toSigned(bytes[i+6])
+        });
+      }
+      data.battery = ((bytes[35] & 0x3f)<<8 | bytes[36])/1000;
+      data.alarm = !!(bytes[35] >> 6);
+      data.bleMode = (bytes[37] >> 5) & 7;
+      data.led = !!(bytes[37] >> 4 & 1);
+      data.motion = !!(bytes[37] >> 3 & 1);
+      break;
+
+    default:
+      return { errors: ["unknown FPort"] };
+  }
+
+  return { data: data };
+}
