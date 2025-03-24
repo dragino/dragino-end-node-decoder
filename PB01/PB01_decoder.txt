@@ -1,0 +1,94 @@
+function decodeUplink(input) {
+  var port = input.fPort;
+  var bytes = input.bytes;
+  var data = {};
+
+  function getzf(c_num) {
+    if (parseInt(c_num) < 10) c_num = '0' + c_num;
+    return c_num;
+  }
+
+  function getMyDate(str) {
+    var c_Date;
+    if (str > 9999999999) c_Date = new Date(parseInt(str));
+    else c_Date = new Date(parseInt(str) * 1000);
+
+    var c_Year = c_Date.getFullYear(),
+      c_Month = c_Date.getMonth() + 1,
+      c_Day = c_Date.getDate(),
+      c_Hour = c_Date.getHours(),
+      c_Min = c_Date.getMinutes(),
+      c_Sen = c_Date.getSeconds();
+    var c_Time = c_Year + '-' + getzf(c_Month) + '-' + getzf(c_Day) + ' ' + getzf(c_Hour) + ':' + getzf(c_Min) + ':' + getzf(c_Sen);
+    return c_Time;
+  }
+
+  function datalog(i, bytes) {
+    var aa = parseFloat(((bytes[0 + i] << 24 >> 16 | bytes[1 + i]) / 10).toFixed(1));
+    var bb = parseFloat(((bytes[2 + i] << 24 >> 16 | bytes[3 + i]) / 10).toFixed(1));
+    var cc = parseFloat(((bytes[4 + i] << 24 >> 16 | bytes[5 + i]) / 10).toFixed(1));
+    var dd = (bytes[6 + i] & 0x01) ? "True" : "False";
+    var ee = getMyDate((bytes[7 + i] << 24 | bytes[8 + i] << 16 | bytes[9 + i] << 8 | bytes[10 + i]).toString(10));
+    return '[' + aa + ',' + bb + ',' + cc + ',' + dd + ',' + ee + ']' + ',';
+  }
+
+  switch (port) {
+    case 2:
+      data.BatV = (bytes[0] << 8 | bytes[1]) / 1000;
+      data.Sound_key = ((bytes[2] >> 1) & 0x01) ? "OPEN" : "CLOSE";
+      data.Sound_ACK = (bytes[2] & 0x01) ? "OPEN" : "CLOSE";
+      data.Alarm = (bytes[3] & 0x01) ? "TRUE" : "FALSE";
+      data.TempC_SHT41 = parseFloat(((bytes[4] << 24 >> 16 | bytes[5]) / 10).toFixed(1);
+      data.Hum_SHT41 = parseFloat(((bytes[6] << 8 | bytes[7]) / 10).toFixed(1));
+
+      if (bytes.length === 8) {
+        return { data: data };
+      }
+      break;
+
+    case 3:
+      var pnack = ((bytes[6] >> 7) & 0x01) ? "True" : "False";
+      var data_sum = '';
+      for (var i = 0; i < bytes.length; i += 11) {
+        data_sum += datalog(i, bytes);
+      }
+      data.DATALOG = data_sum.replace(/,$/, ''); // Remove trailing comma
+      data.PNACKMD = pnack;
+      return { data: data };
+      break;
+
+    case 5:
+      var freq_band, sub_band;
+      if (bytes[0] === 0x35) data.SENSOR_MODEL = "PB01-L";
+      data.FIRMWARE_VERSION = (bytes[1] & 0x0f) + '.' + ((bytes[2] >> 4 & 0x0f) + '.' + (bytes[2] & 0x0f));
+
+      switch (bytes[3]) {
+        case 0x01: freq_band = "EU868"; break;
+        case 0x02: freq_band = "US915"; break;
+        case 0x03: freq_band = "IN865"; break;
+        case 0x04: freq_band = "AU915"; break;
+        case 0x05: freq_band = "KZ865"; break;
+        case 0x06: freq_band = "RU864"; break;
+        case 0x07: freq_band = "AS923"; break;
+        case 0x08: freq_band = "AS923_1"; break;
+        case 0x09: freq_band = "AS923_2"; break;
+        case 0x0A: freq_band = "AS923_3"; break;
+        case 0x0F: freq_band = "AS923_4"; break;
+        case 0x0B: freq_band = "CN470"; break;
+        case 0x0C: freq_band = "EU433"; break;
+        case 0x0D: freq_band = "KR920"; break;
+        case 0x0E: freq_band = "MA869"; break;
+      }
+      data.FREQUENCY_BAND = freq_band;
+
+      data.SUB_BAND = (bytes[4] === 0xFF) ? "NULL" : bytes[4];
+      data.BAT = (bytes[5] << 8 | bytes[6]) / 1000;
+      return { data: data };
+      break;
+
+    default:
+      return {
+        errors: ["unknown FPort"]
+      };
+  }
+}
