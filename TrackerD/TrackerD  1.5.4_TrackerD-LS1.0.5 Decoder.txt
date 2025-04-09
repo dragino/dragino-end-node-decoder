@@ -30,10 +30,16 @@ function decodeUplink(input) {
     case 4:
       data.latitude = parseCoord(bytes, 0);
       data.longitude = parseCoord(bytes, 4);
+      data.speed = bytes[8]<<24 | bytes[9]<<16 | bytes[10]<<8 | bytes[11];
+      data.course = bytes[12]<<24 | bytes[13]<<16 | bytes[14]<<8 | bytes[15];
       data.timestamp = new Date(
-        bytes[8]<<8 | bytes[9], bytes[10]-1, bytes[11],
-        bytes[12], bytes[13], bytes[14]
+        bytes[16]<<8 | bytes[17], bytes[18]-1, bytes[19],
+        bytes[20], bytes[21], bytes[22]
       ).toISOString();
+      data.battery = ((bytes[23] & 0x3f)<<8 | bytes[24])/1000;
+      data.alarm = (bytes[23] & 0x40) ? true : false;
+      data.movement = (bytes[23] & 0x10) ? "MOVE" : "STILL";
+     
       break;
 
     case 5:
