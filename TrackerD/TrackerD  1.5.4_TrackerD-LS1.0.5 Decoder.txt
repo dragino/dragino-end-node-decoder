@@ -42,18 +42,21 @@ function decodeUplink(input) {
      
       break;
 
-    case 5:
+     case 5:
       const bands = {
         1: 'EU868', 2: 'US915', 3: 'IN865', 4: 'AU915', 5: 'KZ865',
         6: 'RU864', 7: 'AS923', 8: 'AS923_1', 9: 'AS923_2', 10: 'AS923_3',
         11: 'CN470', 12: 'EU433', 13: 'KR920', 14: 'MA869'
       };
-      data.model = bytes[0] === 0x21 ? 'TrackerD' : 'Unknown';
+      const Mode = {
+        1: 'GPS', 2: 'BLE', 3: 'Hybrid'
+      };      
+      data.model = bytes[0] === 0x13 ? 'TrackerD' : 'TrackerD_LS';
       data.firmware = `${bytes[1]&0xF}.${bytes[2]>>4&0xF}.${bytes[2]&0xF}`;
       data.band = bands[bytes[3]] || 'Unknown';
       data.subBand = bytes[4] === 0xFF ? null : bytes[4];
       data.battery = (bytes[5]<<8 | bytes[6])/1000;
-      data.sensorMode = ['GPS', 'BLE', 'Hybrid'][(bytes[7]>>6) & 3] || 'Unknown';
+      data.sensorMode = Mode[(bytes[7]>>6)&0x3f] || 'Unknown';
       data.led = !!(bytes[8] & 0x02);
       data.motion = !!(bytes[8] & 0x01);
       break;
