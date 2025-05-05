@@ -1,161 +1,180 @@
- function zxc(num){ 
-	if(parseInt(num) < 10)
-	  num = '0'+ num; 
-	return num; 
-  }
 function Decoder(bytes, port) {
-	if(port == 2 && bytes[0]<0xE0)
-	{ var direction = {0:"N",1:"NNE",2:"NE",3:"ENE",4:"E",5:"ESE",6:"SE",7:"SSE",8:"S",9:"SSW",10:"SW",11:"WSW",12:"W",13:"WNW",14:"NW",15:"NNW"};
-	  var dic = {};
-	  var sensor	  =["bat","wind_speed","wind_direction_angle","illumination",
-					  "rain_snow","CO2","TEM","HUM","pressure",
-					  "rain_gauge","PM2_5","PM10","PAR","TSR","SHT31_TEM","SHT31_HUM"];
-	  var sensor_diy=["A1","A2","A3","A4"];
-	  //4~7:0->/,1->*,2->NULL
-	  //3~0:count
-	  var algorithm =[0x03,0x01,0x01,0x11,
-					  0x20,0x20,0x01,0x01,0x01,
-					  0x01,0x20,0x20,0x20,0x01,0x0A,0x0A];
-	  for(i=0;i<bytes.length;)
-	  {
-		  var len=bytes[i+1];
-		  if(bytes[i]<0xA1)
-		  {
-			  var sensor_type= bytes[i];			
-			  var operation  = algorithm[sensor_type]>>4;
-			  var count  	   = algorithm[sensor_type]&0x0F;
-			  
-			  if(operation===0)
-			 {
-				   if(sensor_type === 0x06 || sensor_type === 0x0E)	//TEM
-				  {
-					  if(bytes[i+2] & 0x80)
-						  dic[sensor[sensor_type]] = (((bytes[i+2]<<8)|bytes[i+3])-0xFFFF)/(count*10.0);	//<0
-					  else
-						  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
-				  }
-				  else
-					  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
-					 
-					if ((dic[sensor[1]])=== 20)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-					if ((dic[sensor[2]])=== 383.8)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-				
-					if ((dic[sensor[5]])=== 5374)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					
-					 if ((dic[sensor[6]])=== 76.6)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					
-					if ((dic[sensor[7]])=== 102.2)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-					if ((dic[sensor[8]])=== 0)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-					if ((dic[sensor[9]])=== 102.2)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					i
-					if ((dic[sensor[10]])=== 102.2)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					i
-					if ((dic[sensor[11]])=== 102.2)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					
-					if ((dic[sensor[12]])=== 2558)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-					if ((dic[sensor[13]])=== 2022.2)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-					
-			  }
-			  else if(operation===1)
-			  {
-				  dic[sensor[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])*(count*10);
-			  }
-			  else
-			  {
-				  if(sensor_type === 0x04)	//RAIN_SNOW
-					  dic[sensor[sensor_type]] = bytes[i+2];
-				  else
-					  dic[sensor[sensor_type]] = (bytes[i+2]<<8)|bytes[i+3];
-			  }
-			  	if ((dic[sensor[3]])=== 202220)
-					{
-					  dic[sensor[sensor_type]]= "No sensor"
-					}
-				
-			  
-				if ((dic[sensor[1]])=== 76.6)
-					{
-					  dic.wind_speed = "No sensor"
-					  dic.wind_speed_level = "No sensor"
-					}
-			else  if(sensor_type===0x01)
-			  {
-				  dic.wind_speed_level = bytes[i+4];
-			  }
-			  else if(sensor_type===0x02)
-			  {
-				  values = bytes[i+4];
-				  dic.wind_direction = direction[values];
-					
-				  }
-			
-		  }		
-		  else
-		  {
-			  dic[sensor_diy[bytes[i]-0xA1]]=(bytes[i+2]<<8)|bytes[i+3];
-		  }
-			  
-		  i=i+2+len;
-	  }
-  
-	  return dic;
-	}
-    if(port==05){
-	var frequency = {1:"EU868",2:"US915",3:"IN865",4:"AU915",5:"KZ865",6:"RU864",7:"AS923",8:"AS923-1",9:"AS923-2",10:"AS923-3"};
-    {
-		var info = {};
-		var node = bytes[0];
-			if (node ===13);
-				info.node="WSC1-L";
-		var version1 = bytes[1],version2 = bytes[2]>>4,version3 = bytes[2]&0x0f;
-				info.version="V"+"."+version1+"."+version2+"."+version3;
-		var values = bytes[3];
-				info.frequency_band = frequency[values];
-				info.sub_band = bytes[4];
-				info.bat = (bytes[5]<<8|bytes[6])/1000;
-				info.weather_sensor_types=bytes[7].toString(16)+zxc(bytes[8].toString(16))+bytes[9].toString(16);
+    var dic = {};
+    var i = 0;
+    var len;
+    var type;
+    var direction = [
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+        "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+        "Calm", "No Sensor"
+    ];
 
-	}
-	return info;
+    while (i < bytes.length) {
+        type = bytes[i];
+        len = bytes[i + 1];
+        i += 2;
 
-	}
+        switch (type) {
+            case 0x01: // 风速
+                var speed = ((bytes[i] << 8) | bytes[i+1]) / 100;
+                var max_speed = ((bytes[i+2] << 8) | bytes[i+3]) / 100;
+                var avg_speed = ((bytes[i+4] << 8) | bytes[i+5]) / 100;
+                var level = bytes[i+6];
+                
+                if (speed === 0x02FE || speed === 0x02FF || speed > 60) {
+                    dic.wind_speed = "No Sensor";
+                } else {
+                    dic.wind_speed = speed;
+                }
+                
+                if (max_speed === 0x02FE || max_speed === 0x02FF || max_speed > 60) {
+                    dic.wind_max_speed = "No Sensor";
+                } else {
+                    dic.wind_max_speed = max_speed;
+                }
+                
+                if (avg_speed === 0x02FE || avg_speed === 0x02FF || avg_speed > 60) {
+                    dic.wind_avg_speed = "No Sensor";
+                } else {
+                    dic.wind_avg_speed = avg_speed;
+                }
+                
+                if (level === 0x14 || level === 0x15 || level > 17) {
+                    dic.wind_speed_level = "No Sensor";
+                } else {
+                    dic.wind_speed_level = level;
+                }
+                i += 7;
+                break;
 
+            case 0x02: // 风向
+                var angle = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                var dir_code = bytes[i+2];
+                
+                if (angle === 0x0EFE || angle === 0x0EFF || angle < 0 || angle > 360) {
+                    dic.wind_direction_angle = "No Sensor";
+                } else {
+                    dic.wind_direction_angle = angle;
+                }
+                
+                if (dir_code >= direction.length) {
+                    dic.wind_direction = "No Sensor";
+                } else {
+                    dic.wind_direction = direction[dir_code];
+                }
+                i += 3;
+                break;
+
+            case 0x03: // 照度
+                var illumination = ((bytes[i] << 8) | bytes[i+1]);
+                
+                if (illumination === 0x4EFE || illumination === 0x4EFF || illumination > 200000) {
+                    dic.illumination = "No Sensor";
+                } else {
+                    dic.illumination = illumination;
+                }
+                i += 2;
+                break;
+
+            case 0x04: // 雨雪
+                var status = bytes[i];
+                if (status === 0x00) {
+                    dic.rain_snow = "No";
+                } else if (status === 0x01) {
+                    dic.rain_snow = "Yes";
+                } else {
+                    dic.rain_snow = "No Sensor";
+                }
+                i += 1;
+                break;
+
+            case 0x05: // CO2
+                var co2 = ((bytes[i] << 8) | bytes[i+1]);
+                
+                if (co2 === 0x14FE || co2 === 0x14FF || co2 > 5000) {
+                    dic.CO2 = "No Sensor";
+                } else {
+                    dic.CO2 = co2;
+                }
+                i += 2;
+                break;
+
+            case 0x06: // 温度
+                var temp = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                if (temp === 0x02FE || temp === 0x02FF || temp < -30 || temp > 70) {
+                    dic.TEM = "No Sensor";
+                } else {
+                    dic.TEM = temp;
+                }
+                i += 2;
+                break;
+
+            case 0x07: // 湿度
+                var hum = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                if (hum === 0x03FE || hum === 0x03FF || hum > 100) {
+                    dic.HUM = "No Sensor";
+                } else {
+                    dic.HUM = hum;
+                }
+                i += 2;
+                break;
+
+            case 0x08: // 气压
+                var pressure = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                if (pressure === 0 || pressure === 1 || pressure < 800 || pressure > 1100) {
+                    dic.pressure = "No Sensor";
+                } else {
+                    dic.pressure = pressure;
+                }
+                i += 2;
+                break;
+
+            case 0x09: // 雨量计
+                var rain = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                if (rain === 0x03FE || rain === 0x03FF || rain > 100) {
+                    dic.rain_gauge = "No Sensor";
+                } else {
+                    dic.rain_gauge = rain;
+                }
+                i += 2;
+                break;
+
+            case 0x0A: // PM2.5
+                var pm25 = ((bytes[i] << 8) | bytes[i+1]);
+                if (pm25 === 0x03FE || pm25 === 0x03FF || pm25 > 1000) {
+                    dic.PM2_5 = "No Sensor";
+                } else {
+                    dic.PM2_5 = pm25;
+                }
+                i += 2;
+                break;
+
+            case 0x0C: // PAR
+                var par = ((bytes[i] << 8) | bytes[i+1]);
+                if (par === 0x09FE || par === 0x09FF || par > 2500) {
+                    dic.PAR = "No Sensor";
+                } else {
+                    dic.PAR = par;
+                }
+                i += 2;
+                break;
+
+            case 0x0D: // TSR
+                var tsr = ((bytes[i] << 8) | bytes[i+1]) / 10;
+                if (tsr === 0x4EFE || tsr === 0x4EFF || tsr > 2000) {
+                    dic.TSR = "No Sensor";
+                } else {
+                    dic.TSR = tsr;
+                }
+                i += 2;
+                break;
+
+            default:
+                
+                i += len;
+                break;
+        }
+    }
+
+    return dic;
 }
