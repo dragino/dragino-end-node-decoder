@@ -208,7 +208,22 @@ case 3:
     return {
       data: data,
     }
+case 3:
+    var Bat= (bytes[0]<<8 | bytes[1])/1000;
+    for(var i=0;i<bytes.length-2;i=i+2)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
     
+    data.Bat_V:Bat,
+    data.DATALOG:data_sum
+  return {
+      data: data,
+    }
   break;
         default:
             data.Bat_V = (bytes[0]<<8 | bytes[1])/1000;
