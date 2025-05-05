@@ -15,6 +15,26 @@ function decodeUplink(input) {
         var tmp  = 2-hex.length;
         return zero.substr(0,tmp) + hex;
     }
+    function datalog(i,bytes){
+	  var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
+	  var string='['+ aa +']'+',';  
+	  return string;
+	}
+
+	function datalog2(i,bytes){
+	  var aa= str_pad(bytes[i])+str_pad(bytes[1+i]);
+	  var bb= parseFloat(((bytes[2+i]<<8 | bytes[3+i])/1000).toFixed(3)); 
+	  var cc= parseFloat(((bytes[4+i]<<8 | bytes[5+i])/1000).toFixed(3));
+	  var dd= (bytes[6+i]&0x08) ? "High":"Low";
+	  var ee= (bytes[6+i]&0x04) ? "High":"Low";
+	  var ff= (bytes[6+i]&0x02) ? "High":"Low";
+	  var gg= (bytes[6+i]&0x01) ? "True":"False";
+	  var hh= transform(cc,bytes[i],bytes[1+i]);
+	  var ii= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+	  var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+','+hh+','+ii+']'+',';  
+	  
+	  return string;
+	}
 
    function transform(IDC_intput_mA,bytes2,bytes3)
 	{
