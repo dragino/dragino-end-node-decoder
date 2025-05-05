@@ -208,7 +208,7 @@ case 3:
     return {
       data: data,
     }
-case 3:
+case 7:
     var Bat= (bytes[0]<<8 | bytes[1])/1000;
     for(var i=0;i<bytes.length-2;i=i+2)
     {
