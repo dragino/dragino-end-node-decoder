@@ -219,8 +219,8 @@ case 7:
         data_sum+=data;
     }
     
-    data.Bat_V:Bat,
-    data.DATALOG:data_sum
+    data.Bat_V=Bat;
+    data.DATALOG=data_sum;
   return {
       data: data,
     }
