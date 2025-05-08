@@ -52,6 +52,23 @@ function getMyDate(str){
 
 function Decode(fPort, bytes, variables) {
   if(fPort==0x02){
+  if (bytes[0] & 0x10) { // 0x10 is binary 00010000, which corresponds to the 5th bit
+            // Only parse batV and additional distance data
+            var value = (bytes[0] << 8 | bytes[1]) & 0x0FFF;
+            var batV = value / 1000; // Battery, units: V
+
+            // Parse the next 40 bytes as distance data
+            var additionalDistanceData = [];
+            for (var i = 8; i < 8 + 40 && i < bytes.length; i += 2) {
+                value = bytes[i] << 8 | bytes[i + 1];
+                additionalDistanceData.push(value);
+            }
+
+            return {
+                Bat: batV,
+                Additional_Distance_Data: additionalDistanceData
+            };
+        } else {
   // Decode an uplink message from a buffer
   // (array) of bytes to an object of fields.
   var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
@@ -75,6 +92,7 @@ function Decode(fPort, bytes, variables) {
 	   Sensor_flag:s_flag,
 	   
   };
+  }
   }
     if(fPort==0x03)
   {
