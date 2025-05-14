@@ -1,0 +1,119 @@
+from datetime import datetime
+
+def datalog(i, bytes):
+    aa = float(((bytes[2 + i] << 24 >> 16) | bytes[3 + i]) / 10)
+    bb = float(((bytes[4 + i] << 24 >> 16) | bytes[5 + i]) / 10)
+    cc = "High" if (bytes[6 + i] & 0x02) else "Low"
+    dd = "True" if (bytes[6 + i] & 0x01) else "False"
+    ee = getMyDate((bytes[7 + i] << 24) | (bytes[8 + i] << 16) | (bytes[9 + i] << 8) | bytes[10 + i])
+    string = '[' + str(aa) + ',' + str(bb) + ',' + cc + ',' + dd + ',' + ee + '],'  
+    return string
+
+def getzf(c_num): 
+    if int(c_num) < 10:
+        c_num = '0' + str(c_num) 
+    return c_num 
+
+def getMyDate(str): 
+    if int(str) > 9999999999:
+        c_Date = datetime.fromtimestamp(int(str))
+    else:
+        c_Date = datetime.fromtimestamp(int(str) * 1000)
+    
+    c_Year = c_Date.year
+    c_Month = c_Date.month
+    c_Day = c_Date.day
+    c_Hour = c_Date.hour
+    c_Min = c_Date.minute
+    c_Sen = c_Date.second
+    
+    c_Time = str(c_Year) + '-' + getzf(c_Month) + '-' + getzf(c_Day) + ' ' + getzf(c_Hour) + ':' + getzf(c_Min) + ':' + getzf(c_Sen)
+    return c_Time
+
+def Decoder(bytes, port):
+    if port == 0x02:
+        decode = {}
+        mode = (bytes[6] & 0x7C) >> 2
+        if mode == 0:
+            decode['BatV'] = (bytes[0] << 8 | bytes[1]) / 1000
+            decode['EXTI_Trigger'] = "TRUE" if (bytes[6] & 0x01) else "FALSE"
+            decode['Door_status'] = "CLOSE" if (bytes[6] & 0x80) else "OPEN"
+            decode['TempC_SHT31'] = float(((bytes[7] << 24 >> 16) | bytes[8]) / 10)
+            decode['Hum_SHT31'] = float(((bytes[9] << 8) | bytes[10]) / 10)
+            decode['Data_time'] = getMyDate((bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5])
+        elif mode == 31:
+            decode['SHTEMP_MIN'] = bytes[7] << 24 >> 24
+            decode['SHTEMP_MAX'] = bytes[8] << 24 >> 24
+            decode['SHHUM_MIN'] = bytes[9]
+            decode['SHHUM_MAX'] = bytes[10]
+        
+        if len(bytes) == 11:
+            return decode
+    elif port == 3:
+        pnack = "True" if ((bytes[6] >> 7) & 0x01) else "False"
+        data_sum = ""
+        for i in range(0, len(bytes), 11):
+            data = datalog(i, bytes)
+            if i == 0:
+                data_sum = data
+            else:
+                data_sum += data
+        return {
+            "DATALOG": data_sum,
+            "PNACKMD": pnack,
+        }
+    elif port == 5:
+        freq_band = None
+        sub_band = None
+        sensor = None
+        
+        if bytes[0] == 0x0A:
+            sensor = "S31-LB"
+        
+        firm_ver = str((bytes[1] & 0x0f)) + '.' + str((bytes[2] >> 4 & 0x0f)) + '.' + str((bytes[2] & 0x0f))
+        
+        if bytes[3] == 0x01:
+            freq_band = "EU868"
+        elif bytes[3] == 0x02:
+            freq_band = "US915"
+        elif bytes[3] == 0x03:
+            freq_band = "IN865"
+        elif bytes[3] == 0x04:
+            freq_band = "AU915"
+        elif bytes[3] == 0x05:
+            freq_band = "KZ865"
+        elif bytes[3] == 0x06:
+            freq_band = "RU864"
+        elif bytes[3] == 0x07:
+            freq_band = "AS923"
+        elif bytes[3] == 0x08:
+            freq_band = "AS923_1"
+        elif bytes[3] == 0x09:
+            freq_band = "AS923_2"
+        elif bytes[3] == 0x0A:
+            freq_band = "AS923_3"
+        elif bytes[3] == 0x0F:
+            freq_band = "AS923_4"
+        elif bytes[3] == 0x0B:
+            freq_band = "CN470"
+        elif bytes[3] == 0x0C:
+            freq_band = "EU433"
+        elif bytes[3] == 0x0D:
+            freq_band = "KR920"
+        elif bytes[3] == 0x0E:
+            freq_band = "MA869"
+        
+        if bytes[4] == 0xff:
+            sub_band = "NULL"
+        else:
+            sub_band = bytes[4]
+        
+        bat = (bytes[5] << 8 | bytes[6]) / 1000
+        
+        return {
+            "SENSOR_MODEL": sensor,
+            "FIRMWARE_VERSION": firm_ver,
+            "FREQUENCY_BAND": freq_band,
+            "SUB_BAND": sub_band,
+            "BAT": bat,
+        }

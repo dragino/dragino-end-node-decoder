@@ -1,0 +1,39 @@
+def str_pad(byte):
+    zero = '0'
+    hex_str = format(byte, 'x')  # 将字节转换为十六进制字符串
+    tmp = 2 - len(hex_str)
+    return zero * tmp + hex_str
+
+def Decoder(bytes, port):
+    decode = {}
+    if port == 2:
+        if len(bytes) == 11:
+            decode['TempC_SHT'] = float(((bytes[0] << 24 >> 16) | bytes[1]) / 100)
+            decode['Hum_SHT'] = float(((bytes[2] << 24 >> 16) | bytes[3]) / 10)
+            decode['TempC_DS'] = float(((bytes[4] << 24 >> 16) | bytes[5]) / 100)
+            decode['Ext'] = bytes[6]
+            decode['Systimestamp'] = (bytes[7] << 24) | (bytes[8] << 16) | (bytes[9] << 8) | bytes[10]
+            return decode
+        else:
+            decode['Status'] = "RPL data or sensor reset"
+            return decode
+
+    if port == 3:
+        decode['Status'] = "Data retrieved, your need to parse it by the application server"
+        return decode
+
+    if port == 4:
+        decode['DS18B20_ID'] = (
+            str_pad(bytes[0]) + str_pad(bytes[1]) + str_pad(bytes[2]) +
+            str_pad(bytes[3]) + str_pad(bytes[4]) + str_pad(bytes[5]) +
+            str_pad(bytes[6]) + str_pad(bytes[7])
+        )
+        return decode
+
+    if port == 5:
+        decode['Sensor_Model'] = bytes[0]
+        decode['Firmware_Version'] = str_pad((bytes[1] << 8) | bytes[2])
+        decode['Freq_Band'] = bytes[3]
+        decode['Sub_Band'] = bytes[4]
+        decode['Bat_mV'] = (bytes[5] << 8) | bytes[6]
+        return decode
