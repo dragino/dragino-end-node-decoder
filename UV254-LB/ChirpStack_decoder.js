@@ -100,8 +100,8 @@ function Decode(fPort, bytes, variables) {
     decode.IN2_pin_level= (bytes[8] & 0x04)? "High":"Low";   
     decode.Exti_pin_level= (bytes[8] & 0x02)? "High":"Low";  
     decode.Exti_status= (bytes[8] & 0x01)? "True":"False";
-    decode.Absorbance= (bytes[6]<<8 | bytes[7])/1000+'mw/cm ²';
-    decode.Node_type="UV254-LB";	
+    decode.Absorbance= (bytes[6]<<8 | bytes[7])/1000+'mw/cm ²'; 
+	decode.Node_type="UV254-LB";	
     var Absorbance= (bytes[6]<<8 | bytes[7])/1000;
     if (Absorbance>5)
     {
