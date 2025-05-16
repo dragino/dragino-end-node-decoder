@@ -12,6 +12,7 @@ function Decoder(bytes,port) {
     var distance_alarm = (bytes[6]>>1)&0x01;
     var inter_alarm = (bytes[6])&0x01;
     return {
+	  Node_type:"LMDS200",
       Bat:bat,
       dis1:dis1,
       dis2:dis2,
@@ -64,6 +65,7 @@ function Decoder(bytes,port) {
     var alarm_max = (bytes[6]<<8 | bytes[7]);
     var input = (bytes[8]);
     return {
+	  Node_type:"LMDS200",
       TDC:tdc,
       ATDC:atdc,
       Alarm_min:alarm_min,

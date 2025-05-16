@@ -45,6 +45,7 @@ function Datalog(bytes,num)
 
     // 返回结构化结果
     return {
+	  Node_type:"LC03",
       Event:datalog_event,
       PlugStatus:datalog_plugstatus,
       RelayStatus:datalog_relaystatus,
@@ -98,6 +99,7 @@ function Decoder(bytes,port) {
     loranode = "LC03";
     // 返回结构化结果
     return {
+	  Node_type:"LC03",
       Event:event,
       PlugStatus:plugstatus,
       RelayStatus:relaystatus,
@@ -113,6 +115,7 @@ function Decoder(bytes,port) {
       data = data.concat(Datalog(bytes,0));
       
     }
+	decode.Node_type="LC03";
     decode.DataLog = data;
     decode.LoraNode = "LC03";
     return decode;

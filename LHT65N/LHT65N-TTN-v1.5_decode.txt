@@ -104,6 +104,7 @@ if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==
 	rs.pop()
 	var new_arr = [...rs]
 	var data1=new_arr
+	decode.Node_type="LHT65N";
 	decode.bat=parseInt(bytes1+str2.substring(0,4)& 0x3FFF)
 	if (parseInt(bytes1+str2.substring(4,))==1){
 		decode.sensor="ds18b20"
@@ -289,7 +290,7 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
- 
+ decode.Node_type="LHT65N";
   if((bytes.length==11)||(bytes.length==15))
   {
     return decode;
@@ -306,7 +307,7 @@ case 1:
       else
         decode.DATALOG+=da;
     }
-
+decode.Node_type="LHT65N";
 }
 {
 return decode;
@@ -323,6 +324,7 @@ case 2:
       else
         data.DATALOG+=da;
     }
+	data.Node_type="LHT65N";
 }
 {
 return{

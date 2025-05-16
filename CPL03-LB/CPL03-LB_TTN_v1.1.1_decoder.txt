@@ -57,6 +57,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"CPL03-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };
@@ -73,6 +74,7 @@ function Decoder(bytes, port) {
     var alarm_tdc= bytes[10];
    
     return {
+	Node_type:"CPL03-LB",
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
@@ -146,6 +148,7 @@ function Decoder(bytes, port) {
     decode.EXTI_PA4_Status= (bytes[0] & 0x04)? "CLOSE":"OPEN"; 
     decode.EXTI_PB15_Trigger= (bytes[0] & 0x20)? "TRUE":"FALSE";
     decode.EXTI_PB15_Status= (bytes[0] & 0x10)? "CLOSE":"OPEN";
+	decode.Node_type="CPL03-LB";
     return decode;
   }
   else
@@ -170,6 +173,7 @@ function Decoder(bytes, port) {
     if(work_mod=="CPL01")
     {
       return {
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,       
       CMOD:count_mod,  
       TDC:tdc_interval,        
@@ -183,7 +187,8 @@ function Decoder(bytes, port) {
     }
     else if(work_mod=="CPL03")
     {
-      return {
+      return 
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,
       CMOD:count_mod,  
       TDC:tdc_interval,

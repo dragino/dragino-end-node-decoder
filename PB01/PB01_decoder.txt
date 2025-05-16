@@ -49,7 +49,7 @@ function decodeUplink(input) {
       
       data.PNACKMD = ((bytes[6] >> 7) & 0x01) ? "True" : "False";
       data.DATALOG = [];
-      
+      data.Node_type="PB01-L";
       for (var i = 0; i < bytes.length; i += 11) {
         data.DATALOG.push([
           parseFloat(((bytes[i] << 24 >> 16 | bytes[i+1]) / 10).toFixed(1)),

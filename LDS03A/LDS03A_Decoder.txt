@@ -46,6 +46,7 @@ function Decoder(bytes, port) {
     if(bytes.length==11)
     {
       return {
+	  Node_type:"LDS03A",
       ALARM:alarm,
       DOOR_OPEN_STATUS:door_open_status,
       DOOR_OPEN_TIMES:open_times,
@@ -65,6 +66,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"LDS03A",
     DATALOG:data_sum
     }
   }

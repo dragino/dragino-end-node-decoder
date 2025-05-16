@@ -4,6 +4,58 @@
 //  - variables contains the device variables e.g. {"calibration": "3.5"} (both the key / value are of type string)
 // The function must return an object, e.g. {"temperature": 22.5}
 
+function calculateReading(integer, decimal) {
+    if (decimal < 100000) {
+        return integer + (decimal / 100000);
+    } else if (decimal < 1000000) {
+        return integer + (decimal / 1000000);
+    } else {
+        return integer + (decimal / 10000000);
+    }
+}
+
+function getFrequencyBand(bandCode) {
+    switch(bandCode) {
+        case 0x01: return "EU868";
+        case 0x02: return "US915";
+        case 0x03: return "IN865";
+        case 0x04: return "AU915";
+        case 0x05: return "KZ865";
+        case 0x06: return "RU864";
+        case 0x07: return "AS923";
+        case 0x08: return "AS923_1";
+        case 0x09: return "AS923_2";
+        case 0x0A: return "AS923_3";
+        case 0x0B: return "CN470";
+        case 0x0C: return "EU433";
+        case 0x0D: return "KR920";
+        case 0x0E: return "MA869";
+        default: return "UNKNOWN";
+    }
+}
+
+function getMyDate(str) {
+    var timestamp = parseInt(str);
+    var date = new Date(timestamp > 9999999999 ? timestamp : timestamp * 1000);
+    
+    return [
+        date.getFullYear(),
+        getzf(date.getMonth()+1),
+        getzf(date.getDate()),
+        getzf(date.getHours()),
+        getzf(date.getMinutes()),
+        getzf(date.getSeconds())
+    ].join('').replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3 $4:$5:$6');
+}
+
+
+
+
+
+
+
+
+
 function Decode(fPort, bytes, variables) {
     var result = {};
     var batV;
@@ -18,7 +70,8 @@ function Decode(fPort, bytes, variables) {
     var integers = [];
     var decimals = [];
     var readings = [];
-    
+    var Node_type;
+	
     switch(fPort) {
         case 0x02:
             batV = (bytes[0] << 8 | bytes[1]) / 1000;
@@ -31,7 +84,7 @@ function Decode(fPort, bytes, variables) {
                 BatV: batV,
                 Data_Time: Data_time,
                 Reading: reading,
-                "lora node": "AIS01-LB"
+                "Node_type":"AIS01-LB"
             };
             break;
 
@@ -45,7 +98,8 @@ function Decode(fPort, bytes, variables) {
                 BatV: batV,
                 Data_Time: Data_time,
                 total_packages: total_packages,
-                subcontracting_count: subcontracting_count
+                subcontracting_count: subcontracting_count,
+				"Node_type":"AIS01-LB"
             };
             break;
 
@@ -78,6 +132,7 @@ function Decode(fPort, bytes, variables) {
 
             result.Data_Times = dataTimes.filter(function(time) { return time !== "1970-01-01 00:00:00"; });
             result.Readings = readings.filter(function(reading) { return reading !== 0; });
+			result.Node_type="AIS01-LB";
             break;
 
         case 0x05:
@@ -129,55 +184,13 @@ function Decode(fPort, bytes, variables) {
 
             result.Data_Times = dataTimes.filter(function(time) { return time !== "1970-01-01 00:00:00"; });
             result.Readings = readings.filter(function(reading) { return reading !== 0; });
+			result.Node_type="AIS01-LB";
             break;
     }
 
     return result;
 }
 
-function calculateReading(integer, decimal) {
-    if (decimal < 100000) {
-        return integer + (decimal / 100000);
-    } else if (decimal < 1000000) {
-        return integer + (decimal / 1000000);
-    } else {
-        return integer + (decimal / 10000000);
-    }
-}
-
-function getFrequencyBand(bandCode) {
-    switch(bandCode) {
-        case 0x01: return "EU868";
-        case 0x02: return "US915";
-        case 0x03: return "IN865";
-        case 0x04: return "AU915";
-        case 0x05: return "KZ865";
-        case 0x06: return "RU864";
-        case 0x07: return "AS923";
-        case 0x08: return "AS923_1";
-        case 0x09: return "AS923_2";
-        case 0x0A: return "AS923_3";
-        case 0x0B: return "CN470";
-        case 0x0C: return "EU433";
-        case 0x0D: return "KR920";
-        case 0x0E: return "MA869";
-        default: return "UNKNOWN";
-    }
-}
-
-function getMyDate(str) {
-    var timestamp = parseInt(str);
-    var date = new Date(timestamp > 9999999999 ? timestamp : timestamp * 1000);
-    
-    return [
-        date.getFullYear(),
-        getzf(date.getMonth()+1),
-        getzf(date.getDate()),
-        getzf(date.getHours()),
-        getzf(date.getMinutes()),
-        getzf(date.getSeconds())
-    ].join('').replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3 $4:$5:$6');
-}
 
 function getzf(num) {
     return (num < 10 ? '0' : '') + num;

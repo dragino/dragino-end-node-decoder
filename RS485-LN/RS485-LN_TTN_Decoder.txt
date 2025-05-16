@@ -5,6 +5,7 @@ function Decoder(bytes, port) {
     var decode = {};
     decode.EXTI_Trigger= (bytes[0] & 0x80)? "TRUE":"FALSE";    
     decode.Payver= bytes[0]&0x7F;
+	decode.Node_type="RS485-LN";
     return decode;
   }
   

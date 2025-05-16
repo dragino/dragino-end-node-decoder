@@ -3,7 +3,7 @@ function Decoder(bytes, port) {
 var mode=(bytes[6] & 0x7C)>>2;
 
 var decode = {};
-
+decode.Node_type="LSN50-D23";
 if((mode!=2)&&(mode!=31))
 
 {

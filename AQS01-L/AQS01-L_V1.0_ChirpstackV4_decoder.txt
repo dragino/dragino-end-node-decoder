@@ -52,6 +52,7 @@ function Decode(fPort, bytes, variables) {
     decode.TEMPH_flag= (bytes[10] &0x04)? "True":"False";
     decode.CO2L_flag= (bytes[10] &0x02)? "True":"False";
     decode.CO2H_flag= (bytes[10] &0x01)? "True":"False"; 
+    decode.Node_type="AQS01-L";
       
     if(bytes.length==11)
       return decode;
@@ -68,6 +69,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+    Node_type:"AQS01-L",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

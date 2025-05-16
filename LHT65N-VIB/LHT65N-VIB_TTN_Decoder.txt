@@ -32,6 +32,7 @@ function Decoder(bytes, port) {
 
     decode.Alarm= (bytes[2] & 0x01)? "TRUE":"FALSE";
     decode.TDC  = (bytes[2] & 0x02)? "YES":"NO";
+	decode.Node_type="LHT65N-VIB";
     
     if(bytes.length==11)
       return decode;
@@ -48,6 +49,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"LHT65N-VIB",
     Bat_V:Bat,
     DATALOG:data_sum
     };    

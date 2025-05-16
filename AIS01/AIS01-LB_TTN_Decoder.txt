@@ -50,6 +50,7 @@ function Decoder(bytes, port) {
   var Data_time;
   var subcontracting_count;
   var total_packages;
+  var Node_type;
   if(port==0x02)
   {
     batV= (bytes[0]<<8 | bytes[1])/1000;
@@ -72,11 +73,12 @@ function Decoder(bytes, port) {
 		BatV:batV,
 		Data_Time:Data_time,
 		Reading:reading,
-                "lora node":"AIS01-LB"
+    "Node_type":"AIS01-LB"
 		};        
   }
   if(port==0x03)
   {
+   
     batV= (bytes[4]<<8 | bytes[5])/1000;
     Data_time= getMyDate((bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]).toString(10)); 
 		total_packages=bytes[6];
@@ -98,6 +100,7 @@ function Decoder(bytes, port) {
 		Data_Time:Data_time,
 		total_packages:total_packages,
 		subcontracting_count:subcontracting_count,
+		"Node_type":"AIS01-LB"
 		};        
   }  
   
@@ -135,6 +138,7 @@ if (port === 0x04)
     if (readings.some(reading => reading !== 0)) {
         result.Readings = readings.filter(reading => reading !== 0);
     }
+    result.Node_type="AIS01-LB";
     return result; // This will only include properties with non-zero values
 }
   
@@ -228,6 +232,7 @@ var result = {};
     if (readings.some(reading => reading !== 0)) {
         result.Readings = readings.filter(reading => reading !== 0);
     }
+    result.Node_type="AIS01-LB";
     return result; // This will only include properties with non-zero values
 }
 }

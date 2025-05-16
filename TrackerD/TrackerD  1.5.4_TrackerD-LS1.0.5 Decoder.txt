@@ -20,7 +20,7 @@ function decodeUplink(input) {
       data.mode = bytes[18] & 0xC0;
       data.led = (bytes[18] & 0x20) ? "ON" : "OFF";
       data.movement = (bytes[18] & 0x10) ? "MOVE" : "STILL";
-
+      data.Node_type="TrackerD";
       if(port === 2 && (bytes[18] & 0xC0) !== 1 && !(bytes[18]>>3 & 1)) {
         data.temperature = (bytes[19]<<8 | bytes[20])/10;
         data.humidity = (bytes[21]<<8 | bytes[22])/10;
@@ -37,9 +37,8 @@ function decodeUplink(input) {
         bytes[20], bytes[21], bytes[22]
       ).toISOString();
       data.battery = ((bytes[23] & 0x3f)<<8 | bytes[24])/1000;
-      data.alarm = (bytes[23] & 0x40) ? true : false;
-      data.movement = (bytes[23] & 0x10) ? "MOVE" : "STILL";
-     
+      data.movement = (bytes[23] & 0x40) ? "MOVE" : "STILL";
+      data.Node_type="TrackerD";
       break;
 
      case 5:
@@ -59,6 +58,7 @@ function decodeUplink(input) {
       data.sensorMode = Mode[(bytes[7]>>6)&0x3f] || 'Unknown';
       data.led = !!(bytes[8] & 0x02);
       data.motion = !!(bytes[8] & 0x01);
+	  data.Node_type="TrackerD";
       break;
 
     case 6:
@@ -71,6 +71,7 @@ function decodeUplink(input) {
       data.alarm = !!(bytes[24] & 0x40);
       data.mode = (bytes[26] >> 6) & 3;
       data.led = !!(bytes[26] & 0x20);
+	  data.Node_type="TrackerD";
       break;
 
     case 7:
@@ -78,6 +79,7 @@ function decodeUplink(input) {
       data.alarm = !!(bytes[0] & 0x40);
       data.mode = bytes[2] & 0xC0;
       data.led = !!(bytes[2] & 0x20);
+	  data.Node_type="TrackerD";
       break;
 
     case 8:
@@ -87,6 +89,7 @@ function decodeUplink(input) {
       data.alarm = !!(bytes[7] & 0x40);
       data.mode = (bytes[9] >> 6) & 3;
       data.led = !!(bytes[9] & 0x20);
+	  data.Node_type="TrackerD";
       break;
 
     case 9:
@@ -116,6 +119,7 @@ function decodeUplink(input) {
       data.bleMode = (bytes[37] >> 5) & 7;
       data.led = !!(bytes[37] >> 4 & 1);
       data.motion = !!(bytes[37] >> 3 & 1);
+	  data.Node_type="TrackerD";
       break;
 
     default:

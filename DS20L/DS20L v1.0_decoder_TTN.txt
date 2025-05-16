@@ -34,6 +34,7 @@ function Decoder(bytes, port) {
      interrupt =  (bytes[2] >> 4) & 0x01;
      interrupt_count = (bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9]);
   		return {
+		Node_type:"DS20L",
   		BatV:batV,
   		Distance_mm:distance,
   		distance_state:distance_state,
@@ -55,6 +56,7 @@ function Decoder(bytes, port) {
         upper_limit = bytes[7]<<8 | bytes[8];
         lower_limit = bytes[9]<<8 | bytes[10];  
         return {
+		    Node_type:"DS20L",
     		BatV:batV,
     		Interrupt_count:interrupt_count,
     		MOD:mod,
@@ -69,6 +71,7 @@ function Decoder(bytes, port) {
         upper_limit = bytes[5]<<8 | bytes[6];
         lower_limit = bytes[7]<<8 | bytes[8];
         return {
+		    Node_type:"DS20L",
     		BatV:batV,
     		Distance_mm:distance,
     		MOD:mod,

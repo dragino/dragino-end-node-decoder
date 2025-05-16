@@ -22,6 +22,7 @@ function Decoder(bytes, port) {
 	var i_flag = bytes[8];
 	var mes_type = bytes[10];
 	return [
+	         Node_type:"LSPH01",
 			{
 				field: "BAT",
 				value: batV

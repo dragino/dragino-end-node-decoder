@@ -210,6 +210,7 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
+decode.Node_type="LHT65N";
   if(bytes.length==11)
   {
     return decode;
@@ -226,6 +227,7 @@ case 1:
       else
         decode.DATALOG+=da;
     }
+	decode.Node_type="LHT65N";
 }
 {
 return decode;

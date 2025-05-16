@@ -17,7 +17,8 @@ function decodeUplink(input) {
 	var raw	      =["Soil_dielectric_constant1","Raw_water_SOIL1","Raw_conduct_SOIL1",
 	                "Soil_dielectric_constant2","Raw_water_SOIL2","Raw_conduct_SOIL2",
 	                "Soil_dielectric_constant3","Raw_water_SOIL3","Raw_conduct_SOIL3",
-					"Soil_dielectric_constant4","Raw_water_SOIL4","Raw_conduct_SOIL4"];					
+					"Soil_dielectric_constant4","Raw_water_SOIL4","Raw_conduct_SOIL4"];	
+    data.Node_type="SE0X-LB";					
 	data.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
 	var mod=(bytes[4]>>7)&0x01;
 	data.i_flag = (bytes[4]>>6)&0x01;

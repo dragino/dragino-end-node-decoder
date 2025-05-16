@@ -53,7 +53,7 @@ function Decode(fPort, bytes, variables) {
     decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10
     decode.distance4_cm=(bytes[8]<<8 | bytes[9])/10;
     decode.mes_type= bytes[10];
-   
+    decode.Node_type="DDS04-LB";
     if(bytes.length==11)
     {
       return decode;     
@@ -71,6 +71,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"DDS04-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

@@ -59,7 +59,7 @@ function Decode(fPort, bytes, variables) {
       TOTAL_PULSE:total_pulse,
       LAST_DISCONNECT_DURATION:disconnect_duration,
       TIME:data_time,
-      "lora node": "CPL01",
+      Node_type: "CPL01",
       }
     }
   }
@@ -90,7 +90,8 @@ function Decode(fPort, bytes, variables) {
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
     KEEP_TIME:keep_time,
-    TRIGGER_MODE:trigger_mode
+    TRIGGER_MODE:trigger_mode,
+	Node_type: "CPL01",
     }
   }
   else if(fPort==0x05)

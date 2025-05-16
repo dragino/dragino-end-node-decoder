@@ -53,7 +53,7 @@ function getMyDate(str){
       data.key3=((bytes[4]>>2) & 0x01)? "Yes":"No";
       data.key2=((bytes[4]>>1) & 0x01)? "Yes":"No";
       data.key1=(bytes[4] & 0x01)? "Yes":"No";
-
+      data.Node_type="PB05-L";
 
   if(bytes.length==5)
   return {
@@ -70,7 +70,7 @@ case 3:
       else
         data_sum+=data1;
     }
-     
+    data.Node_type="PB05-L";
     data.DATALOG=data_sum;
     data.PNACKMD=pnack;
     return {

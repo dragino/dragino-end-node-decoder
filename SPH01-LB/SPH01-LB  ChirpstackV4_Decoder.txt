@@ -65,6 +65,7 @@ function Decode(fPort, bytes, variables) {
    
     if(bytes.length==11)
     return {
+	   Node_type:"SPH01-LB",
        Bat:batV,
        TempC_DS18B20:temp_DS18B20,
        PH1_SOIL:PH1,
@@ -85,6 +86,7 @@ else if(fPort==0x03)
         data_sum+=data;
     }
     return{
+	Node_type:"SPH01-LB",
     DATALOG:data_sum,
     
     };    

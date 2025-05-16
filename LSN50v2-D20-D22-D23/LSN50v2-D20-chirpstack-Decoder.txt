@@ -172,7 +172,7 @@ else if(mode=='31')
 
 }
 
-
+decode.Node_type="LSN50-D23";
 
   if((bytes.length==11)||(bytes.length==12))
 

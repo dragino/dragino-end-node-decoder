@@ -1,6 +1,7 @@
 function Decode(fPort, bytes, variables) {
   var mode=(bytes[2] & 0x7C)>>2;
   var data = {};
+  data.Node_type="LAQ4";
   data.Bat_V=(bytes[0]<<8 | bytes[1])/1000; 
   if(mode==1)
   {

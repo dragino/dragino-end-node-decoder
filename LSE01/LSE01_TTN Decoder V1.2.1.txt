@@ -29,7 +29,7 @@ function Decoder(bytes, port) {
 	data.s_flag = (bytes[10]>>4)&0x01;
 	data.i_flag = bytes[10]&0x0F;
 	data.Mod = mod;
-	
+	data.Node_type="LSE01";
   return  data;
 
 }

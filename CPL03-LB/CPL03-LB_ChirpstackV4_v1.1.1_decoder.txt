@@ -78,6 +78,7 @@ function Decode(fPort, bytes, variables) {
     var alarm_tdc= bytes[10];
    
     return {
+	Node_type:"CPL03-LB",
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
@@ -151,6 +152,7 @@ function Decode(fPort, bytes, variables) {
     decode.EXTI_PA4_Status= (bytes[0] & 0x04)? "CLOSE":"OPEN"; 
     decode.EXTI_PB15_Trigger= (bytes[0] & 0x20)? "TRUE":"FALSE";
     decode.EXTI_PB15_Status= (bytes[0] & 0x10)? "CLOSE":"OPEN";
+	decode.Node_type="CPL03-LB";
     return decode;
   }
   else
@@ -175,6 +177,7 @@ function Decode(fPort, bytes, variables) {
     if(work_mod=="CPL01")
     {
       return {
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,       
       CMOD:count_mod,  
       TDC:tdc_interval,        
@@ -189,6 +192,7 @@ function Decode(fPort, bytes, variables) {
     else if(work_mod=="CPL03")
     {
       return {
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,
       CMOD:count_mod,  
       TDC:tdc_interval,

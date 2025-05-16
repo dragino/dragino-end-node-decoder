@@ -61,6 +61,7 @@ function Decoder(bytes, port) {
     if(bytes.length==11)
     {
      return {
+	          Node_type:"LDS40-LB",
               Bat:batV,
               TempC_DS18B20:temp_DS18B20,
               Lidar_distance:Distance_cm,
@@ -84,6 +85,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"LDS40-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

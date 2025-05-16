@@ -19,6 +19,7 @@ function Decode(fPort, bytes, variables) {
     var decode = {};
     decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
     var mod=(bytes[2]>>2)&0x07;
+	decode.Node_type="LHT65N-VIB";
     if(mod==1)
     {
       decode.vib_count=(bytes[3]<<8 | bytes[4]<<8 | bytes[5]<<8 | bytes[6])>>>0;
@@ -55,6 +56,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"LHT65N-VIB",
     Bat_V:Bat,
     DATALOG:data_sum
     };    

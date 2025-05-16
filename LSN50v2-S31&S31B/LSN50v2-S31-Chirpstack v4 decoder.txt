@@ -60,7 +60,7 @@ function Decode(fPort, bytes, variables) {
       decode.SHHUM_MIN= bytes[9];
       decode.SHHUM_MAX= bytes[10];         
     }
-    
+     decode.Node_type="LSN50-S31";
     if(bytes.length==11)
       return decode;
   }
@@ -75,6 +75,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"LSN50-S31",
     DATALOG:data_sum
     };    
   }

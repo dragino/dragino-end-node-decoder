@@ -2,6 +2,7 @@ function Decoder(bytes, port) {
   var mode=(bytes[2] & 0x7C)>>2;
   var decode = {};
   decode.Bat_V=(bytes[0]<<8 | bytes[1])/1000; 
+  data.Node_type="LAQ4";
   if(mode==1)
   {
     decode.Work_mode="CO2";

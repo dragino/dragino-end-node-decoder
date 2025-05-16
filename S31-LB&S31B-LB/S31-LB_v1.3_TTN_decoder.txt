@@ -56,7 +56,7 @@ function Decoder(bytes, port) {
       decode.SHHUM_MIN= bytes[9];
       decode.SHHUM_MAX= bytes[10];         
     }
-    
+    decode.Node_type="S31-LB";
     if(bytes.length==11)
       return decode;
   }
@@ -72,6 +72,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"S31-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

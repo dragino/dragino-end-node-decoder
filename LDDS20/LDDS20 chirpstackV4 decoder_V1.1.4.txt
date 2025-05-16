@@ -19,6 +19,7 @@ function Decode(fPort, bytes, variables) {
   
   var s_flag = bytes[7];	
   return {
+       Node_type:"LDDS20",
        Bat:batV +" V",
        Distance:distance,
 	   Interrupt_flag:i_flag,

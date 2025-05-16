@@ -46,6 +46,7 @@ function Decode(fPort, bytes, variables) {
   {
     var decode = {};
     var mode=(bytes[6] & 0x7C)>>2;
+	decode.Node_type="D23-LB";
     if(mode===3)
     {
       decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
@@ -93,6 +94,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"D23-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

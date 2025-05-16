@@ -51,6 +51,8 @@ case 2:
     data.i_flag=(bytes[8] & 0x01)? "TRUE":"FALSE";
     data.i_level=(bytes[8] & 0x02)? "HIGH":"LOW";
     data.mes_type=bytes[10];
+	data.Node_type="LDS25-LB";
+
 	if(bytes.length==11)
 return {
       data: data,
@@ -69,6 +71,7 @@ case 3:
      
     data.DATALOG=data_sum;
     data.PNACKMD=pnack;
+	data.Node_type="LDS25-LB";
     return {
       data: data,
     }
@@ -76,6 +79,7 @@ case 3:
   break;
   
  case 6:
+    data.Node_type="LDS25-LB";
     data.Wiper_workmode=bytes[0];
     data.Wiper_clean_times=bytes[1];
     data.Wiper_clean_interval=bytes[2]<<8 | bytes[3];

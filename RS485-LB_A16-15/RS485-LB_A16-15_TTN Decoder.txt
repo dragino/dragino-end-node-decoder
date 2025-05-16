@@ -64,6 +64,7 @@ function Decoder(bytes, port) {
     decode.BatV= ((bytes[0]<<8 | bytes[1])&0x7FFF)/1000;
     decode.Payver= bytes[2];
     decode.distance= (bytes[3]<<8 |bytes[4])+"mm"
+	decode.Node_type="RS485-LB";
     return decode;
   }
 }

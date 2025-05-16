@@ -11,7 +11,7 @@ var decode = {};
 
 decode.Ext= bytes[2]&0x0F;
 decode.BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;
-
+decode.Node_type="LTC2";
 if(decode.Ext==0x01)
 {
   decode.Temp_Channel1=parseFloat(((bytes[3]<<24>>16 | bytes[4])/100).toFixed(2));

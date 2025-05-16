@@ -79,6 +79,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"PS-LB",
     Bat_V:Bat,
     DATALOG:data_sum
     };    
@@ -198,7 +199,7 @@ function Decode(fPort, bytes, variables) {
         }
       }  
     }
-    
+    decode.Node_type="PS-LB";
     if(bytes.length!=1)
     {
       return decode;

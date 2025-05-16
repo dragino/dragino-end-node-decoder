@@ -70,7 +70,8 @@ function Decode(fPort, bytes, variables) {
     else
       decode.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
       
-    decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10
+	decode.Node_type="SW3L";
     
     if(bytes.length==11)
     {
@@ -88,6 +89,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"SW3L",
     DATALOG:data_sum
     };
   }

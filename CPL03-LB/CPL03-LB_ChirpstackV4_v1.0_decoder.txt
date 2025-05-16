@@ -62,6 +62,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"CPL03-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };
@@ -78,6 +79,7 @@ function Decode(fPort, bytes, variables) {
     var alarm_tdc= bytes[10];
    
     return {
+	Node_type:"CPL03-LB",
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
@@ -161,6 +163,7 @@ function Decode(fPort, bytes, variables) {
     if(bytes.length==11)
     {
       return {
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,       
       CMOD:count_mod,  
       TDC:tdc_interval,        
@@ -175,6 +178,7 @@ function Decode(fPort, bytes, variables) {
     else if(bytes.length==10)
     {
       return {
+	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,
       CMOD:count_mod,  
       TDC:tdc_interval,

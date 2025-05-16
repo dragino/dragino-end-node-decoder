@@ -44,7 +44,8 @@ function decodeUplink(input) {
 	data.A2 = bytes[42]<<8 | bytes[43];
 	data.A3 = bytes[46]<<8 | bytes[47];
 	data.A4 = bytes[50]<<8 | bytes[51];
-	
+	data.Node_type="WSC2-LB";
+
  return {
       data: data,
     }

@@ -79,7 +79,7 @@ function Decoder(bytes, port) {
     }
 
     return{
-
+    Node_type:"LWL03A",
     DATALOG:data_sum
 
     };
@@ -103,7 +103,8 @@ function Decoder(bytes, port) {
   
 
     return {
-
+    Node_type:"LWL03A",
+	
     TDC:tdc,
 
     DISALARM:disalarm,
@@ -249,7 +250,8 @@ function Decoder(bytes, port) {
     {
 
       return {
-
+      Node_type:"LWL03A",
+	  
       TDC:tdc_interval,
 
       ALARM:alarm,

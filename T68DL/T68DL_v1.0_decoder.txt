@@ -43,7 +43,7 @@ function decodeUplink(input) {
     data.TEMPH_flag= (bytes[4] &0x01)? "True":"False";
     data.TEMPL_flag= (bytes[4] &0x02)? "True":"False";
     data.Data_time= getMyDate((bytes[5]<<24 | bytes[6]<<16 | bytes[7]<<8 | bytes[8]).toString(10));         
-    
+    data.Node_type="T68DL";
 
 
   if(bytes.length==9)
@@ -61,7 +61,7 @@ case 3:
       else
         data_sum+=data1;
     }
-     
+    data.Node_type="T68DL"; 
     data.DATALOG=data_sum;
     data.PNACKMD=pnack;
     return {

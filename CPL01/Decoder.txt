@@ -54,7 +54,7 @@ function Decoder(bytes, port) {
       TOTAL_PULSE:total_pulse,
       LAST_DISCONNECT_DURATION:disconnect_duration,
       TIME:data_time,
-      "lora node": "CPL01",
+      Node_type: "CPL01",
   	}
 	}
   }
@@ -81,6 +81,7 @@ function Decoder(bytes, port) {
 	var trigger_mode = bytes[7]&0x01;
 	
 	return {
+	Node_type: "CPL01",
    	TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,

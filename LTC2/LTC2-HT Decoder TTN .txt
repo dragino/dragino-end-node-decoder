@@ -5,6 +5,7 @@ function Decoder(bytes, port) {
  var BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;
  decode.BatV=BatV;
  decode.BatV_status=parseFloat((((BatV-2.5)/1.1)*100).toFixed(2))+'%';
+ decode.Node_type="LTC2";
    if(decode.Ext==0x01) 
  { 
    if((bytes[3]==0x80) && (bytes[4]==0x01))
@@ -44,7 +45,10 @@ function Decoder(bytes, port) {
  decode.Res_Channel1=parseFloat(((bytes[3]<<8 | bytes[4])/100).toFixed(2)); 
  decode.Res_Channel2=parseFloat(((bytes[5]<<8 | bytes[6])/100).toFixed(2)); 
  } 
-   decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] ); 
+   decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] );
+   
+
+   
      if(poll_message_status===0) 
  { 
  if(bytes.length==11) 

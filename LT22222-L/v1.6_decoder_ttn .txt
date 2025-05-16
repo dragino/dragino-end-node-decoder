@@ -96,7 +96,7 @@ function Decoder(bytes, port) {
       decode.DI1_status= (bytes[2] &0x02)? "True":"False";
       decode.DI1_flag= (bytes[2] &0x01)? "True":"False";   
     }
-    
+    decode.Node_type="LT22222";
     if(bytes.length!=1)
       return decode;
   }

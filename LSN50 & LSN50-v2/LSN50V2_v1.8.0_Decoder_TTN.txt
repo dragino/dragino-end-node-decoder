@@ -131,7 +131,8 @@ if(port==0x02)
     decode.Count1= (bytes[9]<<24 | bytes[10]<<16 | bytes[11]<<8 | bytes[12])>>>0;
     decode.Count2= (bytes[13]<<24 | bytes[14]<<16 | bytes[15]<<8 | bytes[16])>>>0;
   }
-  
+  decode.Node_type="LSN50";
+
   if(bytes.length!=1)
     return decode;
   }

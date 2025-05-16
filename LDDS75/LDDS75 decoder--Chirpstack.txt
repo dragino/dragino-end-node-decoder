@@ -18,6 +18,7 @@ function Decode(fPort, bytes, variables) {
    
   var interrupt = bytes[len-1]; 
   return {
+       Node_type:"LDDS75",
        Bat:batV ,
        Distance:distance,
        Interrupt_status:interrupt

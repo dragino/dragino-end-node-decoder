@@ -77,6 +77,7 @@ function Decoder(bytes, port) {
 	var i_flag = bytes[8];
 	var mes_type = bytes[10];
   return {
+       Node_type:"LMS01-LB",
        Bat:batV,
        TempC_DS18B20:temp_DS18B20,
        Leaf_Moisture :moisture,
@@ -97,6 +98,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"LMS01-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

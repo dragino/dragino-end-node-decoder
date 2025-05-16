@@ -15,7 +15,8 @@ case 2:
 	data.Pressure=((bytes[13]<<8 | bytes[14])/100).toFixed(2);
     data.illumination=bytes[15]<<8 | bytes[16];	
 	data.i_flag = (bytes[17]>>5)&0x01;
-	
+	data.Node_type="WSC3-LB";
+
  return {
       data: data,
     }

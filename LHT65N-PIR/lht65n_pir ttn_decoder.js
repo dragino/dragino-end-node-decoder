@@ -117,7 +117,8 @@ if((port==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==
 	for (var i=0;i<data1.length;i++){
     var temp=(parseInt(bytes1+data1[i].substring(0,4)))/100
     array1[i]=temp
-}
+
+    decode.Node_type="LHT65N-PIR";
 	decode.Temp=array1
 	{
     return decode;
@@ -269,6 +270,7 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
+  decode.Node_type="LHT65N-PIR";
   if((bytes.length==11)||(bytes.length==15))
   {
     return decode;
@@ -286,6 +288,7 @@ case 1:
         decode.DATALOG+=da;
     }
 }
+decode.Node_type="LHT65N-PIR";
 {
 return decode;
 }

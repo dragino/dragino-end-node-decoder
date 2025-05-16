@@ -54,6 +54,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"WL03A-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };   
@@ -67,6 +68,7 @@ function Decode(fPort, bytes, variables) {
     var leak_alarm_time= bytes[7];
    
     return {
+	Node_type:"WL03A-LB",
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS:keep_status,
@@ -141,6 +143,7 @@ function Decode(fPort, bytes, variables) {
     if(bytes.length==11)
     {
       return {
+	  Node_type:"WL03A-LB",
       CMOD:count_mod,  
       TDC:tdc_interval,
       ALARM:alarm,

@@ -46,7 +46,6 @@ def Decoder(bytes, port):
             decode['SHTEMP_MAX'] = bytes[8] << 24 >> 24
             decode['SHHUM_MIN'] = bytes[9]
             decode['SHHUM_MAX'] = bytes[10]
-        
         if len(bytes) == 11:
             return decode
     elif port == 3:

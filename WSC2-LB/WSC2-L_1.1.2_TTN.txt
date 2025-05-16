@@ -102,7 +102,7 @@ function Decoder(bytes, port) {
 	  }
 	decode.i_flag = (bytes[9]>>5)&0x01;
 	decode.Mod = mod;
-	
+	decode.Node_type="WSC2-LB";
 	
 	 return decode;
    }

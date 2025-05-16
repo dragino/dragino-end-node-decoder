@@ -156,6 +156,7 @@ function Decode(fPort, bytes, variables) {
 	  	decode.PH=(bytes[j]<<8 | bytes[j+1])/100;	
 	  	j=2+j;	  	
 	}
+	decode.Node_type="WQS-LB";
 	 return decode;
      }
   
@@ -171,6 +172,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"WQS-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

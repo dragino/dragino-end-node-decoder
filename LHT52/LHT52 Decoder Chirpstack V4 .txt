@@ -23,13 +23,13 @@ if(fPort==2)
 
     decode.Ext=bytes[6];
     decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] );
-    
+    decode.Node_type="LHT52";
     return decode;
   }
   else
   {
     decode.Status="RPL data or sensor reset";
- 
+    decode.Node_type="LHT52";
     return decode;
   }
 }
@@ -37,14 +37,14 @@ if(fPort==2)
 if(fPort==3)
 {
   decode.Status="Data retrieved, your need to parse it by the application server";
- 
+  decode.Node_type="LHT52";
   return decode;
 }
 
 if(fPort==4)
 {
   decode.DS18B20_ID=str_pad(bytes[0])+str_pad(bytes[1])+str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[6])+str_pad(bytes[7]);
-
+  decode.Node_type="LHT52";
   return decode;
 }
 
@@ -55,7 +55,7 @@ if(fPort==5)
   decode.Freq_Band=bytes[3];
   decode.Sub_Band=bytes[4];
   decode.Bat_mV=bytes[5]<<8|bytes[6];
- 
+  decode.Node_type="LHT52";
   return decode;
 }
 }

@@ -72,6 +72,7 @@ function Decoder(bytes, port) {
 		  reading =integer+(decimal/10000000);
 		}
 		return {
+		Node_type:"SAC01L",
 		BatV:batV,
 		//Data_Time:Data_time,
 		Mod:mod,
@@ -99,6 +100,7 @@ function Decoder(bytes, port) {
 		  reading =integer+(decimal/10000000);
 		}
 		return {
+		Node_type:"SAC01L",
 		BatV:batV,
 		Data_Time:Data_time,
 		total_packages:total_packages,

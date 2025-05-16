@@ -61,6 +61,7 @@ function Decoder(bytes, port) {
     var alarm_tdc= bytes[10];
    
     return {
+	Node_type:"LDS03A",
     TDC:tdc,
     DISALARM:disalarm,
     KEEP_STATUS1:keep_status1,
@@ -150,7 +151,8 @@ function Decoder(bytes, port) {
     } 
     else if(bytes.length==18)
     {
-      return {
+      return 
+	  Node_type:"LDS03A",
       TDC:tdc_interval, 
       ALARM1:alarm1,
       DOOR1_OPEN_STATUS:door1_open_status,

@@ -59,6 +59,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"SW3L-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };
@@ -70,6 +71,7 @@ function Decoder(bytes, port) {
     var alarm_timer= bytes[5]<<8 | bytes[6];
     
     return {
+	Node_type:"SW3L-LB",
     TDC:tdc,
     Stop_Timer:stop_timer,
     Alarm_Timer:alarm_timer,
@@ -155,7 +157,7 @@ function Decoder(bytes, port) {
       decode.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
       
     decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
-    
+    decode.Node_type="SW3L-LB";
     if(bytes.length==11)
     {
       return decode;

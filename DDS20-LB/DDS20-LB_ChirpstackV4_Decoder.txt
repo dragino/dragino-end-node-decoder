@@ -58,6 +58,7 @@ var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
   
   var s_flag = bytes[7];	
   return {
+       Node_type:"DDS20-LB",
        Bat:batV,
        Distance:distance,
 	   Interrupt_flag:i_flag,
@@ -77,6 +78,7 @@ var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
         data_sum+=data;
     }
     return{
+	Node_type:"DDS20-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

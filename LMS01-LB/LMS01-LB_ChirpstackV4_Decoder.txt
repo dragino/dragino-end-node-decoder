@@ -82,6 +82,7 @@ function Decode(fPort, bytes, variables) {
 	var i_flag = bytes[8];
 	var mes_type = bytes[10];
   return {
+       Node_type:"LMS01-LB",
        Bat:batV,
        TempC_DS18B20:temp_DS18B20,
        Leaf_Moisture :moisture,
@@ -102,6 +103,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"LMS01-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

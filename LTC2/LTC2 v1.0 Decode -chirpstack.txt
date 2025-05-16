@@ -6,6 +6,7 @@ var decode = {};
 
 decode.Ext= bytes[2]&0x0F;
 decode.BatV= ((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;
+decode.Node_type="LTC2";
 
 if(decode.Ext==0x01)
 {
@@ -24,7 +25,6 @@ else if(decode.Ext==0x03)
 }
 
 decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] );
-
 
 if(poll_message_status===0)
 {

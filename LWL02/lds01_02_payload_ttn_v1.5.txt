@@ -15,6 +15,7 @@ function Decoder(bytes, port) {
     var open_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
     if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
     return {
+	  Node_type:"LWL02",
       BAT_V:bat,
       MOD:mod,
       DOOR_OPEN_STATUS:door_open_status,
@@ -29,6 +30,7 @@ function Decoder(bytes, port) {
   var leak_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];//units:min
   if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
   return {
+      Node_type:"LWL02",
       BAT_V:bat,
       MOD:mod,
       WATER_LEAK_STATUS:water_leak_status,
@@ -40,6 +42,7 @@ function Decoder(bytes, port) {
   if(bytes.length==10 &&  0x07>bytes[0]< 0x0f)
   {
   return {
+      Node_type:"LWL02",
       BAT_V:bat,
       MOD:mod,
       DOOR_OPEN_STATUS:door_open_status,
@@ -49,6 +52,7 @@ function Decoder(bytes, port) {
   }
   else{
   return {
+      Node_type:"LWL02",
       BAT_V:bat,
       MOD:mod,
   };

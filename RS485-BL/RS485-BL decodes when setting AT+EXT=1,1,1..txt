@@ -6,6 +6,7 @@ function Decoder(bytes, port) {
     decode.EXTI_Trigger= (bytes[0] & 0x80)? "TRUE":"FALSE";    
     decode.BatV= ((bytes[0]<<8 | bytes[1])&0x7FFF)/1000;
     decode.Payver= bytes[2];
+	decode.Node_type="RS485-BL";
     
     if((bytes[3]==0x7f)&&(bytes[4]==0xff))
       decode.TempC_SHT= "NULL";
@@ -23,7 +24,7 @@ function Decoder(bytes, port) {
       decode.TempC2= "NULL";
     else  
       decode.TempC2= parseFloat(((bytes[11]<<24>>16 | bytes[12])/10).toFixed(1));
-
+ 
     return decode;
   }
   

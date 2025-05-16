@@ -62,7 +62,8 @@ function Decoder(bytes, port) {
     decode.Cur3H_status= (bytes[10] &0x04)? "True":"False";
     decode.Cur4L_status= (bytes[10] &0x02)? "True":"False";
     decode.Cur4H_status= (bytes[10] &0x01)? "True":"False"; 
-   
+    decode.Node_type="CS01-LB";
+	
     if(bytes.length==11)
     {
       return decode;     
@@ -80,6 +81,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"CS01-LB",
     Bat_V:Bat,
     DATALOG:data_sum
     };    
@@ -96,6 +98,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"CS01-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

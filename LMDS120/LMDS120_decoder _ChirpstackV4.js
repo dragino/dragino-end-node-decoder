@@ -23,6 +23,7 @@ function Decode(fPort, bytes, variables) {
 	var temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
 	var s_flag = (bytes[7])&0x01;
     return {
+	   Node_type:"LMDS120",
        Bat:batV ,
 	   TempC_DS18B20:temp_DS18B20,
        Distance:distance,

@@ -77,7 +77,9 @@ case 2:
     {
     data.Temp_Channel2 = Temp_Channel1;
     }
-    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));         
+    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));      
+    data.Node_type="LTC2-LB";
+	
  if(bytes.length==11)
   return {
       data: data,
@@ -86,7 +88,7 @@ case 2:
 case 5:
   { 
     if(bytes[0]==0x16)
-      data.SENSOR_MODEL= "PS-LB";
+      data.SENSOR_MODEL= "LTC2-LB";
       
     if(bytes[4]==0xff)
       data.SUB_BAND="NULL";
@@ -139,7 +141,7 @@ case 3:
       else
         data_sum+=data1;
     }
-     
+    data.Node_type="LTC2-LB";
     data.DATALOG=data_sum;
     data.PNACKMD=pnack;
     return {
@@ -157,6 +159,7 @@ case 7:
       else
         data_sum+=data;
     }
+	data.Node_type="LTC2-LB";
     data.DATALOG=data_sum;
     data.Bat=Bat;
     return {

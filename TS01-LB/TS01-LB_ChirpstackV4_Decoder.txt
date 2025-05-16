@@ -74,6 +74,7 @@ function Decode(fPort, bytes, variables) {
          in_flag = "Vertical"; 			
 	}
     return {
+	   Node_type:"TS01-LB",
        Bat:batV ,
 	   TempC_DS18B20:temp_DS18B20,
        Roll:Roll,
@@ -94,6 +95,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"TS01-LB",
     DATALOG:data_sum,
     };
   }

@@ -102,6 +102,7 @@ function Decode(fPort, bytes, variables) {
           }
         }
       }
+	  decode.Node_type="SDI12-LB";
       return decode;   
   }
   

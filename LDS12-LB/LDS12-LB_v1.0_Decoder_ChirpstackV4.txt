@@ -66,6 +66,7 @@ function Decode(fPort, bytes, variables) {
     if(bytes.length==11)
     {
      return {
+	          Node_type:"LDS12-LB",
               Bat:batV,
               TempC_DS18B20:temp_DS18B20,
               Lidar_distance:Distance_cm,
@@ -88,7 +89,8 @@ function Decode(fPort, bytes, variables) {
       else
         data_sum+=data;
     }
-    return{
+    return
+	Node_type:"LDS12-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

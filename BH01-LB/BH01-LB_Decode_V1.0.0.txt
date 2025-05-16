@@ -20,6 +20,7 @@ function data1Info(bytes,num)
   rssi = bytes[11+num]<< 24>>24;
   
   return {
+  
   MACaddr:addr,
   Temp:temp,
   Bat:bat,
@@ -139,6 +140,7 @@ function Decoder(bytes,port)
       decode.EWTAH02 = data1;
       decode.Lora_node = "BH01-LB";
       decode.Timestamp = timestamp;
+	  decode.Node_type="BH01-LB";
       return decode;
     }
     else if(port === 5)

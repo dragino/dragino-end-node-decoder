@@ -97,14 +97,16 @@ var retransmission_Status=((bytes[6]>>7)&0x01);
 var Connect=(bytes[6]&0x80)>>7;
 var decode = {};
 var data = {};
+
 if((fPort==3)&&((bytes[2]==0x01)||(bytes[2]==0x02)||(bytes[2]==0x03)||(bytes[2]==0x04))){
 	var array1=[]
 	var bytes1="0x"
 	var str1=Str1(bytes)
 	var str2=str1.substring(0,6)
 	var str3=str1.substring(6,)
-  var reg=/.{4}/g;
+    var reg=/.{4}/g;
 	var rs=str3.match(reg);
+	decode.Node_type="LHT65N";
 	rs.push(str3.substring(rs.join('').length));
 	rs.pop()
 	var new_arr = [...rs]
@@ -278,6 +280,7 @@ else if(Ext=='15')
   decode.ID=str_pad(bytes[2])+str_pad(bytes[3])+str_pad(bytes[4])+str_pad(bytes[5])+str_pad(bytes[7])+str_pad(bytes[8])+str_pad(bytes[9])+str_pad(bytes[10]);
 }
 }
+decode.Node_type="LHT65N";
   if((bytes.length==11)||(bytes.length==15))
   {
     return decode;
@@ -294,6 +297,7 @@ case 1:
       else
         decode.DATALOG+=da;
     }
+	decode.Node_type="LHT65N";
 }
 {
 return decode;
@@ -318,6 +322,7 @@ switch (retransmission_Status) {
       else
         data.retransmission_message+=da;
     }
+	data.Node_type="LHT65N";
 }
 {
 return data;

@@ -47,7 +47,7 @@ function Decoder(bytes, port) {
     decode.TEMPH_flag= (bytes[5] &0x04)? "True":"False";
     decode.TEMPL_flag= (bytes[5] &0x08)? "True":"False";
     decode.Data_time= getMyDate((bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9]).toString(10));         
-    
+    decode.Node_type="TC01-LB";
     if(bytes.length==10)
       return decode;
   }
@@ -63,6 +63,8 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"TC01-LB",
+
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

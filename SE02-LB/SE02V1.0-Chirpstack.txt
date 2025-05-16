@@ -111,6 +111,7 @@ function Decode(fPort, bytes, variables) {
 	decode.s_flag = (bytes[16]>>4)&0x01;
 	decode.i_flag = bytes[16]&0x0F;
 	decode.Mod = mod;
+	decode.Node_type="SE02-LB";
 	 return decode;
      }
   
@@ -126,6 +127,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
+	Node_type:"SE02-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

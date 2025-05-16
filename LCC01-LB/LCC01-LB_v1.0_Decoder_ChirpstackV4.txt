@@ -31,6 +31,7 @@ function Decode(fPort, bytes, variables) {
     if(mod == 1)
     {
   		return {
+		Node_type:"LCC01-LB",
   		BatV:batV,
   		Actual_Weight_g:weight_g,
   		Weight_Reading:weight_reading,
@@ -42,6 +43,7 @@ function Decode(fPort, bytes, variables) {
 		if(mod == 2)
 		{
   		return {
+		Node_type:"LCC01-LB",
   		BatV:batV,
   		Actual_Weight_g:weight_g,
   		Weight_Reading:weight_reading,
@@ -57,7 +59,7 @@ function Decode(fPort, bytes, variables) {
 	if(fPort==0x05)
 	{
 		if(bytes[0]==0x32)
-		  sensor_mode="LCC";
+		  sensor_mode="LCC01-LB";
 		else
 		  sensor_mode="NULL"; 
 		   

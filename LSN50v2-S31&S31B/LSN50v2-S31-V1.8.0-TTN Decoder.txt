@@ -55,7 +55,7 @@ function Decoder(bytes, port) {
       decode.Data_time= getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10));         
     }
     
-    
+    decode.Node_type="LSN50-S31";
     if(bytes.length==11)
       return decode;
   }
@@ -70,6 +70,7 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	Node_type:"LSN50-S31",
     DATALOG:data_sum
     };    
   }

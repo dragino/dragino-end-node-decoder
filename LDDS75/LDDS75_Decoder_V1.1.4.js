@@ -16,6 +16,7 @@ function Decoder(bytes, port) {
   
   var s_flag = bytes[7];	
   return {
+	   Node_type:"LDDS75",
        Bat:batV,
        Distance:distance,
 	   Interrupt_flag:i_flag,

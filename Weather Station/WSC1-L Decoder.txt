@@ -13,7 +13,7 @@ function Decoder(bytes, port) {
         type = bytes[i];
         len = bytes[i + 1];
         i += 2;
-
+        data.Node_type="WSC-L";
         switch (type) {
             case 0x01: // 风速
                 var speed = ((bytes[i] << 8) | bytes[i+1]) / 100;

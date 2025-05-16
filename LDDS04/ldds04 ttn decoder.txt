@@ -8,6 +8,7 @@ function Decoder(bytes, port) {
    decode.distance3_cm=(bytes[6]<<8 | bytes[7])/10
    decode.distance4_cm=(bytes[8]<<8 | bytes[9])/10;
    decode.mes_type= bytes[10];
+   decode.Node_type="LDDS04";
 
    if(!((bytes[0]==0x03)&&(bytes[10]==0x02)))
    {

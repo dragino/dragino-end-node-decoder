@@ -93,6 +93,7 @@ function Decoder(bytes, port) {
 	decode.s_flag = (bytes[10]>>4)&0x01;
 	decode.i_flag = bytes[10]&0x0F;
 	decode.Mod=mod
+	decode.Node_type="SE01-LB";
 	 return decode;
      }
   
@@ -108,6 +109,8 @@ function Decoder(bytes, port) {
         data_sum+=data;
     }
     return{
+	
+	Node_type:"SE01-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
     };    

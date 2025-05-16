@@ -5,7 +5,7 @@ function decodeUplink(input) {
 
 switch (input.fPort) {
 case 7:
-  
+    data.Node_type="LDS02";
     data.BatV=((bytes[0]<<8 | bytes[1])&0x3fff)/1000;
     data.edc_mod=bytes[0]&0x80?"OPEN":"CLOSE";
     data.times=bytes[2]<<16 | bytes[3]<<8 | bytes[4];
@@ -21,6 +21,8 @@ data.water_leak_status=bytes[0]&0x40?1:0;
 var mod=bytes[2];
 data.alarm=bytes[9]&0x01;
 data.mod=mod
+data.Node_type="LDS02";
+
     
     if(mod==1)
 	{   
