@@ -35,6 +35,9 @@ function Decode(fPort, bytes, variables) {
 	data.i_flag = bytes[10]&0x0F;
 	data.Mod = mod;
 	data.Node_type="LSE01";
+        data.water_SOIL=Number(data.water_SOIL);
+        data.temp_SOIL=Number(data.temp_SOIL);
+        data.temp_DS18B20=Number(data.temp_DS18B20); 
 	
   return  data;
 
