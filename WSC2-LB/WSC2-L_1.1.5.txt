@@ -1,0 +1,165 @@
+function Decoder(bytes, port) {
+	var data = {};
+	var decode = {};
+	var value;
+	var mod=(bytes[9]>>7)&0x01;
+	var factor=(bytes[9])&0x0F;	
+	var divisor=bytes[10];	 
+	var i=11;
+   if(port==0x02)
+   {
+    var direction = {0:"N",1:"NNE",2:"NE",3:"ENE",4:"E",5:"ESE",6:"SE",7:"SSE",8:"S",9:"SSW",10:"SW",11:"WSW",12:"W",13:"WNW",14:"NW",15:"NNW"};	   
+	var sen	  =["wind_speed","wind_direction_angle","illumination",
+					  "rain_snow","WSS-CO2","TEM","HUM","pressure",
+					  "rain_gauge","PM2_5","PM10","PAR","TSR"];
+    var sensor_diy=["A1","A2","A3","A4"];	
+	  var algorithm =[0x03,0x01,0x11,
+					  0x20,0x20,0x01,0x01,0x01,
+					  0x01,0x20,0x20,0x20,0x01];	
+	decode.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
+	decode.Payload_Ver=bytes[2];
+    decode.rain=(bytes[3]<<24 |bytes[4]<<16 |bytes[5]<<8 | bytes[6])*(factor/divisor);	
+	value=bytes[7]<<8 | bytes[8];
+	if(bytes[7] & 0x80)
+	{value |= 0xFFFF0000;}
+    decode.temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+    if(bytes[2]==1)
+    {
+	 decode.WIND_SPEED=((bytes[11]<<8 | bytes[12])/100).toFixed(2);
+	 decode.wind_speed_max = (((bytes[13]<<8)|bytes[14])/100).toFixed(2);
+	 decode.wind_speed_average = (((bytes[15]<<8)|bytes[16])/100).toFixed(2);
+     decode.WIND_LEVEL=bytes[17]<<8 | bytes[18];
+     decode.WIND_DIRECTION=bytes[19]<<8 | bytes[20];
+	 decode.WIND_ANGLE=bytes[21]<<8 | bytes[22];
+
+	 decode.Humidity=((bytes[23]<<8 | bytes[24])/10).toFixed(1);
+	 decode.Temperature=((bytes[25]<<8 | bytes[26])/10).toFixed(1);
+	
+	 decode.NOISE=((bytes[27]<<8 | bytes[28])/10).toFixed(1);
+     if(mod===0)
+	  decode.CO2=bytes[29]<<8 | bytes[30];
+     else
+	 {
+	  decode.Pm2_5=bytes[29]<<8 | bytes[30];
+	  decode.Pm10=bytes[31]<<8 | bytes[32];
+	 }
+	  decode.Pressure=((bytes[33]<<8 | bytes[34])/10).toFixed(1);
+      decode.illumination=(bytes[35]<<24 |bytes[36]<<16 |bytes[37]<<8 | bytes[38]) >>>0;	
+	  i=39;
+	}
+	  for(i;i<bytes.length;)
+	  {
+		  var len=bytes[i+1];
+		  if(bytes[i]<0xA1)
+		  {
+			  var sensor_type= bytes[i];			
+			  var operation  = algorithm[sensor_type]>>4;
+			  var count  	   = algorithm[sensor_type]&0x0F;
+			  
+			  if(operation===0)
+			  {
+				  if(sensor_type === 0x05)	//TEM
+				  {
+					  if(bytes[i+2] & 0x80)
+						  decode[sen[sensor_type]] = (((bytes[i+2]<<8)|bytes[i+3])-0xFFFF)/(count*10.0);	//<0
+					  else
+						  decode[sen[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
+				  }
+				  else
+					  decode[sen[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])/(count*10.0);
+			  }
+			  else if(operation===1)
+			  {
+				  decode[sen[sensor_type]] = ((bytes[i+2]<<8)|bytes[i+3])*(count*10);
+			  }
+			  else
+			  {
+				  if(sensor_type === 0x03)	//RAIN_SNOW
+					  decode[sen[sensor_type]] = bytes[i+2];
+				  else
+					  decode[sen[sensor_type]] = (bytes[i+2]<<8)|bytes[i+3];
+			  }
+			  
+			  if(sensor_type===0x00)
+			  {
+				  decode.wind_speed_max = ((bytes[i+4]<<8)|bytes[i+5])/10.0;
+				  decode.wind_speed_average = ((bytes[i+6]<<8)|bytes[i+7])/10.0;
+				  decode.wind_speed_level =  bytes[i+8];
+			  }
+			  else if(sensor_type===0x01)
+			  {
+				  values = bytes[i+4];
+				  decode.wind_direction = direction[values];
+					
+				  }
+		  }		
+		  else
+		  {
+			  decode[sensor_diy[bytes[i]-0xA1]]=(bytes[i+2]<<8)|bytes[i+3];
+		  }
+			  
+		  i=i+2+len;
+	  }
+	decode.i_flag = (bytes[9]>>5)&0x01;
+	decode.Mod = mod;
+	
+	
+	 return decode;
+   }
+
+else if(port==0x05)
+  {
+    var sub_band;
+    var freq_band;
+    var sensor;
+    
+    if(bytes[0]==0x2E)
+       sensor= "WSC2-L";
+      
+    if(bytes[4]==0xff)
+      sub_band="NULL";
+    else
+      sub_band=bytes[4];
+    
+    if(bytes[3]==0x01)
+      freq_band="EU868";
+    else if(bytes[3]==0x02)
+      freq_band="US915";
+    else if(bytes[3]==0x03)
+      freq_band="IN865";
+    else if(bytes[3]==0x04)
+      freq_band="AU915";
+    else if(bytes[3]==0x05)
+      freq_band="KZ865";
+    else if(bytes[3]==0x06)
+      freq_band="RU864";
+    else if(bytes[3]==0x07)
+      freq_band="AS923";
+    else if(bytes[3]==0x08)
+      freq_band="AS923_1";
+    else if(bytes[3]==0x09)
+      freq_band="AS923_2";
+    else if(bytes[3]==0x0A)
+      freq_band="AS923_3";
+     else if(bytes[3]==0x0F)
+      freq_band="AS923_4";
+    else if(bytes[3]==0x0B)
+      freq_band="CN470";
+    else if(bytes[3]==0x0C)
+      freq_band="EU433";
+    else if(bytes[3]==0x0D)
+      freq_band="KR920";
+    else if(bytes[3]==0x0E)
+      freq_band="MA869";
+      
+    var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+     bat= (bytes[5]<<8 | bytes[6])/1000;
+    return {
+    SENSOR_MODEL:sensor,
+    FIRMWARE_VERSION:firm_ver,
+    FREQUENCY_BAND:freq_band,
+    SUB_BAND:sub_band,
+    BAT:bat,
+    };
+  }
+}
