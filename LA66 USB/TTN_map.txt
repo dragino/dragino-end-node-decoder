@@ -1,0 +1,39 @@
+function add0(m){return m<10?'0'+m:m }
+function format(shijianchuo){
+//shijianchuo是整数，否则要parseInt转换
+  var time = new Date(shijianchuo);
+  var y = time.getFullYear();
+  var m = time.getMonth()+1;
+  var d = time.getDate();
+  var h = time.getHours();
+  var mm = time.getMinutes();
+  var s = time.getSeconds();
+  return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+}
+
+function Decoder(bytes) {
+  var data={};
+  var doorflg
+  if (bytes[0]===1){
+    doorflg = "indoor"
+  }
+  else{
+    doorflg = "outdoor"
+  }
+  if (bytes.length==13){
+    data.doorflg = doorflg
+    data.latitude=parseFloat(((bytes[1]<<24|bytes[2]<<16|bytes[3]<<8|bytes[4])/1000000).toFixed(6));
+    data.longitude=parseFloat(((bytes[5]<<24|bytes[6]<<16|bytes[7]<<8|bytes[8])/1000000).toFixed(6));
+    timestamp1=bytes[9]<<24|bytes[10]<<16|bytes[11]<<8|bytes[12];
+    data.timestamp=timestamp1;
+    data.beijintime=format((timestamp1+28800)*1000);
+    return data;
+  }
+  else if(bytes.length==9){
+    data.doorflg = doorflg
+    data.Node_type = "Dragino_Mapper"
+    data.latitude=parseFloat(((bytes[1]<<24|bytes[2]<<16|bytes[3]<<8|bytes[4])/1000000).toFixed(6));
+    data.longitude=parseFloat(((bytes[5]<<24|bytes[6]<<16|bytes[7]<<8|bytes[8])/1000000).toFixed(6));
+    return data;
+  }
+}
