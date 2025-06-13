@@ -187,7 +187,7 @@ function Decoder(bytes, port) {
     }
     else if(work_mod=="CPL03")
     {
-      return 
+      return {
 	  Node_type:"CPL03-LB",
       WORKMOD:work_mod,
       CMOD:count_mod,  
