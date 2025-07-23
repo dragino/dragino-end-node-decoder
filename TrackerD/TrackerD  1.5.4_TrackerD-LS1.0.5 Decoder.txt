@@ -22,8 +22,8 @@ function decodeUplink(input) {
       data.movement = (bytes[18] & 0x10) ? "MOVE" : "STILL";
       data.Node_type="TrackerD";
       if(port === 2 && (bytes[18] & 0xC0) !== 1 && !(bytes[18]>>3 & 1)) {
-        data.temperature = (bytes[19]<<8 | bytes[20])/10;
-        data.humidity = (bytes[21]<<8 | bytes[22])/10;
+        data.humidity = (bytes[19]<<8 | bytes[20])/10;
+        data.temperature = (bytes[21]<<8 | bytes[22])/10;
       }
       break;
 
