@@ -151,7 +151,7 @@ function Decoder(bytes, port) {
     } 
     else if(bytes.length==18)
     {
-      return{
+      return {
       Node_type:"LDS03A",
       TDC:tdc_interval, 
       ALARM1:alarm1,
