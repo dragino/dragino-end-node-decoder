@@ -1,0 +1,94 @@
+function Decoder(payload, payloadB64) {
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            if (lengthInBits && (value & (1 << (lengthInBits - 1)))) {
+                value -= (1 << lengthInBits);
+            }
+            return value;
+        }
+
+        // 解析原始NB设备数据
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var IMSI = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXIT_Level = toInt(hex.substr(offset, 2)); offset += 2;
+        var GPIO_EXIT_Flag = toInt(hex.substr(offset, 2)); offset += 2;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var Payload_version = toInt(hex.substr(offset, 2)); offset += 2;
+
+        // 解析RS485传感器数据 (新增部分)
+        var sensorData = {};
+        if (hex.length - offset >= 24) { // 检查是否有足够的传感器数据
+            sensorData.slaveAddr = toInt(hex.substr(offset, 4), 16); offset += 4;
+            sensorData.baudRate = toInt(hex.substr(offset, 4), 16); offset += 4;
+            sensorData.unit = toInt(hex.substr(offset, 4), 16); offset += 4;
+            sensorData.decimalPoints = toInt(hex.substr(offset, 4), 16); offset += 4;
+            
+            // 处理测量值（有符号整数）
+            var measureHex = hex.substr(offset, 4); offset += 4;
+            var measureValue = toInt(measureHex, 16);
+            
+            // 处理零点值（有符号整数）
+            var zeroHex = hex.substr(offset, 4); offset += 4;
+            var zeroValue = toInt(zeroHex, 16);
+            
+            sensorData.measurement = measureValue;
+            sensorData.zeroPoint = zeroValue;
+        }
+
+        return {
+            deviceID: deviceID,
+            version: version,
+            battery: battery,
+            signal: signal,
+            GPIO_EXIT_Level: GPIO_EXIT_Level,
+            GPIO_EXIT_Flag: GPIO_EXIT_Flag,
+            timestamp: timestamp,
+            Payload_version: Payload_version,
+            sensorData: sensorData  // 新增传感器数据字段
+        };
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    var mainTimestamp = parsedData.timestamp;
+    
+    var result = [
+        { field: "BATTERY", value: parsedData.battery, timestamp: mainTimestamp },
+        { field: "SIGNAL", value: parsedData.signal, timestamp: mainTimestamp },
+        { field: "GPIO_EXIT_Level", value: parsedData.GPIO_EXIT_Level, timestamp: mainTimestamp },
+        { field: "GPIO_EXIT_Flag", value: parsedData.GPIO_EXIT_Flag, timestamp: mainTimestamp },
+        { field: "Payload_version", value: parsedData.Payload_version, timestamp: mainTimestamp }
+    ];
+
+    // 添加RS485传感器数据字段
+    if (Object.keys(parsedData.sensorData).length > 0) {
+        var s = parsedData.sensorData;
+        result.push(
+            { field: "RS485_SLAVE_ADDR", value: s.slaveAddr, timestamp: mainTimestamp },
+            { field: "RS485_BAUD_RATE", value: s.baudRate, timestamp: mainTimestamp },
+            { field: "RS485_UNIT", value: s.unit, timestamp: mainTimestamp },
+            { field: "RS485_DECIMAL", value: s.decimalPoints, timestamp: mainTimestamp },
+            { field: "RS485_MEASUREMENT", value: s.measurement, timestamp: mainTimestamp },
+            { field: "RS485_ZERO_POINT", value: s.zeroPoint, timestamp: mainTimestamp }
+        );
+    }
+
+    return result;
+}
