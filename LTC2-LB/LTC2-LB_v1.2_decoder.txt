@@ -75,7 +75,7 @@ case 2:
     }
    else
     {
-    data.Temp_Channel2 = Temp_Channel1;
+    data.Temp_Channel2 = Temp_Channel2;
     }
     data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));      
     data.Node_type="LTC2-LB";
