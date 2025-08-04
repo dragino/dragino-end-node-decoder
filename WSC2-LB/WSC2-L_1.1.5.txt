@@ -25,9 +25,9 @@ function Decoder(bytes, port) {
     decode.temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
     if(bytes[2]==1)
     {
-	 decode.WIND_SPEED=((bytes[11]<<8 | bytes[12])/100).toFixed(2);
-	 decode.wind_speed_max = (((bytes[13]<<8)|bytes[14])/100).toFixed(2);
-	 decode.wind_speed_average = (((bytes[15]<<8)|bytes[16])/100).toFixed(2);
+	 decode.WIND_SPEED=((bytes[11]<<8 | bytes[12])/10).toFixed(2);
+	 decode.wind_speed_max = (((bytes[13]<<8)|bytes[14])/10).toFixed(2);
+	 decode.wind_speed_average = (((bytes[15]<<8)|bytes[16])/10).toFixed(2);
      decode.WIND_LEVEL=bytes[17]<<8 | bytes[18];
      decode.WIND_DIRECTION=bytes[19]<<8 | bytes[20];
 	 decode.WIND_ANGLE=bytes[21]<<8 | bytes[22];
