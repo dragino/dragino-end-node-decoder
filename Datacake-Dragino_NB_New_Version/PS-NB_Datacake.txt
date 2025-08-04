@@ -26,6 +26,7 @@ function Decoder(payload, payloadB64) {
         }
 
         var deviceID = hex.substr(offset, 16); offset += 16;
+        var IMSI = hex.substr(offset, 16); offset += 16;
         var versionStr = hex.substr(offset, 4); offset += 4;
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
@@ -35,8 +36,8 @@ function Decoder(payload, payloadB64) {
         var interrupt2 = toInt(hex.substr(offset, 2)); offset += 2;
         var GPIO_EXTI_level = toInt(hex.substr(offset, 2)); offset += 2;
         var GPIO_EXTI_flag = toInt(hex.substr(offset, 2)); offset += 2;
-        var IDC_intput_mA = toInt(hex.substr(offset, 4)); offset += 4;
-        var VDC_intput_V = toInt(hex.substr(offset, 4)); offset += 4;
+        var IDC_intput_mA = toInt(hex.substr(offset, 4))/1000; offset += 4;
+        var VDC_intput_V = toInt(hex.substr(offset, 4))/1000; offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
