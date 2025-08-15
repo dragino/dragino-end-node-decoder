@@ -1,0 +1,183 @@
+function Decoder(payload, payloadB64) {
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            hex += hexByte.length === 1 ? '0' + hexByte : hexByte;
+        }
+        return hex;
+    }
+    
+    // 修复1: 正确解析32位有符号坐标（处理正负号）
+    function parseCoordinate(hex) {
+        var value = parseInt(hex, 16);
+        if (value > 0x7FFFFFFF) 
+            value = value - 0x100000000; // 处理32位有符号整数的补码
+        return value / 1000000; // 转换为度
+    }
+
+    // 修复2: 版本号格式化为X.XX浮点数
+    function parseVersion(hex) {
+        var versionInt = parseInt(hex, 16) || 0;
+        return (versionInt / 100).toFixed(2); // 例如 506f → 206.15
+    }
+    
+    function parsePayload(hex) {
+        var offset = 0;
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {
+                value -= (1 << lengthInBits);  // two's complement conversion
+            }
+            return value;
+        }
+        var deviceID = hex.substr(offset, 16); offset += 16;
+        var IMSI = hex.substr(offset, 16); offset += 16;
+        var versionStr = hex.substr(offset, 4); offset += 4;
+        var version = toInt(versionStr) / 100;
+        var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substr(offset, 2)); offset += 2;
+        var PA8_status = parseInt(hex.substr(offset, 2), 16); offset += 2;
+        var PA8_door_open_num = toInt(hex.substr(offset, 6)); offset += 6;
+        var PA8_last_open_time = toInt(hex.substr(offset, 6)); offset += 6;
+        var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+        var Latitude = parseCoordinate(hex.substr(offset, 8)); offset += 8; // 使用修复的坐标解析
+        var Longitude = parseCoordinate(hex.substr(offset, 8)); offset += 8;
+        var gps_timestamp = toInt(hex.substr(offset, 8)); offset += 8;
+       try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+
+        var dataset = [];
+        while (offset < hex.length) {
+            var PA8_status1 = parseInt(hex.substr(offset, 2), 16); offset += 2;
+            var PA8_door_open_num1 = toInt(hex.substr(offset, 6)); offset += 6;
+            var PA8_last_open_time1 = toInt(hex.substr(offset, 6)); offset += 6;
+            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
+            dataset.push({ PA8_status1: PA8_status1,PA8_door_open_num1: PA8_door_open_num1,PA8_last_open_time1: PA8_last_open_time1, timestamp: timestampLog });
+        }
+        return {
+            deviceID: deviceID,
+            IMSI:IMSI,
+            version: version,
+            battery: battery,
+            signal: signal,
+            PA8_status: PA8_status,
+            PA8_door_open_num: PA8_door_open_num,
+            PA8_last_open_time: PA8_last_open_time,
+            PA8_status1: PA8_status1,
+            PA8_door_open_num1: PA8_door_open_num1,
+            PA8_last_open_time1: PA8_last_open_time1,
+            Latitude: Latitude,
+            Longitude: Longitude,
+            timestamp: timestamp,
+            gps_timestamp: gps_timestamp,
+            dataset: dataset
+        };
+    }
+    
+    var payloadHex = bytesToHex(payloadB64);
+    var parsedData = parsePayload(payloadHex);
+    payload = parsedData
+    var deviceID = payload.deviceID;
+    var mainIMSI = payload.IMSI;
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainPA8_status = payload.PA8_status;
+    var mainPA8_door_open_num = payload.PA8_door_open_num;
+    var mainPA8_last_open_time = payload.PA8_last_open_time;
+    var mainLatitude  = payload.Latitude;
+    var mainLongitude  = payload.Longitude;
+    var maingps_timestamp  = payload.gps_timestamp;
+    var mainTimestamp = payload.timestamp;
+    var result = [];
+    var mod = payload.mod;
+ 
+    result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_status",
+        value: mainPA8_status,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_door_open_num",
+        value: mainPA8_door_open_num,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "PA8_last_open_time",
+        value: mainPA8_last_open_time,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Latitude",
+        value: mainLatitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Longitude",
+        value: mainLongitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "gps_timestamp",
+        value: maingps_timestamp,
+        timestamp: mainTimestamp
+    });
+
+   
+    var dataset = payload.dataset;
+    for (var i = 0; i < dataset.length; i++) {
+        var data = dataset[i];
+        var PA8_status1 = data.PA8_status1;
+        var PA8_door_open_num1 = data.PA8_door_open_num1;
+        var PA8_last_open_time1 = data.PA8_last_open_time1;
+        var timestamp = data.timestamp;
+        
+        result.push({
+            field: "PA8_status",
+            value: PA8_status1,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "PA8_door_open_num",
+            value: PA8_door_open_num1,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "PA8_last_open_time",
+            value: PA8_last_open_time1,
+            timestamp: timestamp
+        });
+    }
+    return result;
+}
