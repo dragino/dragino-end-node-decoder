@@ -9,13 +9,26 @@ function Decoder(payload, payloadB64) {
         return hex;
     }
     
+    // 修复1: 正确解析32位有符号坐标（处理正负号）
+    function parseCoordinate(hex) {
+        var value = parseInt(hex, 16);
+        if (value > 0x7FFFFFFF) 
+            value = value - 0x100000000; // 处理32位有符号整数的补码
+        return value / 1000000; // 转换为度
+    }
+
+    // 修复2: 版本号格式化为X.XX浮点数
+    function parseVersion(hex) {
+        var versionInt = parseInt(hex, 16) || 0;
+        return (versionInt / 100).toFixed(2); // 例如 506f → 206.15
+    }
+    
     function parsePayload(hex) {
         var offset = 0;
-
         function toInt(hexString, lengthInBits) {
             var value = parseInt(hexString, 16);
             if(lengthInBits && (value & (1 << (lengthInBits - 1)))) {
-                value -= (1 << lengthInBits);
+                value -= (1 << lengthInBits);  // two's complement conversion
             }
             return value;
         }
@@ -31,15 +44,35 @@ function Decoder(payload, payloadB64) {
         var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
         var distance = toInt(hex.substr(offset, 4)); offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
-        
-        // 处理有符号经纬度
-        var Latitude = toInt(hex.substr(offset, 8), 32) / 1000000; offset += 8;
-        var Longitude = toInt(hex.substr(offset, 8), 32) / 1000000; offset += 8;
+        var Latitude = parseCoordinate(hex.substr(offset, 8)); offset += 8; // 使用修复的坐标解析
+        var Longitude = parseCoordinate(hex.substr(offset, 8)); offset += 8;
         var gps_timestamp = toInt(hex.substr(offset, 8)); offset += 8;
-
+        
+        try {
+            
+            // Parse the higher byte for sensor model
+            var sensorModelHex = versionStr.substr(0, 2);
+            var sensorModel = parseInt(sensorModelHex, 16);
+            
+            // Parse the lower byte for software version
+            var versionHex = versionStr.substr(2, 2);
+            var versionInt = parseInt(versionHex, 16);
+            
+            // Convert versionInt to version string
+            var versionStr = (Math.floor(versionInt / 100)) + '.' + 
+                             (Math.floor((versionInt % 100) / 10)) + '.' + 
+                             (versionInt % 10);
+                             
+            console.log('Sensor Model: ' + sensorModel)
+            console.log('Version: ' + versionStr)
+            
+        } catch(e) {
+            console.log("Error parsing version")
+            console.log(JSON.stringify(e))
+        }
+        
         var dataSet = [];
-        // 确保读取所有数据组 (每组12个字符)
-        while (offset + 12 <= hex.length) {
+        while (offset < hex.length) {
             var distance1 = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
             dataSet.push({ distance1: distance1, timestamp: timestampLog });
@@ -50,10 +83,11 @@ function Decoder(payload, payloadB64) {
             version: version,
             battery: battery,
             signal: signal,
-            mod: mod,
+            mod: mod,   
             Interrupt_level: Interrupt_level,
             interrupt: interrupt,
             distance: distance,
+            distance1: distance1,
             Latitude: Latitude,
             Longitude: Longitude,
             timestamp: timestamp,
@@ -62,42 +96,82 @@ function Decoder(payload, payloadB64) {
         };
     }
 
-    var payloadHex = bytesToHex(payload);
+    var payloadHex = bytesToHex(payloadB64);
     var parsedData = parsePayload(payloadHex);
-    
+    payload = parsedData
+    var deviceID = payload.deviceID;
+    var mainIMSI = payload.IMSI;
+    var mainBattery = payload.battery;
+    var mainSignal = payload.signal;
+    var mainmod = payload.mod;
+    var mainInterrupt_level = payload.Interrupt_level;
+    var maininterrupt = payload.interrupt;
+    var maindistance = payload.distance;
+    var mainLatitude  = payload.Latitude;
+    var mainLongitude  = payload.Longitude;
+    var maingps_timestamp  = payload.gps_timestamp;
+    var mainTimestamp = payload.timestamp;
     var result = [];
-    var mainTimestamp = parsedData.timestamp;
+    var mod = payload.mod;
 
-    // 添加主字段 (兼容旧语法)
-    var fields = [
-        {field: "BATTERY", key: "battery"},
-        {field: "SIGNAL", key: "signal"},
-        {field: "MOD", key: "mod"},
-        {field: "INTERRUPT", key: "interrupt"},
-        {field: "Interrupt_level", key: "Interrupt_level"},
-        {field: "distance", key: "distance"},
-        {field: "gps_timestamp", key: "gps_timestamp"},
-        {field: "Latitude", key: "Latitude"},
-        {field: "Longitude", key: "Longitude"}
-    ];
-    
-    for (var i = 0; i < fields.length; i++) {
-        result.push({
-            field: fields[i].field,
-            value: parsedData[fields[i].key],
-            timestamp: mainTimestamp
-        });
-    }
-
-    // 添加所有数据组
-    for (var j = 0; j < parsedData.dataSet.length; j++) {
-        var data = parsedData.dataSet[j];
+   result.push({
+        field: "BATTERY",
+        value: mainBattery,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "SIGNAL",
+        value: mainSignal,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "MOD",
+        value: mainmod,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Interrupt_level",
+        value: mainInterrupt_level,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Interrupt",
+        value: maininterrupt,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "distance",
+        value: maindistance,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Latitude",
+        value: mainLatitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "Longitude",
+        value: mainLongitude,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "gps_timestamp",
+        value: maingps_timestamp,
+        timestamp: mainTimestamp
+    });
+  
+     var dataSet = payload.dataSet;
+    for (var i = 0; i < dataSet.length; i++) {
+        var data = dataSet[i];
+        var distance1 = data.distance1;
+      
+        var timestamp = data.timestamp;
+        
         result.push({
             field: "distance",
-            value: data.distance1,
-            timestamp: data.timestamp
+            value: distance1,
+            timestamp: timestamp
         });
     }
-
     return result;
 }
