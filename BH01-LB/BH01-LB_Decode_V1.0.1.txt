@@ -1,0 +1,241 @@
+function data1Info(bytes,num)
+{
+  var addr = "";
+  var temp = "";
+  var bat = "";
+  var rssi = "";
+
+
+	for(var i = num ; i < 6+num ; i++) 
+	{
+	  	addr += bytes[i].toString(16).padStart(2, '0');
+	  	
+	}  
+
+
+  temp = temp + parseFloat(((bytes[8+num] | bytes[9+num] <<24>>16) / 10).toFixed(1));
+  
+  bat = bat + bytes[10+num] + '%';
+  
+  rssi = bytes[11+num]<< 24>>24;
+  
+  return {
+  MACaddr:addr,
+  Temp:temp,
+  Bat:bat,
+  Rssi:rssi,
+  };  
+}
+
+function data2Info(bytes,num)
+{
+  var addr = "";
+  var humidity = "";
+  var temp = "";
+  var bat = "";
+  var rssi = "";
+
+	for(var i = num ; i < 6+num ; i++) 
+	{
+	  	addr += bytes[i].toString(16).padStart(2, '0');
+	  	
+	}  
+
+
+  if(bytes[8+num]  === 0x00)
+    humidity = humidity.concat("NULL");
+  else
+    humidity = humidity + bytes[8+num] + '%';
+
+  temp = temp + parseFloat(((bytes[9+num] | bytes[10+num] <<24>>16) / 10).toFixed(1));
+ 
+  
+  bat = bat + bytes[11+num] + '%';
+
+  rssi = bytes[12+num]<< 24>>24
+  
+  return {
+  MACaddr:addr,
+  Humidity:humidity,
+  Temp:temp,
+  Bat:bat,
+  Rssi:rssi,
+  };
+}
+
+function data3Info(bytes,num)
+{
+  var addr = "";  
+  var bat = "";
+  var major = "";
+  var minor = "";
+  var tx_power = "";
+  var rssi = ""; 
+
+	for(var i = num ; i < 6+num ; i++) 
+	{
+	  	addr += bytes[i].toString(16).padStart(2, '0');
+	} 
+
+	
+  major = major + (bytes[8+num] << 8 | bytes[9+num]);
+
+  minor =  minor + (bytes[10+num] << 8 | bytes[11+num]);
+      
+  tx_power = tx_power + (bytes[12+num]<< 24>>24);
+    
+  rssi = rssi + (bytes[13+num]<< 24>>24);
+
+  return {
+  MACaddr:addr,
+  Major:major,
+  Minor:minor,
+  Txpower:tx_power,
+  Rssi:rssi,
+  };  
+}
+
+//DMT01 Probe
+function data4Info(bytes,num)
+{
+  var addr = ""; 
+  var temp1 = "";
+  var temp2 = "";
+  var bat = "";
+  var rssi = ""; 
+
+	for(var i = num ; i < 6+num ; i++) 
+	{
+	  	addr += bytes[i].toString(16).padStart(2, '0');
+	} 
+
+	temp1 = parseFloat(((bytes[8+num] | bytes[9+num] <<24>>16) / 10).toFixed(1));
+	
+	temp2 = parseFloat(((bytes[10+num] | bytes[11+num] <<24>>16) / 10).toFixed(1));
+
+  bat = bat + bytes[12+num] + '%';
+    
+  rssi = rssi + (bytes[13+num]<< 24>>24);
+
+  return {
+  MACaddr:addr,
+  FoodTemp:temp1,
+  ENVTemp:temp2,
+  Bat:bat,
+  //By default, do not decode the obtained RSSI; If necessary, you can open it.
+  //Rssi:rssi,            
+  };  
+}
+
+function Decoder(bytes,port)
+{
+  var string1 = "";
+  var string = "";
+  var decode = {};
+  var single_data_len;
+  var jsonstr;
+  var data1 = [];
+  var data2 = [];
+  var data3 = [];
+  var data4 = [];
+  var device_num;
+  var timestamp;
+  
+    if(port === 2)
+    {
+      timestamp |= bytes[0] ;
+      timestamp |= bytes[1] << 8;
+      timestamp |= bytes[2] << 16;
+      timestamp |= bytes[3] << 24;
+      for(var i = 4;i < bytes.length;i = i+ single_data_len)
+      {
+        if(bytes[i+6] == 0x01)
+        {
+          data1 = data1.concat(data1Info(bytes,i));        
+        }
+        else if(bytes[6+i] == 0x02)
+        {
+          data2 = data2.concat(data2Info(bytes,i));  
+        }
+        else if(bytes[6+i] == 0x03)
+        {
+            data3 = data3.concat(data3Info(bytes,i));          
+        }
+         else if(bytes[6+i] == 0x04)
+        {
+            data4 = data4.concat(data4Info(bytes,i));          
+        }
+ 
+        single_data_len = bytes[i+7] + 8;
+  
+        
+      }  
+
+      decode.EWTAH02 = data1;
+      decode.ES01 = data2;
+      decode.ibecaon = data3;
+      decode.DMT01Probe = data4;
+      decode.Lora_node = "BH01-LB";
+      decode.Timestamp = timestamp;
+      return decode;
+    }
+    else if(port === 5)
+    {
+      var freq_band;
+    	var sub_band;
+      var sensor;
+      
+      if(bytes[0]==0x44)
+        sensor= "BH01-LB";
+        
+  	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+  	  
+      if(bytes[3]==0x01)
+          freq_band="EU868";
+    	else if(bytes[3]==0x02)
+          freq_band="US915";
+    	else if(bytes[3]==0x03)
+          freq_band="IN865";
+    	else if(bytes[3]==0x04)
+          freq_band="AU915";
+    	else if(bytes[3]==0x05)
+          freq_band="KZ865";
+    	else if(bytes[3]==0x06)
+          freq_band="RU864";
+    	else if(bytes[3]==0x07)
+          freq_band="AS923";
+    	else if(bytes[3]==0x08)
+          freq_band="AS923_1";
+    	else if(bytes[3]==0x09)
+          freq_band="AS923_2";
+    	else if(bytes[3]==0x0A)
+          freq_band="AS923_3";
+    	else if(bytes[3]==0x0F)
+          freq_band="AS923_4";
+    	else if(bytes[3]==0x0B)
+          freq_band="CN470";
+    	else if(bytes[3]==0x0C)
+          freq_band="EU433";
+    	else if(bytes[3]==0x0D)
+          freq_band="KR920";
+    	else if(bytes[3]==0x0E)
+          freq_band="MA869";
+    	
+      if(bytes[4]==0xff)
+        sub_band="NULL";
+  	  else
+        sub_band=bytes[4];
+  
+      var bat= (bytes[5]<<8 | bytes[6])/1000;
+      
+    	return {
+    	  SENSOR_MODEL:sensor,
+        FIRMWARE_VERSION:firm_ver,
+        FREQUENCY_BAND:freq_band,
+        SUB_BAND:sub_band,
+        BAT:bat,
+    	};
+      
+    }
+    
+}
