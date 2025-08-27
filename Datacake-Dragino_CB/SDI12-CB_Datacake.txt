@@ -1,0 +1,191 @@
+function Decoder(payload, payloadB64) {
+    function bytesToHex(bytes) {
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+            var hexByte = current.toString(16);
+            if (hexByte.length === 1) {
+                hex += '0' + hexByte;
+            } else {
+                hex += hexByte;
+            }
+        }
+        return hex;
+    }
+
+    function parsePayload(hex) {
+        var offset = 0;
+        var result = [];
+
+        function toInt(hexString, lengthInBits) {
+            var value = parseInt(hexString, 16);
+            if (lengthInBits && (value & (1 << (lengthInBits - 1)))) {
+                value -= (1 << lengthInBits);
+            }
+            return value;
+        }
+
+        function hexToAscii(hexStr) {
+            var str = '';
+            for (var i = 0; i < hexStr.length; i += 2) {
+                var byte = hexStr.substring(i, i + 2);
+                str += String.fromCharCode(parseInt(byte, 16)); // 修复了这里
+            }
+            return str;
+        }
+
+        // 解析设备信息
+        var deviceID = hex.substring(offset, offset + 16); offset += 16;
+        var IMSI = hex.substring(offset, offset + 16); offset += 16;
+        var versionStr = hex.substring(offset, offset + 4); offset += 4;
+        var battery = toInt(hex.substring(offset, offset + 4)) / 1000; offset += 4;
+        var signal = toInt(hex.substring(offset, offset + 2)); offset += 2;
+        var GPIO_EXIT_Level = toInt(hex.substring(offset, offset + 2)); offset += 2;
+        var GPIO_EXIT_Flag = toInt(hex.substring(offset, offset + 2)); offset += 2;
+        
+        // 解析GPS数据
+        var latitude = toInt(hex.substring(offset, offset + 8), 32) / 1000000; offset += 8;
+        var longitude = toInt(hex.substring(offset, offset + 8), 32) / 1000000; offset += 8;
+        var gpsTimestamp = toInt(hex.substring(offset, offset + 8), 32); offset += 8;
+        var timestamp = toInt(hex.substring(offset, offset + 8), 32); offset += 8;
+        var Pulse_count = toInt(hex.substring(offset, offset + 8), 32); offset += 8;
+        var Payload_version = toInt(hex.substring(offset, offset + 2)); offset += 2;
+        
+        // 添加设备信息到结果
+        result.push(
+            { field: "IMEI", value: deviceID, timestamp: timestamp },
+            { field: "IMSI", value: IMSI, timestamp: timestamp },
+            { field: "VERSION", value: toInt(versionStr) / 100, timestamp: timestamp },
+            { field: "BATTERY", value: battery, timestamp: timestamp },
+            { field: "SIGNAL", value: signal, timestamp: timestamp },
+            { field: "GPIO_EXIT_Level", value: GPIO_EXIT_Level, timestamp: timestamp },
+            { field: "GPIO_EXIT_Flag", value: GPIO_EXIT_Flag, timestamp: timestamp },
+            { field: "LATITUDE", value: latitude, timestamp: timestamp },
+            { field: "LONGITUDE", value: longitude, timestamp: timestamp },
+            { field: "GPS_TIMESTAMP", value: gpsTimestamp, timestamp: timestamp },
+            { field: "Pulse_count", value: Pulse_count, timestamp: timestamp },
+            { field: "Payload_version", value: Payload_version, timestamp: timestamp }
+        );
+
+        // 在Payload_version后立即解析一次SDI12数据
+        if (offset < hex.length) {
+            // 查找SDI12数据结束位置（0x0d）
+            var dataEnd = offset;
+            while (dataEnd < hex.length) {
+                if (hex.substring(dataEnd, dataEnd + 2) === '0d') {
+                    break;
+                }
+                dataEnd += 2;
+            }
+            
+            // 提取SDI12数据
+            var sdi12Hex = hex.substring(offset, dataEnd);
+            var sdi12Ascii = hexToAscii(sdi12Hex);
+            
+            // 解析SDI12数据（按符号分割）
+            var values = [];
+            var current = '';
+            
+            for (var i = 0; i < sdi12Ascii.length; i++) {
+                var char = sdi12Ascii.charAt(i);
+                
+                if (char === '+' || char === '-') {
+                    if (current !== '') {
+                        values.push(current);
+                    }
+                    current = char;
+                } else if (char === '.' || (char >= '0' && char <= '9')) {
+                    current += char;
+                } else {
+                    if (current !== '') {
+                        values.push(current);
+                        current = '';
+                    }
+                }
+            }
+            
+            if (current !== '') {
+                values.push(current);
+            }
+            
+            // 添加传感器数据到结果
+            for (var j = 0; j < values.length; j++) {
+                result.push({ 
+                    field: "SDI12_VALUE_" + j, 
+                    value: values[j], 
+                    timestamp: timestamp 
+                });
+            }
+            
+            offset = dataEnd + 2; // 跳过结束符
+        }
+
+        // 解析后续传感器数据组
+        while (offset < hex.length) {
+            var timestamp = toInt(hex.substring(offset, offset + 8), 32); offset += 8;
+            var pulseCount = toInt(hex.substring(offset, offset + 8), 32); offset += 8;
+            var payloadVer = toInt(hex.substring(offset, offset + 2)); offset += 2;
+            
+            // 查找SDI12数据结束位置（0x0d）
+            var dataEnd = offset;
+            while (dataEnd < hex.length) {
+                if (hex.substring(dataEnd, dataEnd + 2) === '0d') {
+                    break;
+                }
+                dataEnd += 2;
+            }
+            
+            // 提取SDI12数据
+            var sdi12Hex = hex.substring(offset, dataEnd);
+            var sdi12Ascii = hexToAscii(sdi12Hex);
+            
+            // 解析SDI12数据（按极符号分割）
+            var values = [];
+            var current = '';
+            
+            for (var i = 0; i < sdi12Ascii.length; i++) {
+                var char = sdi12Ascii.charAt(i);
+                
+                if (char === '+' || char === '-') {
+                    if (current !== '') {
+                        values.push(current);
+                    }
+                    current = char;
+                } else if (char === '.' || (char >= '0' && char <= '9')) {
+                    current += char;
+                } else {
+                    if (current !== '') {
+                        values.push(current);
+                        current = '';
+                    }
+                }
+            }
+            
+            if (current !== '') {
+                values.push(current);
+            }
+            
+            // 添加传感器数据到结果
+            result.push(
+                { field: "timestamp", value: timestamp, timestamp: timestamp },
+                { field: "PULSE_COUNT", value: pulseCount, timestamp: timestamp },
+                { field: "PAYLOAD_VERSION", value: payloadVer, timestamp: timestamp }
+            );
+            
+            for (var j = 0; j < values.length; j++) {
+                result.push({ 
+                    field: "SDI12_VALUE_" + j, 
+                    value: values[j], 
+                    timestamp: timestamp 
+                });
+            }
+            
+            offset = dataEnd + 2; // 跳过结束符
+        }
+
+        return result;
+    }
+
+    var payloadHex = bytesToHex(payloadB64);
+    return parsePayload(payloadHex);
+}
