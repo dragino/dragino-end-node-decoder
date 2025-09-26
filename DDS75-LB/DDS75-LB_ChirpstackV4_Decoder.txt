@@ -51,7 +51,7 @@ function getMyDate(str){
 }
 
 function Decode(fPort, bytes, variables) {
-   if (port == 0x02) {
+   if (fPort == 0x02) {
         // Check the 5th bit of the first byte
         if (bytes[0] & 0x10) { // 0x10 is binary 00010000, which corresponds to the 5th bit
             // Only parse batV and additional distance data
@@ -190,7 +190,7 @@ function Decode(fPort, bytes, variables) {
     BAT:bat,
     };
   }
-   else if(port==0x06)
+   else if(fPort==0x06)
   {
     
     for(var i=0;i<bytes.length;i=i+2)
