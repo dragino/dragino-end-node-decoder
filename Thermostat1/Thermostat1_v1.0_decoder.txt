@@ -1,0 +1,284 @@
+function Feature_list(bytes){
+  switch(bytes)
+  {
+    case 1: string="roomtemp"; break;
+    case 2: string="setcooltemp"; break;
+    case 3: string="setheattemp"; break;
+    case 4: string="mode"; break;
+    case 5: string="startmode"; break;
+    case 6: string="fanmode"; break; 
+    case 7: string="caltemp"; break; 
+    case 8: string="secstartup"; break;
+    case 9: string="pressdelay"; break;
+    case 10:string="stmmode"; break;
+    case 11:string="childlock"; break;
+    case 12:string="power"; break;
+    case 13:string="controlmode"; break;
+    case 14:string="coolpro1temp"; break;
+    case 15:string="coolpro2temp"; break;
+    case 16:string="coolpro3temp"; break;
+    case 17:string="coolpro4temp"; break;
+    case 18:string="coolpro5temp"; break;
+    case 19:string="coolpro6temp"; break;
+    case 20:string="coolpro7temp"; break;
+    case 21:string="coolpro8temp"; break;
+    case 22:string="heatpro1temp"; break;
+    case 23:string="heatpro2temp"; break;
+    case 24:string="heatpro3temp"; break;
+    case 25:string="heatpro4temp"; break;
+    case 26:string="heatpro5temp"; break;
+    case 27:string="heatpro6temp"; break;
+    case 28:string="heatpro7temp"; break;
+    case 29:string="heatpro8temp"; break;
+    case 30:string="coolpro1time"; break;
+    case 31:string="coolpro2time"; break;
+    case 32:string="coolpro3time"; break;
+    case 33:string="coolpro4time"; break;
+    case 34:string="coolpro5time"; break;
+    case 35:string="coolpro6time"; break;
+    case 36:string="coolpro7time"; break;
+    case 37:string="coolpro8time"; break;
+    case 38:string="heatpro1time"; break;
+    case 39:string="heatpro2time"; break;
+    case 40:string="heatpro3time"; break;
+    case 41:string="heatpro4time"; break;
+    case 42:string="heatpro5time"; break;
+    case 43:string="heatpro6time"; break;
+    case 44:string="heatpro7time"; break;
+    case 45:string="heatpro8time"; break;
+    default:
+    break;
+  }
+  return string;
+}
+
+function str_pad(byte){
+    var zero = '00';
+    var hex= byte.toString(10);    
+    var tmp  = 2-hex.length;
+    return zero.substr(0,tmp) + hex;
+}
+
+function str_pad2(byte){
+    var zero = '00';
+    var hex= byte.toString(16);    
+    var tmp  = 2-hex.length;
+    return zero.substr(0,tmp) + hex;
+}
+
+function Feature_value(bytes,i,y){
+  var value;
+  switch(bytes[i])
+  {
+    case 4:
+      if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "cool";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "heat";
+      else if((bytes[y]<<8 | bytes[y+1])==0x03)
+        value= "auto";
+      else if((bytes[y]<<8 | bytes[y+1])==0x04)
+        value= "aux";
+    break;
+    case 5:
+       if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "slow";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "fast";
+    break;
+    case 6:
+       if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "on";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "auto";
+    break;  
+    case 7:
+    case 8:
+    case 9:
+        value= bytes[y]<<8 | bytes[y+1];
+    break;
+    case 10:
+      if((bytes[y]<<8 | bytes[y+1])===0x00)
+        value= "Control one cooling";
+      else if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "Control one heating";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "Control one cooling and one heating";
+      else if((bytes[y]<<8 | bytes[y+1])==0x03)
+        value= "Control one cooling and two heating";
+      else if((bytes[y]<<8 | bytes[y+1])==0x04)
+        value= "Control two cooling and two heating";
+    break;
+    case 11:
+       if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "lock";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "unlock";
+    break;
+    case 12:
+       if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "on";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "off";
+    break;
+    case 13:
+       if((bytes[y]<<8 | bytes[y+1])==0x01)
+        value= "manual";
+      else if((bytes[y]<<8 | bytes[y+1])==0x02)
+        value= "auto";
+    break;
+    case 1:
+    case 2:
+    case 3:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+    case 25:
+    case 26:
+    case 27:
+    case 28:
+    case 29:
+        value=(bytes[y]<<8 | bytes[y+1])/10;    
+    break;
+    case 30:
+    case 31:
+    case 32:
+    case 33:
+    case 34:
+    case 35:
+    case 36:
+    case 37:
+    case 38:
+    case 39:
+    case 40:
+    case 41:
+    case 42:
+    case 43:
+    case 44:
+    case 45:
+      value=str_pad(bytes[y]) + ":" + str_pad(bytes[y+1]);
+    break;
+    default:
+    break;
+  }
+  return value;  
+}
+
+function Decoder(bytes, port) {
+  if(port==2)
+  { 
+    var decode={};
+    if(bytes[0]===0x01)
+    {
+      decode.type="uplink";
+      decode.roomtemp_F= (bytes[1]<<8 | bytes[2])/10;
+      decode.roomtemp_C= parseFloat(((((bytes[1]<<8 | bytes[2])/10)-32)*5/9).toFixed(1));
+      decode.sensor= bytes[3] ? "external":"internal";
+    }
+    else if(bytes[0]===0x02)
+    {
+      decode.mode=Feature_list(bytes[1]);
+      if(bytes[2]===0x01)
+      {
+        decode.type="downlink_get";
+        decode.get_value=Feature_value(bytes,1,5); 
+      }
+      else if(bytes[2]===0x02)
+      {
+        decode.type="downlink_set";
+        decode.set_value=str_pad2(bytes[3])+str_pad2(bytes[4]);
+        if((bytes[5]<<8 | bytes[6])==0x01)
+          decode.set_result="ok";
+        else if((bytes[5]<<8 | bytes[6])==0x02) 
+          decode.set_result="illegal range";
+        else if((bytes[5]<<8 | bytes[6])==0x03) 
+          decode.set_result="unknow value";
+        else if((bytes[5]<<8 | bytes[6])==0xFFFF)
+          decode.set_result="other";
+      }
+    }
+    else if(bytes[0]===0x03)
+    {
+      for(var k=1;k<bytes.length;k=k+3)
+      {
+        data= Feature_list(bytes[k])+'['+Feature_value(bytes,k,k+1) +']';
+        if(k==1)
+        {
+          if(bytes.length==4)
+            decode.manual_setting=data;
+          else
+            decode.manual_setting=data+',';
+        }
+        else
+          decode.manual_setting=decode.manual_setting+data+',';
+      }
+    }
+    return decode;
+  }
+  else if(port === 5)
+    {
+      var freq_band;
+    	var sub_band;
+      var sensor;
+      
+      if(bytes[0]==0x1F)
+        sensor= "thermostat1";
+        
+  	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+  	  
+      if(bytes[3]==0x01)
+          freq_band="EU868";
+    	else if(bytes[3]==0x02)
+          freq_band="US915";
+    	else if(bytes[3]==0x03)
+          freq_band="IN865";
+    	else if(bytes[3]==0x04)
+          freq_band="AU915";
+    	else if(bytes[3]==0x05)
+          freq_band="KZ865";
+    	else if(bytes[3]==0x06)
+          freq_band="RU864";
+    	else if(bytes[3]==0x07)
+          freq_band="AS923";
+    	else if(bytes[3]==0x08)
+          freq_band="AS923_1";
+    	else if(bytes[3]==0x09)
+          freq_band="AS923_2";
+    	else if(bytes[3]==0x0A)
+          freq_band="AS923_3";
+    	else if(bytes[3]==0x0F)
+          freq_band="AS923_4";
+    	else if(bytes[3]==0x0B)
+          freq_band="CN470";
+    	else if(bytes[3]==0x0C)
+          freq_band="EU433";
+    	else if(bytes[3]==0x0D)
+          freq_band="KR920";
+    	else if(bytes[3]==0x0E)
+          freq_band="MA869";
+    	
+      if(bytes[4]==0xff)
+        sub_band="NULL";
+  	  else
+        sub_band=bytes[4];
+  
+      
+      
+    	return {
+    	  SENSOR_MODEL:sensor,
+        FIRMWARE_VERSION:firm_ver,
+        FREQUENCY_BAND:freq_band,
+        SUB_BAND:sub_band,
+        
+    	};
+      
+    }
+ }
