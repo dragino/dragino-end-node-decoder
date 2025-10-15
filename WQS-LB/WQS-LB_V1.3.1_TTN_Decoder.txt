@@ -1,0 +1,308 @@
+function Str1(str2){
+  var str3 ="";
+  for (var i=0;i<str2.length;i++){
+    if (str2[i]<=0x0f){
+     str2[i]="0"+str2[i].toString(16)+"";
+    }
+  str3+= str2[i].toString(16)+"";}
+  return str3;
+}
+function str_pad(byte){
+    var zero = '00';
+    var hex= byte.toString(16);    
+    var tmp  = 2-hex.length;
+    return zero.substr(0,tmp) + hex + " ";
+}
+
+
+function datalog(i,bytes){
+  var aa= (bytes[7])&0xFF;
+  var bb={};
+  var cc= (bytes[6]<<8 | bytes[7])& 0x3FFF;  
+  var gg,ff;  var k=0;
+	if(((aa>>5)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/10).toFixed(1));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	}
+	if(((aa>>4)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/100).toFixed(2));	
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}	
+	}
+	if(((aa>>3)&0x01)==1)
+	{
+	  	gg=parseFloat(bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2]);
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}	
+	}
+	if(((aa>>2)&0x01)==1)
+	{
+	  	gg=parseFloat((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])*10);
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}	
+	}
+	if(((aa>>1)&0x01)==1)
+	{
+	  	gg=parseFloat(bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2]);
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}	
+	}
+	if(((aa)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/100).toFixed(2));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	} 
+	if(((aa>>6)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/100).toFixed(2));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	}  
+	if(((aa>>7)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/100).toFixed(2));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	} 
+	if(((cc>>9)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/10).toFixed(1));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	}
+	if(((cc>>10)&0x01)==1)
+	{
+	  	gg=parseFloat(((bytes[0+i+k*2]<<24>>16 | bytes[1+i+k*2])/10).toFixed(1));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  k++;
+		}		
+	}	
+	if(((cc>>8)&0x01)==1)
+	{
+	  	gg=parseFloat((bytes[1+i+k*2]<<16 |bytes[2+i+k*2]<<8 | bytes[3+i+k*2]));
+		ff=parseFloat(((bytes[4+i+k*2]<<24>>16 | bytes[5+i+k*2])/10).toFixed(1));
+		if(k<3)
+		{
+		  bb[k]=gg;
+		  bb[k+1]=ff;
+		  k++;
+		}		
+	} 
+  var ee= getMyDate((bytes[8+i]<<24 | bytes[9+i]<<16 | bytes[10+i]<<8 | bytes[11+i]).toString(10));
+  var string='['+bb[0]+','+bb[1]+','+bb[2]+','+ee+']'+',';  
+  
+  return string;
+}
+
+function getzf(c_num){ 
+  if(parseInt(c_num) < 10)
+    c_num = '0' + c_num; 
+
+  return c_num; 
+}
+
+function getMyDate(str){ 
+  var c_Date;
+  if(str > 9999999999)
+     c_Date = new Date(parseInt(str));
+  else 
+     c_Date = new Date(parseInt(str) * 1000);
+  
+  var c_Year = c_Date.getFullYear(), 
+  c_Month = c_Date.getMonth()+1, 
+  c_Day = c_Date.getDate(),
+  c_Hour = c_Date.getHours(), 
+  c_Min = c_Date.getMinutes(), 
+  c_Sen = c_Date.getSeconds();
+  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+  
+  return c_Time;
+}
+
+
+function Decoder(bytes, port) {
+	var data = {};
+	var decode = {};
+   if(port==0x02)
+     {
+	decode.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
+
+	var value=bytes[2]<<8 | bytes[3];
+	if(bytes[2] & 0x80)
+	{value |= 0xFFFF0000;}
+  decode.temp_DS18B20=(value/10).toFixed(2);//DS18B20,temperature
+  decode.i_flag = (bytes[4]>>3)&0x01;
+ 	var sensor_type=(bytes[5])&0xFF;
+ 	var sensor_type2=(bytes[4])&0x7F;	
+	var j=6;
+	if(((sensor_type>>5)&0x01)==1)
+	{
+	  	decode.turbidity=(bytes[j]<<8 | bytes[j+1])/10;
+	  	j=2+j;
+	}
+	if(((sensor_type>>4)&0x01)==1)
+	{
+	  	decode.dissolved_oxygen=(bytes[j]<<8 | bytes[j+1])/100;
+	  	decode.do_temp=(bytes[j+2]<<8 | bytes[j+3])/100;
+	  	j=4+j;
+	}
+	if(((sensor_type>>3)&0x01)==1)
+	{
+	  	decode.ORP=(bytes[j]<<24>>16 | bytes[j+1]);	
+	  	j=2+j;
+	}
+	if(((sensor_type>>2)&0x01)==1)
+	{
+	  	decode.EC_K10=(bytes[j]<<8 | bytes[j+1])*10;
+	  	decode.EC10_Temp=(bytes[j+2]<<8 | bytes[j+3])/10;
+	  	j=4+j;	  	
+	}
+	if(((sensor_type>>1)&0x01)==1)
+	{
+	  	decode.EC_K1=bytes[j]<<8 | bytes[j+1];	
+	  	decode.EC1_Temp=(bytes[j+2]<<8 | bytes[j+3])/10;		
+	  	j=4+j;	
+	}
+	if(((sensor_type)&0x01)==1)
+	{
+	  	decode.PH=(bytes[j]<<8 | bytes[j+1])/100;	
+	  	decode.PH_Temp=(bytes[j+2]<<8 | bytes[j+3])/10;		
+	  	j=4+j;	  	
+	}
+	if(((sensor_type>>6)&0x01)==1)
+	{
+	  	decode.RC_2A=(bytes[j]<<8 | bytes[j+1])/100;		
+	  	j=2+j;	
+	}	
+	if(((sensor_type>>7)&0x01)==1)
+	{
+	  	decode.RC_10A=(bytes[j]<<8 | bytes[j+1])/100;		
+	  	j=2+j;	
+	}
+	if(((sensor_type2>>1)&0x01)==1)
+	{
+	  	decode.turbidity_200=(bytes[j]<<8 | bytes[j+1])/10;	
+	  	decode.turbidity_200_Temp=(bytes[j+2]<<8 | bytes[j+3])/10;		
+	  	j=4+j;	  	
+	}	
+	if(((sensor_type2>>2)&0x01)==1)
+	{
+	  	decode.turbidity_4000=(bytes[j]<<8 | bytes[j+1])/10;	
+	  	decode.turbidity_4000_Temp=(bytes[j+2]<<8 | bytes[j+3])/10;		
+	  	j=4+j;	  	
+	}		
+	if(((sensor_type2)&0x01)==1)
+	{
+	  	decode.Four_EC=bytes[j]<<16 | bytes[j+1]<<8 | bytes[j+2];	
+	  	decode.Salinity=(bytes[j+3]<<8 | bytes[j+4])/10;	
+	  	decode.Four_EC_Temp=(bytes[j+5]<<8 | bytes[j+6])/10;			
+	  	j=7+j;	
+	}	
+	 return decode;
+     }
+  
+  else if(port==3)  
+  {
+    var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+12)
+    {
+      var data= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+    DATALOG:data_sum,
+    PNACKMD:pnack,
+    };    
+  }
+else if(port==0x05)
+  {
+    var sub_band;
+    var freq_band;
+    var sensor;
+    
+    if(bytes[0]==0x3C)
+       sensor= "WQS01-LB";
+      
+    if(bytes[4]==0xff)
+      sub_band="NULL";
+    else
+      sub_band=bytes[4];
+    
+    if(bytes[3]==0x01)
+      freq_band="EU868";
+    else if(bytes[3]==0x02)
+      freq_band="US915";
+    else if(bytes[3]==0x03)
+      freq_band="IN865";
+    else if(bytes[3]==0x04)
+      freq_band="AU915";
+    else if(bytes[3]==0x05)
+      freq_band="KZ865";
+    else if(bytes[3]==0x06)
+      freq_band="RU864";
+    else if(bytes[3]==0x07)
+      freq_band="AS923";
+    else if(bytes[3]==0x08)
+      freq_band="AS923_1";
+    else if(bytes[3]==0x09)
+      freq_band="AS923_2";
+    else if(bytes[3]==0x0A)
+      freq_band="AS923_3";
+    else if(bytes[3]==0x0B)
+      freq_band="CN470";
+    else if(bytes[3]==0x0C)
+      freq_band="EU433";
+    else if(bytes[3]==0x0D)
+      freq_band="KR920";
+    else if(bytes[3]==0x0E)
+      freq_band="MA869";
+      
+    var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+     bat= (bytes[5]<<8 | bytes[6])/1000;
+    return {
+    SENSOR_MODEL:sensor,
+    FIRMWARE_VERSION:firm_ver,
+    FREQUENCY_BAND:freq_band,
+    SUB_BAND:sub_band,
+    BAT:bat,
+    };
+
+}
+
+ }
