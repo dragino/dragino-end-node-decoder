@@ -27,6 +27,7 @@ function Decoder(payload, payloadB64) {
         }
     
         var deviceID = hex.substr(offset, 16); offset += 16;
+		var IMSI = hex.substr(offset, 16); offset += 16;
         var version = toInt(hex.substr(offset, 4)) / 100; offset += 4;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
