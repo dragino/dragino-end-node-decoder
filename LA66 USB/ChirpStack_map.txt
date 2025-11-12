@@ -16,7 +16,7 @@ data.Node_type = "Dragino_Mapper";
         data.latitude = parseFloat(((bytes[1] << 24 >>> 0 | bytes[2] << 16 | bytes[3] << 8 | bytes[4]) / 1e6).toFixed(6));
         data.longitude = parseFloat(((bytes[5] << 24 >>> 0 | bytes[6] << 16 | bytes[7] << 8 | bytes[8]) / 1e6).toFixed(6));
 
-        // 剩余字节为 title（如果存在）
+        
         if (bytes.length > 9) {
             const titleBytes = bytes.slice(9);
             data.title = bytesToString(titleBytes);
