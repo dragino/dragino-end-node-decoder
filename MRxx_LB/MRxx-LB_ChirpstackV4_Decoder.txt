@@ -142,8 +142,8 @@ function Decode(fPort, bytes, variables) {
     var freq_band;
     var sensor;
     
-    if(bytes[0]==0x27)
-       sensor= "DDS75-LB";
+    if(bytes[0]==0x2A)
+       sensor= "MRxx-LB";
       
     if(bytes[4]==0xff)
       sub_band="NULL";
