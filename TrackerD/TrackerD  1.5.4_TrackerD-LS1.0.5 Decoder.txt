@@ -66,7 +66,8 @@ function decodeUplink(input) {
       data.major = bytes[16]<<8 | bytes[17];
       data.minor = bytes[18]<<8 | bytes[19];
       data.power = bytes[15];
-      data.rssi = toSigned(bytes[23]);
+      data.rssi_beacons = toSigned(bytes[23]);
+      data.rssi_device_1m = toSigned(bytes[21]);
       data.battery = ((bytes[24] & 0x3f)<<8 | bytes[25])/1000;
       data.alarm = !!(bytes[24] & 0x40);
       data.mode = (bytes[26] >> 6) & 3;

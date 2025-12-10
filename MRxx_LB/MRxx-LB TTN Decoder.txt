@@ -106,7 +106,7 @@ function Decoder(bytes, port) {
             var s_flag = bytes[7]; // Sensor flag (decimal)
 
             return {
-                Node_type: "DDS75-LB",
+                
                 Bat: batV,
                 Distance: distance,
                 Interrupt_flag: i_flag,
@@ -126,7 +126,7 @@ function Decoder(bytes, port) {
                 data_sum += data;
         }
         return {
-            Node_type: "DDS75-LB",
+            
             DATALOG: data_sum,
             PNACKMD: pnack,
         };
@@ -135,8 +135,8 @@ function Decoder(bytes, port) {
         var freq_band;
         var sensor;
 
-        if (bytes[0] == 0x27)
-            sensor = "DDS75-LB";
+        if (bytes[0] == 0x2A)
+            sensor = "MRxx-LB";
 
         if (bytes[4] == 0xff)
             sub_band = "NULL";
