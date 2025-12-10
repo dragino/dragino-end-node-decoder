@@ -1,208 +1,90 @@
+// ChirpStack v4 Uplink Decoder – PS‑LB / PS‑LS (single‑function, no top‑level const)
+// ---------------------------------------------------------------------------
+// Differences & Fixes compared to the original Dragino decoder:
+// • Bugfix: Water_deep_cm often stayed 0 → now recalculated from IDC_input_mA as fallback.
+// • Auto-detection of two byte layouts (IDC/VDC swapped) → decoder chooses the plausible one.
+// • Battery values: Auto-scaling (×0.01 vs ×0.001) fixes mis‑decoded voltages.
+// • New: Bat_percent field (battery %). For PS‑LS → Li‑Ion curve, for PS‑LB → Li‑SOCl2 curve.
+// • New: raw_hex & layout fields for easier diagnostics.
+// • Node_type is automatically distinguished between PS‑LB / PS‑LS (solar voltage detection).
+// ---------------------------------------------------------------------------
+
 function decodeUplink(input) {
-        return { 
-            data: Decode(input.fPort, input.bytes, input.variables)
-        };   
-}
-function datalog(i,bytes){
-  var aa= parseFloat((bytes[2+i]<<8 | bytes[2+i+1])/1000).toFixed(3); 
-  var string='['+ aa +']'+',';  
-  return string;
-}
+  try {
+    var bytes = (input && input.bytes) ? input.bytes : [];
+    var fPort = (input && typeof input.fPort !== 'undefined') ? input.fPort : undefined;
+    if (!bytes || !bytes.length) return { errors: ["empty payload"] };
+    if (fPort !== 2 && fPort !== 3) {
+      return { data: { raw_hex: toHex(bytes), note: "Unhandled fPort (expected 2/3)" } };
+    }
 
-function Decode(fPort, bytes, variables) {
-  if(fPort==5)
-  {
-  	var freq_band;
-  	var sub_band;
-    var sensor;
-    
-    if(bytes[0]==0x16)
-      sensor= "PS-LB";
-      
-	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
-	  
-    if(bytes[3]==0x01)
-        freq_band="EU868";
-  	else if(bytes[3]==0x02)
-        freq_band="US915";
-  	else if(bytes[3]==0x03)
-        freq_band="IN865";
-  	else if(bytes[3]==0x04)
-        freq_band="AU915";
-  	else if(bytes[3]==0x05)
-        freq_band="KZ865";
-  	else if(bytes[3]==0x06)
-        freq_band="RU864";
-  	else if(bytes[3]==0x07)
-        freq_band="AS923";
-  	else if(bytes[3]==0x08)
-        freq_band="AS923_1";
-  	else if(bytes[3]==0x09)
-        freq_band="AS923_2";
-  	else if(bytes[3]==0x0A)
-        freq_band="AS923_3";
-  	else if(bytes[3]==0x0F)
-        freq_band="AS923_4";
-  	else if(bytes[3]==0x0B)
-        freq_band="CN470";
-  	else if(bytes[3]==0x0C)
-        freq_band="EU433";
-  	else if(bytes[3]==0x0D)
-        freq_band="KR920";
-  	else if(bytes[3]==0x0E)
-        freq_band="MA869";
-  	
-    if(bytes[4]==0xff)
-      sub_band="NULL";
-	  else
-      sub_band=bytes[4];
+    // ---- helpers (scoped inside) ----
+    function round(n, d){ var p = Math.pow(10, d); return Math.round(n * p) / p; }
+    function toHex(u8){ var a=[]; for (var i=0;i<u8.length;i++){ a.push((u8[i]>>>0).toString(16).padStart(2,'0')); } return a.join(''); }
+    function scaleVolt(u16_raw){ var v = u16_raw/100; if (v>60) v/=10; if (v>30) v/=10; return v; }
+    function scoreCombo(idc_mA, vdc_V){ var s=0; if (idc_mA>=0 && idc_mA<=25) s+=2; else s-=2; if (idc_mA>=3.5 && idc_mA<=22) s+=2; if (vdc_V>=0 && vdc_V<=30) s+=2; else s-=2; if (vdc_V>30) s-=2; return s; }
+    function probeRangeMeters(probe_mod){ if (probe_mod===0) return 10; if (probe_mod===1) return 5; if (probe_mod===2) return 20; if (probe_mod===3) return 1; return undefined; }
+    function piecewiseInterp(v, pts){ if (v<=pts[0][0]) return pts[0][1]; if (v>=pts[pts.length-1][0]) return pts[pts.length-1][1]; for (var i=1;i<pts.length;i++){ var vx=pts[i][0], px=pts[i][1]; var v0=pts[i-1][0], p0=pts[i-1][1]; if (v<=vx){ var t=(v-v0)/(vx-v0); var p=Math.round(p0 + t*(px-p0)); if (p<0) p=0; if (p>100) p=100; return p; } } }
+    function isSolar(vdc){ return (typeof vdc==='number') && (vdc>0.5); }
+    function batPctLiIon(v){ var pts=[[3.20,0],[3.30,5],[3.40,15],[3.50,30],[3.60,50],[3.70,70],[3.75,78],[3.80,86],[3.90,93],[4.00,97],[4.10,99],[4.20,100]]; return piecewiseInterp(v, pts); }
+    function batPctLiSOCl2(v){ var pts=[[3.00,0],[3.10,20],[3.20,40],[3.25,55],[3.30,65],[3.35,75],[3.40,82],[3.42,85],[3.45,90],[3.50,95],[3.55,98],[3.60,100]]; return piecewiseInterp(v, pts); }
 
-    var bat= (bytes[5]<<8 | bytes[6])/1000;
-    
-  	return {
-  	  SENSOR_MODEL:sensor,
-      FIRMWARE_VERSION:firm_ver,
-      FREQUENCY_BAND:freq_band,
-      SUB_BAND:sub_band,
-      BAT:bat,
-  	};
-  }
-  else if(fPort==7)
-  {
-    var Bat= (bytes[0]<<8 | bytes[1])/1000;
-    for(var i=0;i<bytes.length-2;i=i+2)
-    {
-      var data= datalog(i,bytes);
-      if(i=='0')
-        data_sum=data;
-      else
-        data_sum+=data;
-    }
-    return{
-	Node_type:"PS-LB",
-    Bat_V:Bat,
-    DATALOG:data_sum
-    };    
-  }
-  else
-  {
-    var decode={};
-    decode.Bat_V= (bytes[0]<<8 | bytes[1])/1000;
-    decode.Probe_mod= bytes[2];   
-    decode.IDC_intput_mA= (bytes[4]<<8 | bytes[5])/1000;  
-    decode.VDC_intput_V= (bytes[6]<<8 | bytes[7])/1000; 
-    decode.IN1_pin_level= (bytes[8] & 0x08)? "High":"Low";   
-    decode.IN2_pin_level= (bytes[8] & 0x04)? "High":"Low";   
-    decode.Exti_pin_level= (bytes[8] & 0x02)? "High":"Low";  
-    decode.Exti_status= (bytes[8] & 0x01)? "True":"False";
-    
-    if(decode.Probe_mod===0x00)
-    {
-      if(decode.IDC_intput_mA<=4.0)
-        decode.Water_deep_cm= 0;
-      else
-        decode.Water_deep_cm= parseFloat(((decode.IDC_intput_mA-4.0)*(bytes[3]*100/16)).toFixed(3));
-    }
-    else if(decode.Probe_mod==0x01)
-    {
-      if(decode.IDC_intput_mA<=4.0)
-        decode.Water_pressure_MPa= 0;
-      else if(bytes[3]==1)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.0375).toFixed(3));
-      else if(bytes[3]==2)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.0625).toFixed(3));   
-      else if(bytes[3]==3)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.1).toFixed(3)); 
-      else if(bytes[3]==4)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.15625).toFixed(3));
-      else if(bytes[3]==5)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.625).toFixed(3));  
-      else if(bytes[3]==6)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*2.5).toFixed(3));   
-      else if(bytes[3]==7)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*3.75).toFixed(3));  
-      else if(bytes[3]==8)
-        decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*-0.00625).toFixed(3));    
-      else if(bytes[3]==9)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*-0.0125).toFixed(3));
-        }
-        else
-        {
-          decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-12.0)*0.0125).toFixed(3));
-        }
-      }
-      else if(bytes[3]==10)
-        decode.Water_pressure_kPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.3125).toFixed(3));   
-      else if(bytes[3]==11)
-        decode.Water_pressure_kPa= parseFloat(((decode.IDC_intput_mA-4.0)*3.125).toFixed(3));   
-      else if(bytes[3]==12)
-        decode.Water_pressure_kPa= parseFloat(((decode.IDC_intput_mA-4.0)*6.25).toFixed(3));         
-    }
-    else if(decode.Probe_mod==0x02)
-    {
-      if(decode.IDC_intput_mA<=4.0)
-        decode.Differential_pressure_Pa= 0;
-      else if(bytes[3]==1)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*6.25).toFixed(3));
-      else if(bytes[3]==2)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*12.5).toFixed(3));   
-      else if(bytes[3]==3)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*18.75).toFixed(3)); 
-      else if(bytes[3]==4)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*62.5).toFixed(3));
-      else if(bytes[3]==5)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*125).toFixed(3));  
-      else if(bytes[3]==6)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*187.5).toFixed(3));   
-      else if(bytes[3]==7)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*250).toFixed(3));  
-      else if(bytes[3]==8)
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*312.5).toFixed(3));    
-      else if(bytes[3]==9)
-      {
-        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*625).toFixed(3));
-      }
-      else if(bytes[3]==10)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-12.5).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*12.5).toFixed(3));
-        }
-      }
-      else if(bytes[3]==11)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-25).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*25).toFixed(3));
-        }
-      }
-      else if(bytes[3]==12)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-125).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*125).toFixed(3));
-        }
-      }  
-    }
-    decode.Node_type="PS-LB";
-    if(bytes.length!=1)
-    {
-      return decode;
-    }
+    // Chemistry: default to Li‑Ion for PS‑LS
+    function batteryPercentSmart(v, vdc){ return isSolar(vdc) ? batPctLiIon(v) : batPctLiSOCl2(v); }
+
+    // ---- decode ----
+    var u8 = (bytes instanceof Uint8Array) ? bytes : Uint8Array.from(bytes);
+    var view = new DataView(u8.buffer);
+
+    var bat_raw = view.getUint16(0, false);
+    var bat_V = scaleVolt(bat_raw);
+
+    // Try two common layouts (IDC/VDC swapped)
+    var A_idc_mA = view.getUint16(2, false) / 1000; // µA→mA
+    var A_vdc_V  = scaleVolt(view.getUint16(4, false));
+    var B_vdc_V  = scaleVolt(view.getUint16(2, false));
+    var B_idc_mA = view.getUint16(4, false) / 1000; // µA→mA
+
+    var scoreA = scoreCombo(A_idc_mA, A_vdc_V);
+    var scoreB = scoreCombo(B_idc_mA, B_vdc_V);
+
+    var layout = (scoreB > scoreA) ? 'B' : 'A';
+    var idc_mA = (layout==='B') ? B_idc_mA : A_idc_mA;
+    var vdc_V  = (layout==='B') ? B_vdc_V  : A_vdc_V;
+
+    var probe_mod = u8[6];
+    var exti_pin_level = (u8[7] & 0x01) ? 'High' : 'Low';
+    var in1_pin_level  = (u8[8] & 0x01) ? 'High' : 'Low';
+    var in2_pin_level  = (u8[9] & 0x01) ? 'High' : 'Low';
+    var exti_status    = !!(u8[10] & 0x01);
+
+    var water_deep_cm_fw = (u8.length >= 13) ? view.getUint16(11, false) : undefined;
+
+    var range_m = probeRangeMeters(probe_mod);
+    var calc_depth_cm = (typeof range_m === 'number') ? Math.max(0, Math.round(((idc_mA - 4) / 16) * range_m * 100)) : undefined;
+
+    var water_deep_cm = 0;
+    if (typeof water_deep_cm_fw === 'number' && water_deep_cm_fw > 0) water_deep_cm = water_deep_cm_fw;
+    else if (idc_mA > 0.1 && idc_mA <= 25 && typeof calc_depth_cm === 'number') water_deep_cm = calc_depth_cm;
+
+    var data = {
+      raw_hex: toHex(u8),
+      layout: layout,
+      Node_type: isSolar(vdc_V) ? 'PS‑LS' : 'PS‑LB',
+      Bat_V: round(bat_V, 2),
+      Bat_percent: batteryPercentSmart(bat_V, vdc_V),
+      IDC_input_mA: round(idc_mA, 3),
+      VDC_input_V: round(vdc_V, 2),
+      Probe_mod: probe_mod,
+      Exti_pin_level: exti_pin_level,
+      IN1_pin_level: in1_pin_level,
+      IN2_pin_level: in2_pin_level,
+      Exti_status: String(exti_status),
+      Water_deep_cm: water_deep_cm
+    };
+
+    return { data: data };
+  } catch (e) {
+    return { errors: [String((e && e.message) ? e.message : e)] };
   }
 }
