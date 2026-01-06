@@ -190,19 +190,5 @@ function Decode(fPort, bytes, variables) {
     BAT:bat,
     };
   }
-   else if(fPort==0x06)
-  {
-    
-    for(var i=0;i<bytes.length;i=i+2)
-    {
-      var data= Detect(i,bytes);
-      if(i=='0')
-        data_sum=data;
-      else
-        data_sum+=data;
-    }
-    return{
-    Detect_Mode_Data:data_sum,
-    };
-  }
+  
 }
