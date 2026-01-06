@@ -182,17 +182,5 @@ function Decoder(bytes, port) {
             SUB_BAND: sub_band,
             BAT: bat,
         };
-    } else if (port == 0x06) {
-        var data_sum = '';
-        for (var i = 0; i < bytes.length; i = i + 2) {
-            var data = Detect(i, bytes);
-            if (i == '0')
-                data_sum = data;
-            else
-                data_sum += data;
-        }
-        return {
-            Detect_Mode_Data: data_sum,
-        };
-    }
+    } 
 }
