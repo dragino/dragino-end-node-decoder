@@ -44,48 +44,7 @@ function getMyDate(str) {
 
 function Decoder(bytes, port) {
     if (port == 0x02) {
-        // Check the 5th bit of the first byte
-        if (bytes[0] & 0x10) { // 0x10 is binary 00010000, which corresponds to the 5th bit
-            // Only parse batV and additional distance data
-            var value = (bytes[0] << 8 | bytes[1]) & 0x0FFF;
-            var batV = value / 1000; // Battery, units: V
-
-            // Parse the next bytes as distance data (excluding last 4 bytes)
-            var additionalDistanceData = [];
-            // Calculate end index (leaving last 4 bytes for flags)
-            var endIndex = bytes.length - 4;
-            // Maximum 40 bytes (20 values) or until endIndex
-            var maxIndex = Math.min(8 + 40, endIndex);
-            for (var i = 8; i < maxIndex; i += 2) {
-                value = bytes[i] << 8 | bytes[i + 1];
-                additionalDistanceData.push(value);
-            }
-
-            // PARSE LAST 4 BYTES AS REQUESTED:
-            // Interrupt_flag (1 byte, decimal)
-            var i_flag = bytes[bytes.length - 4];
-            
-            // TempC_DS18B20 (2 bytes, signed decimal divided by 100)
-            value = bytes[bytes.length - 3] << 8 | bytes[bytes.length - 2];
-            // Handle negative temperature (two's complement)
-            if (value & 0x8000) {
-                value = -(0x10000 - value);
-            }
-            var temp_DS18B20 = (value / 10).toFixed(2);  // Divided by 100 as requested
-            
-            // Sensor_flag (1 byte, decimal)
-            var s_flag = bytes[bytes.length - 1];
-
-            return {
-                Bat: batV,
-                Additional_Distance_Data: additionalDistanceData,
-                // Added new fields from last 4 bytes:
-                Interrupt_flag: i_flag,
-                TempC_DS18B20: temp_DS18B20,
-                Sensor_flag: s_flag
-            };
-        } else {
-            // Parse all other fields as usual
+       
             var value = (bytes[0] << 8 | bytes[1]) & 0x3FFF;
             var batV = value / 1000; // Battery, units: V
 
@@ -112,7 +71,7 @@ function Decoder(bytes, port) {
                 TempC_DS18B20: temp_DS18B20,
                 Sensor_flag: s_flag
             };
-        }
+        
     } 
     else if (port == 0x03) {
         var pnack = ((bytes[0] >> 7) & 0x01) ? "True" : "False";
