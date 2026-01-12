@@ -1,7 +1,11 @@
 function decodeUplink(input) {
-	var data = {};
+	var port = input.fPort;
+    var bytes = input.bytes;
+    var data = {};
 	var decode = {};
 	var value;	 
+	
+switch (input.fPort) {
 case 2:
 	data.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
 	data.Payload_Ver=bytes[2];
