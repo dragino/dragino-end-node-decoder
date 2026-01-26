@@ -153,11 +153,11 @@ case 7:
   var Bat= (bytes[0]<<8 | bytes[1])/1000;
     for(var j=0;j<bytes.length-2;j=j+4)
     {
-      data= datalog2(j,bytes);
+      data1= datalog2(j,bytes);
       if(j=='0')
-        data_sum=data;
+        data_sum=data1;
       else
-        data_sum+=data;
+        data_sum+=data1;
     }
 	data.Node_type="LTC2-LB";
     data.DATALOG=data_sum;
