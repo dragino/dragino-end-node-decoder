@@ -1,6 +1,6 @@
 // Temperature unit Settings: 0 is Celsius and 1 is Fahrenheit
-var TEMP = 0;
-// var TEMP = 1;
+var TEMP_UNIT = 0;
+// var TEMP_UNIT = 1;
 
 function decodeUplink(input) {
     return { 
@@ -12,9 +12,9 @@ function datalog_mode2(i, bytes) {
     var value = (bytes[i] << 24 >> 16) | bytes[i + 1];
     var aa;
     
-    if (TEMP === 0) {
+    if (TEMP_UNIT === 0) {
         aa = parseFloat(value / 100).toFixed(2);
-    } else if (TEMP === 1) {
+    } else if (TEMP_UNIT === 1) {
         aa = parseFloat((value / 100) * 1.8 + 32).toFixed(3);
     }
     
@@ -26,10 +26,10 @@ function datalog_mode3(i, bytes) {
     var value2 = (bytes[i + 2] << 24 >> 16) | bytes[i + 3];
     var aa, bb;
     
-    if (TEMP === 0) {
+    if (TEMP_UNIT === 0) {
         aa = parseFloat(value1 / 100).toFixed(2);
         bb = parseFloat(value2 / 100).toFixed(2);
-    } else if (TEMP === 1) {
+    } else if (TEMP_UNIT === 1) {
         aa = parseFloat((value1 / 100) * 1.8 + 32).toFixed(3);
         bb = parseFloat((value2 / 100) * 1.8 + 32).toFixed(3);
     }
@@ -60,27 +60,36 @@ function formatTimestamp(timestamp, separator = ' ') {
     return `${year}-${month}-${day}${separator}${hours}:${minutes}:${seconds}`;
 }
 
-function celsiusToFahrenheit(celsius, digit_num) {
+function celsiusToFahrenheit(celsius) {
     var fahrenheit = (celsius * 9/5) + 32;
-    return parseFloat(fahrenheit.toFixed(digit_num));
+    return fahrenheit;
 }
 
 function Decode(fport, bytes, variables) {
     var decode = {};
     var k;
     var data_sum = "";
+    var signedValue;
     
     if (fport === 2) {
-        decode.timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
-        decode.time = formatTimestamp(decode.timestamp);
+        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = (bytes[4] * 20) / 1000;
         
-        if (TEMP === 0) {
-            decode.MaxTempMax31865 = bytes[5];
-            decode.HighTempThld = bytes[6];
-        } else if (TEMP === 1) {
-            decode.MaxTempMax31865 = celsiusToFahrenheit(bytes[5], 1);
-            decode.HighTempThld = celsiusToFahrenheit(bytes[6], 1);
+        signedValue = bytes[5] << 24 >> 24;
+
+        if (TEMP_UNIT === 0) {
+            decode.MaxTempPT100 = parseFloat(signedValue.toFixed(1));
+        } else if (TEMP_UNIT === 1) {
+            decode.MaxTempPT100 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(1));
+        }
+
+        signedValue = bytes[6] << 24 >> 24;
+        
+        if (TEMP_UNIT === 0) {
+            decode.HighTempThld = parseFloat(signedValue.toFixed(1));
+        } else if (TEMP_UNIT === 1) {
+            decode.HighTempThld = parseFloat(celsiusToFahrenheit(signedValue).toFixed(1));
         }
         
         decode.OvertempIntvlNum = (bytes[7] << 8) | bytes[8];
@@ -90,6 +99,37 @@ function Decode(fport, bytes, variables) {
         decode.NodeType = "DishSense";
         
         if (bytes.length === 11) return decode;
+    } 
+    else if (fport === 17 || fport === 18) {
+        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Time = formatTimestamp(decode.Timestamp);
+        decode.BatV = (bytes[4] * 20) / 1000;
+        
+        signedValue = bytes[5] << 24 >> 24;
+
+        if (TEMP_UNIT === 0) {
+            decode.MaxTempPT100 = parseFloat(signedValue.toFixed(1));
+        } else if (TEMP_UNIT === 1) {
+            decode.MaxTempPT100 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(1));
+        }
+        
+        decode.NodeType = "DishSense";
+        
+        if (fport === 17) {
+            decode.TempCal = "OFF";
+        } else if (fport === 18) {
+            decode.TempCal = "ON";
+        }
+        return decode;
+    } 
+    else if (fport === 13) {
+        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Time = formatTimestamp(decode.Timestamp);
+        decode.BatV = bytes[4] << 8 | bytes[5];
+        
+        decode.NodeType = "DishSense";
+        
+        return decode;
     } 
     else if(fport === 9) {
         decode.PacketType = "Retrive";
@@ -103,10 +143,12 @@ function Decode(fport, bytes, variables) {
         decode.SampleCount = bytes[3];
         decode.SampleIntvlSec = ((bytes[4] << 8) | bytes[5]) / 1000;
         
-        if (TEMP === 0) {
-            decode.MaxTempMax31865 = ((bytes[6] << 8) | bytes[7]) / 100;
-        } else if (TEMP === 1) {
-            decode.MaxTempMax31865 = celsiusToFahrenheit(((bytes[6] << 8) | bytes[7]) / 100, 3);
+        signedValue = (((bytes[6] << 8) | bytes[7]) << 16 >> 16) / 100;
+
+        if (TEMP_UNIT === 0) {
+            decode.MaxTempPT100 = parseFloat(signedValue.toFixed(3));
+        } else if (TEMP_UNIT === 1) {
+            decode.MaxTempPT100 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
         }
         
         for (k = 8; k < bytes.length; k += 2) {
@@ -125,12 +167,21 @@ function Decode(fport, bytes, variables) {
         decode.SampleCount = bytes[3];
         decode.SampleIntvlSec = ((bytes[4] << 8) | bytes[5]) / 1000;
         
-        if (TEMP === 0) {
-            decode.MaxTempMax31865 = ((bytes[6] << 8) | bytes[7]) / 100;
-            decode.MaxTempDs18b20 = ((bytes[8] << 8) | bytes[9]) / 100;
-        } else if (TEMP === 1) {
-            decode.MaxTempMax31865 = celsiusToFahrenheit(((bytes[6] << 8) | bytes[7]) / 100, 3);
-            decode.MaxTempDs18b20 = celsiusToFahrenheit(((bytes[8] << 8) | bytes[9]) / 100, 3);
+        signedValue = (((bytes[6] << 8) | bytes[7]) << 16 >> 16) / 100;
+        
+        if (TEMP_UNIT === 0) {
+            decode.MaxTempPT100 = parseFloat(signedValue.toFixed(3));
+        } else if (TEMP_UNIT === 1) {
+            decode.MaxTempPT100 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
+            
+        }
+        
+        signedValue = (((bytes[8] << 8) | bytes[9]) << 16 >> 16) / 100;
+
+        if (TEMP_UNIT === 0) {
+            decode.MaxTempDs18b20 = parseFloat(signedValue.toFixed(3));
+        } else if (TEMP_UNIT === 1) {
+            decode.MaxTempDs18b20 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
         }
         
         for (k = 10; k < bytes.length; k += 4) {
@@ -152,10 +203,12 @@ function Decode(fport, bytes, variables) {
         if (decode.WorkMode === 1) {
             decode.SampleCount = (bytes[7] << 8) | bytes[8];
             
-            if (TEMP === 0) {
-                decode.HighTempThld = ((bytes[9] << 8) | bytes[10]) / 100;
-            } else if (TEMP === 1) {
-                decode.HighTempThld = celsiusToFahrenheit(((bytes[9] << 8) | bytes[10]) / 100, 3);
+            signedValue = (((bytes[9] << 8) | bytes[10]) << 16 >> 16) / 100;
+
+            if (TEMP_UNIT === 0) {
+                decode.HighTempThld = parseFloat(signedValue.toFixed(3));
+            } else if (TEMP_UNIT === 1) {
+                decode.HighTempThld = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
             }
         } else if (decode.WorkMode === 2 || decode.WorkMode === 3) {
             decode.SampleCount = bytes[7];
@@ -170,16 +223,24 @@ function Decode(fport, bytes, variables) {
         }
     } 
     else if (fport === 6) {
-        decode.timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
-        decode.time = formatTimestamp(decode.timestamp);
+        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = ((bytes[4] << 8) | bytes[5]) / 1000;
         
-        if (TEMP === 0) {
-            decode.TempMax31865 = ((bytes[6] << 8) | bytes[7]) / 100;
-            decode.TempDs18b20 = ((bytes[8] << 8) | bytes[9]) / 100;
-        } else if (TEMP === 1) {
-            decode.TempMax31865 = celsiusToFahrenheit(((bytes[6] << 8) | bytes[7]) / 100, 3);
-            decode.TempDs18b20 = celsiusToFahrenheit(((bytes[8] << 8) | bytes[9]) / 100, 3);
+        signedValue = (((bytes[6] << 8) | bytes[7]) << 16 >> 16) / 100;
+
+        if (TEMP_UNIT === 0) {
+            decode.TempPT100 = parseFloat(signedValue.toFixed(3));
+        } else if (TEMP_UNIT === 1) {
+            decode.TempPT100 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
+        }
+
+        signedValue = (((bytes[8] << 8) | bytes[9]) << 16 >> 16) / 100;
+
+        if (TEMP_UNIT === 0) {
+            decode.TempDs18b20 = parseFloat(signedValue.toFixed(3));
+        } else if (TEMP_UNIT === 1) {
+            decode.TempDs18b20 = parseFloat(celsiusToFahrenheit(signedValue).toFixed(3));
         }
         
         decode.NodeType = "DishSense";
@@ -189,9 +250,9 @@ function Decode(fport, bytes, variables) {
     else if (fport === 5) {
         var freq_band;
         var sensor = (bytes[0] === 0x51) ? "DishSense" : "Unknown";
-        var firm_ver = (bytes[1] & 0x0f) + '.' + ((bytes[2] >> 4) & 0x0f) + '.' + (bytes[2] & 0x0f);
+        var firm_ver = bytes[1] + '.' + bytes[2] + '.' + bytes[3];
         
-        switch (bytes[3]) {
+        switch (bytes[4]) {
             case 0x01: freq_band = "EU868"; break;
             case 0x02: freq_band = "US915"; break;
             case 0x03: freq_band = "IN865"; break;
@@ -210,8 +271,8 @@ function Decode(fport, bytes, variables) {
             default: freq_band = "Unknown"; break;
         }
         
-        var sub_band = (bytes[4] === 0xFF) ? "NULL" : bytes[4].toString();
-        var bat = ((bytes[5] << 8) | bytes[6]) / 1000;
+        var sub_band = (bytes[5] === 0xFF) ? "NULL" : bytes[5].toString();
+        var bat = ((bytes[6] << 8) | bytes[7]) / 1000;
         
         return {
             SENSOR_MODEL: sensor,
