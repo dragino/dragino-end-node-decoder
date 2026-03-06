@@ -31,13 +31,15 @@ function Decoder(payload, payloadB64) {
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
-        var Probe_Model = toInt(hex.substr(offset, 4)); offset += 4;
-        var interrupt1 = toInt(hex.substr(offset, 2)); offset += 2;
-        var interrupt2 = toInt(hex.substr(offset, 2)); offset += 2;
+        var IN1 = toInt(hex.substr(offset, 2)); offset += 2;
+        var IN2 = toInt(hex.substr(offset, 2)); offset += 2;
         var GPIO_EXTI_level = toInt(hex.substr(offset, 2)); offset += 2;
         var GPIO_EXTI_flag = toInt(hex.substr(offset, 2)); offset += 2;
-        var IDC_intput_mA = toInt(hex.substr(offset, 4))/1000; offset += 4;
-        var VDC_intput_V = toInt(hex.substr(offset, 4))/1000; offset += 4;
+        var IDC_alarm = toInt(hex.substr(offset, 2)); offset += 2;
+        var VDC_alarm = toInt(hex.substr(offset, 2)); offset += 2;
+        var Probe_Model = toInt(hex.substr(offset, 4)); offset += 4;
+        var IDC_intput_mA1 = toInt(hex.substr(offset, 4)); offset += 4;
+        var VDC_intput_V1 = toInt(hex.substr(offset, 4)); offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         
         try {
@@ -74,16 +76,21 @@ function Decoder(payload, payloadB64) {
 
         return {
             deviceID: deviceID,
+            IMSI:IMSI,
             version: version,
             battery: battery,
             signal: signal,
             Probe_Model: Probe_Model,
-            interrupt1: interrupt1,
-            interrupt2: interrupt2,
+            IN1: IN1,
+            IN2: IN2,
+            IDC_alarm: IDC_alarm,
+            VDC_alarm: VDC_alarm,
             GPIO_EXTI_level:GPIO_EXTI_level,
             GPIO_EXTI_flag: GPIO_EXTI_flag,
             IDC_intput_mA: IDC_intput_mA,
             VDC_intput_V: VDC_intput_V,
+            IDC_intput_mA1: IDC_intput_mA1,
+            VDC_intput_V1: VDC_intput_V1,
             timestamp: timestamp,
             dataSet: dataSet
         };
@@ -99,15 +106,18 @@ function Decoder(payload, payloadB64) {
 
     // Preparing to return data to Datacake...
     // Extract main attributes
+    var IMSI = payload.IMSI;
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
     var mainProbe_Model = payload.Probe_Model;
-    var maininterrupt1 = payload.interrupt1;
-    var maininterrupt2 = payload.interrupt2;
+    var maininterrupt1 = payload.IN1;
+    var maininterrupt2 = payload.IN2;
     var mainGPIO_EXTI_level = payload.GPIO_EXTI_level;
     var mainGPIO_EXTI_flag = payload.GPIO_EXTI_flag;
-    var mainIDC_intput_mA = payload.IDC_intput_mA;
-    var mainVDC_intput_V = payload.VDC_intput_V;
+    var mainIDC_alarm = payload.IDC_alarm;
+    var mainVDC_alarm = payload.VDC_alarm;
+    var mainIDC_intput_mA = payload.IDC_intput_mA1;
+    var mainVDC_intput_V = payload.VDC_intput_V1;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -117,6 +127,11 @@ function Decoder(payload, payloadB64) {
     result.push({
         field: "DeviceID",
         value: deviceID,
+        timestamp: mainTimestamp
+    });
+     result.push({
+        field: "IMSI",
+        value: IMSI,
         timestamp: mainTimestamp
     });
     result.push({
@@ -150,8 +165,18 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "GPIO_EXTI_level",
-        value: mainGPIO_EXTI_level,
+        field: "GPIO_EXTI_flag",
+        value: mainGPIO_EXTI_flag,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "IDC_alarm",
+        value: mainIDC_alarm,
+        timestamp: mainTimestamp
+    });
+    result.push({
+        field: "VDC_alarm",
+        value: mainIDC_alarm,
         timestamp: mainTimestamp
     });
     result.push({
