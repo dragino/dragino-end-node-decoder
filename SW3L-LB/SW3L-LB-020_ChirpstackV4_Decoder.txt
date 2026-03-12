@@ -3,11 +3,6 @@ function decodeUplink(input) {
             data: Decode(input.fPort, input.bytes, input.variables)
         };   
 }
-function decodeUplink(input) {
-        return { 
-            data: Decode(input.fPort, input.bytes, input.variables)
-        };   
-}
 function datalog(i,bytes){
   var aa=(bytes[0+i]&0x02)?"TRUE":"FALSE";
   var bb=(bytes[0+i]&0xFC)>>2;
