@@ -64,6 +64,7 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return
+  {
 	Node_type:"SW3L-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
