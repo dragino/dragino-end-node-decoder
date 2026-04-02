@@ -1,9 +1,8 @@
 function decodeUplink(input) {
-        return { 
-            data: Decode(input.fPort, input.bytes, input.variables)
-        };   
-}
-function datalog(i,bytes){
+	var port = input.fPort;
+	var bytes = input.bytes;
+    var data = {};
+	function datalog(i,bytes){
   var aa=(bytes[0+i]&0x01)?"YES":"NO"; 
   var bb=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
   var cc=(bytes[0+i]&0x3C)>>2;
@@ -26,148 +25,133 @@ function datalog(i,bytes){
   return string;
 }
 
-function getzf(c_num){ 
-  if(parseInt(c_num) < 10)
-    c_num = '0' + c_num; 
 
-  return c_num; 
-}
+	function getzf(c_num){ 
+	  if(parseInt(c_num) < 10)
+		c_num = '0' + c_num; 
 
-function getMyDate(str){ 
-  var c_Date;
-  if(str > 9999999999)
-     c_Date = new Date(parseInt(str));
-  else 
-     c_Date = new Date(parseInt(str) * 1000);
-  
-  var c_Year = c_Date.getFullYear(), 
-  c_Month = c_Date.getMonth()+1, 
-  c_Day = c_Date.getDate(),
-  c_Hour = c_Date.getHours(), 
-  c_Min = c_Date.getMinutes(), 
-  c_Sen = c_Date.getSeconds();
-  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
-  
-  return c_Time;
-}
+	  return c_num; 
+	}
 
-function Decode(fPort, bytes, variables) {
-  if(fPort==0x03)
-  {
-    var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
+	function getMyDate(str){ 
+	  var c_Date;
+	  if(str > 9999999999)
+		c_Date = new Date(parseInt(str));
+	  else 
+		c_Date = new Date(parseInt(str) * 1000);
+	  
+	  var c_Year = c_Date.getFullYear(), 
+	  c_Month = c_Date.getMonth()+1, 
+	  c_Day = c_Date.getDate(),
+	  c_Hour = c_Date.getHours(), 
+	  c_Min = c_Date.getMinutes(), 
+	  c_Sen = c_Date.getSeconds();
+	  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+	  
+	  return c_Time;
+	}
+
+switch (input.fPort) {
+case 3:
+   var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
     {
-      var data= datalog(i,bytes);
+      var data1= datalog(i,bytes);
       if(i=='0')
-        data_sum=data;
+        data_sum=data1;
       else
-        data_sum+=data;
+        data_sum+=data1;
     }
-    return
-  {
-	Node_type:"SW3L-LB",
-    DATALOG:data_sum,
-    PNACKMD:pnack,
-    };
-  }
-  else if(fPort==0x04)
-  {
-    var tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
-    var stop_timer= bytes[4];
-    var alarm_timer= bytes[5]<<8 | bytes[6];
-    
+     
+    data.DATALOG=data_sum;
+    data.PNACKMD=pnack;
     return {
-	Node_type:"SW3L-LB",
-    TDC:tdc,
-    Stop_Timer:stop_timer,
-    Alarm_Timer:alarm_timer,
-    };
-  }
-  else if(fPort==0x05)
-  {
-    var sub_band;
-    var freq_band;
-    var sensor;
+      data: data,
+    }
     
+  break;
+case 4:
+    data.tdc= bytes[0]<<16 | bytes[1]<<8 | bytes[2];
+    data.stop_timer= bytes[4];
+    data.alarm_timer= bytes[5]<<8 | bytes[6];
+     return {
+      data: data,
+    }
+  break;
+case 5:
+  { 
     if(bytes[0]==0x1F)
-       sensor= "SW3L-LB";
+      data.SENSOR_MODEL= "SW3L-LB";
       
     if(bytes[4]==0xff)
-      sub_band="NULL";
+      data.SUB_BAND="NULL";
     else
-      sub_band=bytes[4];
+      data.SUB_BAND=bytes[4];
     
     if(bytes[3]==0x01)
-      freq_band="EU868";
+      data.FREQUENCY_BAND="EU868";
     else if(bytes[3]==0x02)
-      freq_band="US915";
+      data.FREQUENCY_BAND="US915";
     else if(bytes[3]==0x03)
-      freq_band="IN865";
+      data.FREQUENCY_BAND="IN865";
     else if(bytes[3]==0x04)
-      freq_band="AU915";
+      data.FREQUENCY_BAND="AU915";
     else if(bytes[3]==0x05)
-      freq_band="KZ865";
+      data.FREQUENCY_BAND="KZ865";
     else if(bytes[3]==0x06)
-      freq_band="RU864";
+      data.FREQUENCY_BAND="RU864";
     else if(bytes[3]==0x07)
-      freq_band="AS923";
+      data.FREQUENCY_BAND="AS923";
     else if(bytes[3]==0x08)
-      freq_band="AS923_1";
+      data.FREQUENCY_BAND="AS923_1";
     else if(bytes[3]==0x09)
-      freq_band="AS923_2";
+      data.FREQUENCY_BAND="AS923_2";
     else if(bytes[3]==0x0A)
-      freq_band="AS923_3";
+      data.FREQUENCY_BAND="AS923_3";
     else if(bytes[3]==0x0B)
-      freq_band="CN470";
+      data.FREQUENCY_BAND="CN470";
     else if(bytes[3]==0x0C)
-      freq_band="EU433";
+      data.FREQUENCY_BAND="EU433";
     else if(bytes[3]==0x0D)
-      freq_band="KR920";
+      data.FREQUENCY_BAND="KR920";
     else if(bytes[3]==0x0E)
-      freq_band="MA869";
+      data.FREQUENCY_BAND="MA869";
       
-    var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
-    var bat= (bytes[5]<<8 | bytes[6])/1000;
-    
-    return {
-    SENSOR_MODEL:sensor,
-    FIRMWARE_VERSION:firm_ver,
-    FREQUENCY_BAND:freq_band,
-    SUB_BAND:sub_band,
-    BAT:bat,
-    };
+    data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    data.BAT= (bytes[5]<<8 | bytes[6])/1000;
   }
-  else
-  { 
-    var decode = {};
-    
-    decode.MOD=bytes[5]&0x3F;
-    decode.PA4_Level=(bytes[5]&0x80)? "H":"L";
-    decode.PB15_Level=(bytes[5]&0x40)? "H":"L";     
-    decode.Calculate_flag=(bytes[0]&0x3C)>>2;
-    decode.Alarm=(bytes[0]&0x02)?"TRUE":"FALSE"; 
-    decode.tdc_interval=(bytes[0]&0x01)?"YES":"NO"; 
-    
-    if(decode.Calculate_flag==3)
-      decode.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/12).toFixed(1));
-    else if(decode.Calculate_flag==2)
-      decode.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/64).toFixed(1));
-    else if(decode.Calculate_flag==1)
-      decode.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/390).toFixed(1));
+  return {
+      data: data,
+    }
+  break;
+default:
+    data.Node_type="SW3L-LB";
+    data.MOD=bytes[5]&0x3F;
+    data.PA4_Level=(bytes[5]&0x80)? "H":"L";
+    data.PB15_Level=(bytes[5]&0x40)? "H":"L";     
+    data.Calculate_flag=(bytes[0]&0x3C)>>2;
+    data.Alarm=(bytes[0]&0x02)?"TRUE":"FALSE"; 
+    data.tdc_interval=(bytes[0]&0x01)?"YES":"NO"; 
+
+    if(data.Calculate_flag==3)
+      data.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/12).toFixed(1));
+    else if(data.Calculate_flag==2)
+      data.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/64).toFixed(1));
+    else if(data.Calculate_flag==1)
+      data.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/390).toFixed(1));
     else
-      decode.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/450).toFixed(1));
+      data.Water_flow_value=parseFloat((((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0)/450).toFixed(1));
       
     if(bytes[5]==0x01)
-      decode.Last_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
+      data.Last_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
     else
-      decode.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
+      data.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
       
-    decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
-    decode.Node_type="SW3L-LB";
-	
-    if(bytes.length==11)
-    {
-      return decode;
+    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+	if(bytes.length==11)
+  return {
+      data: data,
     }
-  }
+	break;
+	 }
 }
