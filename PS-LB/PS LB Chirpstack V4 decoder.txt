@@ -124,16 +124,7 @@ function Decode(fPort, bytes, variables) {
       else if(bytes[3]==8)
         decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*-0.00625).toFixed(3));    
       else if(bytes[3]==9)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-4.0)*-0.0125).toFixed(3));
-        }
-        else
-        {
           decode.Water_pressure_MPa= parseFloat(((decode.IDC_intput_mA-12.0)*0.0125).toFixed(3));
-        }
-      }
       else if(bytes[3]==10)
         decode.Water_pressure_kPa= parseFloat(((decode.IDC_intput_mA-4.0)*0.3125).toFixed(3));   
       else if(bytes[3]==11)
@@ -162,42 +153,13 @@ function Decode(fPort, bytes, variables) {
       else if(bytes[3]==8)
         decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*312.5).toFixed(3));    
       else if(bytes[3]==9)
-      {
         decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*625).toFixed(3));
-      }
       else if(bytes[3]==10)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-12.5).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*12.5).toFixed(3));
-        }
-      }
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*12.5).toFixed(3));
       else if(bytes[3]==11)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-25).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*25).toFixed(3));
-        }
-      }
+        decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*25).toFixed(3));
       else if(bytes[3]==12)
-      {
-        if(decode.IDC_intput_mA<=12.0)
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-4.0)*-125).toFixed(3));
-        }
-        else
-        {
-          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*125).toFixed(3));
-        }
-      }  
+          decode.Differential_pressure_Pa= parseFloat(((decode.IDC_intput_mA-12.0)*125).toFixed(3)); 
     }
     decode.Node_type="PS-LB";
     if(bytes.length!=1)

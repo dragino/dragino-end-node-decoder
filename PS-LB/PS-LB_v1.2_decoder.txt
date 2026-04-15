@@ -84,16 +84,7 @@ function getMyDate(str){
             else if(bytes3==8)
                 idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-0.00625).toFixed(3));    
             else if(bytes3==9)
-            {
-                if(IDC_intput_mA<=12.0)
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-0.0125).toFixed(3));
-                }
-                else
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*0.0125).toFixed(3));
-                }
-            }
+                idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*0.0125).toFixed(3));
             else if(bytes3==10)
                 idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*0.3125).toFixed(3));   
             else if(bytes3==11)
@@ -121,43 +112,14 @@ function getMyDate(str){
                 idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*250).toFixed(3));  
             else if(bytes3==8)
                 idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*312.5).toFixed(3));    
-            else if(bytes3==9)
-            {
+            else if(bytes3==9)         
                 idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*625).toFixed(3));
-            }
             else if(bytes3==10)
-            {
-                if(IDC_intput_mA<=12.0)
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-12.5).toFixed(3));
-                }
-                else
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*12.5).toFixed(3));
-                }
-            }
+                idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*12.5).toFixed(3));
             else if(bytes3==11)
-            {
-                if(IDC_intput_mA<=12.0)
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-25).toFixed(3));
-                }
-                else
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*25).toFixed(3));
-                }
-            }
+                idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*25).toFixed(3));
             else if(bytes3==12)
-            {
-                if(IDC_intput_mA<=12.0)
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-4.0)*-125).toFixed(3));
-                }
-                else
-                {
-                    idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*125).toFixed(3));
-                }
-            }  
+                idc_input_convert= parseFloat(((IDC_intput_mA-12.0)*125).toFixed(3));
         } 
         return idc_input_convert;  
     }
