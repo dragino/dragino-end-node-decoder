@@ -11,8 +11,7 @@ function Decoder(payload, payloadB64) {
         }
         return hex;
     }
-    
-    
+
     function parsePayload(hex) {
         var offset = 0;
 
@@ -27,20 +26,20 @@ function Decoder(payload, payloadB64) {
         }
 
         var deviceID = hex.substr(offset, 16); offset += 16;
-        var MSI = hex.substr(offset, 16); offset += 16;
+        var IMSI = hex.substr(offset, 16); offset += 16;
         var versionStr = hex.substr(offset, 4); offset += 4;
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
         var signal = toInt(hex.substr(offset, 2)); offset += 2;
         var mod = toInt(hex.substr(offset, 2)); offset += 2;
-        var Ds18b20 = toInt(hex.substr(offset, 4)); offset += 4;
+        var tempDS18B20 = toInt(hex.substr(offset, 4), 16); offset += 4;
         var PA4_level = toInt(hex.substr(offset, 2)); offset += 2;
         var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
         var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
         var adc = toInt(hex.substr(offset, 4)); offset += 4;
         var count = toInt(hex.substr(offset, 8)); offset += 8;
-        var temp = toInt(hex.substr(offset, 4)); offset += 4;
-        var hum = toInt(hex.substr(offset, 4)); offset += 4;
+        var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
+        var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         var Latitude = toInt(hex.substr(offset, 8)); offset += 8;
         var Longitude = toInt(hex.substr(offset, 8)); offset += 8;
@@ -72,10 +71,10 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
 
         while (offset < hex.length) {
-            var temp1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
-            var hum1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
+            var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
+            var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({  temp1: temp1, hum1: hum1,timestamp: timestampLog });
+            dataSet.push({ shtTemp: shtTemp, shtHum: shtHum, timestamp: timestampLog });
         }
 
         return {
@@ -84,21 +83,16 @@ function Decoder(payload, payloadB64) {
             battery: battery,
             signal: signal,
             mod: mod,
-            PA4_level: PA4_level,
             Interrupt_level: Interrupt_level,
             interrupt: interrupt,
-            Ds18b20 : Ds18b20,
+            Ds18b20 : tempDS18B20,
             adc: adc,
             count: count,
-            temp: temp,
-            hum: hum,
-            temp1: temp1,
-            hum1: hum1,
-            Latitude: Latitude,
-            Longitude: Longitude,
+            adc: adc,
+            shtTemp: shtTemp,
+            shtHum: shtHum,
             timestamp: timestamp,
-            gps_timestamp: gps_timestamp,
-            dataSet: dataSet,
+            dataSet: dataSet
         };
     }
 
@@ -115,17 +109,14 @@ function Decoder(payload, payloadB64) {
     var mainBattery = payload.battery;
     var mainSignal = payload.signal;
     var mainMod = payload.mod;
-    var mainDs18b20 = payload.Ds18b20;
+    var mainTempDS18B20 = payload.tempDS18B20;
     var mainPA4_level = payload.PA4_level;
     var mainInterrupt = payload.interrupt;
     var mainInterrupt_level = payload.Interrupt_level;
     var mainAdc = payload.adc;
-    var maintemp1 = payload.temp;
-    var mainhum1 = payload.hum;
-    var maincount = payload.count;
-    var mainLatitude  = payload.Latitude;
-    var mainLongitude  = payload.Longitude;
-    var maingps_timestamp  = payload.gps_timestamp;
+     var maincount = payload.count;
+    var mainShtTemp = payload.shtTemp;
+    var mainShtHum = payload.shtHum;
     var mainTimestamp = payload.timestamp;
     console.log(mainTimestamp)
     // Initialize result array
@@ -148,18 +139,8 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
-        field: "temp",
-        value: maintemp1,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "INTERRUPT",
-        value: mainInterrupt,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "ADC",
-        value: mainAdc,
+        field: "TEMPDS18B20",
+        value: mainTempDS18B20,
         timestamp: mainTimestamp
     });
     result.push({
@@ -168,43 +149,33 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
+        field: "INTERRUPT",
+        value: mainInterrupt,
+        timestamp: mainTimestamp
+    });
+    result.push({
         field: "Interrupt_level",
         value: mainInterrupt_level,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "Ds18b20",
-        value: mainDs18b20,
+        field: "ADC",
+        value: mainAdc,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "temp",
-        value: maintemp1,
+        field: "SHTTEMP",
+        value: mainShtTemp,
         timestamp: mainTimestamp
     });
     result.push({
-        field: "hum",
-        value: mainhum1,
+        field: "SHTHUM",
+        value: mainShtHum,
         timestamp: mainTimestamp
     });
     result.push({
         field: "count",
         value: maincount,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "Latitude",
-        value: mainLatitude,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "Longitude",
-        value: mainLongitude,
-        timestamp: mainTimestamp
-    });
-    result.push({
-        field: "gps_timestamp",
-        value: maingps_timestamp,
         timestamp: mainTimestamp
     });
 
@@ -213,23 +184,22 @@ function Decoder(payload, payloadB64) {
     
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
-        var temp = data.temp1;
-        var hum = data.hum1;
+        var shtTemp = data.shtTemp;
+        var shtHum = data.shtHum;
         var timestamp = data.timestamp;
         console.log(timestamp)
         
         result.push({
-        field: "temp",
-        value: temp,
-        timestamp: timestamp
-    });
-    result.push({
-        field: "hum",
-        value: hum,
-        timestamp: timestamp
-    });
-    
+            field: "SHTTEMP",
+            value: shtTemp,
+            timestamp: timestamp
+        });
+        result.push({
+            field: "SHTHUM",
+            value: shtHum,
+            timestamp: timestamp
+        });
+    }
 
     return result;
-}
 }
