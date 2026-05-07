@@ -47,31 +47,82 @@ function getMyDate(str){
 }
 
 function Decode(fPort, bytes, variables) {
-  //CS01-LB Decode   
+    var fport=fPort&0x0F;
   if(fPort==0x02)
   {
-    var decode = {}; 
+    var decode = {};
+    var rang12=fPort>>6&0x03;
+    var rang34=fPort>>4&0x03;
+    var multiple12,multiple34;
+    if(rang12===0)
+     multiple12=1;
+    else if(rang12===1)
+     multiple12=3;
+    else if(rang12===2)
+     multiple12=6;
+     
+    if(rang34===0)
+     multiple34=1;
+    else if(rang34===1)
+     multiple34=3;
+    else if(rang34===2)
+     multiple34=6;
+     
     var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
     decode.BatV= value/1000;
     decode.EXTI_Trigger=(bytes[0] & 0x40)? "TRUE":"FALSE";
     decode.EXTI_Level=(bytes[0] & 0x80)? "HIGH":"LOW";
-    decode.Current1_A=(bytes[2]<<8 | bytes[3])/100;
-    decode.Current2_A=(bytes[4]<<8 | bytes[5])/100;
-    decode.Current3_A=(bytes[6]<<8 | bytes[7])/100;
-    decode.Current4_A=(bytes[8]<<8 | bytes[9])/100;
-    decode.Cur1L_status= (bytes[10] &0x80)? "True":"False";
-    decode.Cur1H_status= (bytes[10] &0x40)? "True":"False";
-    decode.Cur2L_status= (bytes[10] &0x20)? "True":"False";
-    decode.Cur2H_status= (bytes[10] &0x10)? "True":"False";   
-    decode.Cur3L_status= (bytes[10] &0x08)? "True":"False";
-    decode.Cur3H_status= (bytes[10] &0x04)? "True":"False";
-    decode.Cur4L_status= (bytes[10] &0x02)? "True":"False";
-    decode.Cur4H_status= (bytes[10] &0x01)? "True":"False"; 
     decode.Node_type="CS01-LB";
-    if(bytes.length==11)
+    if((bytes.length==11)||(bytes.length==28))
     {
-      return decode;     
+      decode.Current1_A=(bytes[2]<<8 | bytes[3])/100*multiple12;
+      decode.Current2_A=(bytes[4]<<8 | bytes[5])/100*multiple12;
+      decode.Current3_A=(bytes[6]<<8 | bytes[7])/100*multiple34;
+      decode.Current4_A=(bytes[8]<<8 | bytes[9])/100*multiple34;
+      decode.Cur1L_status= (bytes[10] &0x80)? "True":"False";
+      decode.Cur1H_status= (bytes[10] &0x40)? "True":"False";
+      decode.Cur2L_status= (bytes[10] &0x20)? "True":"False";
+      decode.Cur2H_status= (bytes[10] &0x10)? "True":"False";   
+      decode.Cur3L_status= (bytes[10] &0x08)? "True":"False";
+      decode.Cur3H_status= (bytes[10] &0x04)? "True":"False";
+      decode.Cur4L_status= (bytes[10] &0x02)? "True":"False";
+      decode.Cur4H_status= (bytes[10] &0x01)? "True":"False"; 
+  	  
+  	  if(bytes.length==28)
+  	  {
+  	    decode.curtotal_mod=bytes[11];
+  	    decode.curtotal1_mA_min=(bytes[12]<<24 | bytes[13]<<16 | bytes[14]<<8 | bytes[15])>>>0;
+  	    decode.curtotal2_mA_min=(bytes[16]<<24 | bytes[17]<<16 | bytes[18]<<8 | bytes[19])>>>0;
+  	    decode.curtotal3_mA_min=(bytes[20]<<24 | bytes[21]<<16 | bytes[22]<<8 | bytes[23])>>>0;
+  	    decode.curtotal4_mA_min=(bytes[24]<<24 | bytes[25]<<16 | bytes[26]<<8 | bytes[27])>>>0;
+  	  }
+  	  return decode;
     }
+    else if((bytes.length==15)||(bytes.length==32))
+    {
+      decode.Current1_A=(bytes[2]<<16 | bytes[3]<<8 | bytes[4])/1000*multiple12;
+      decode.Current2_A=(bytes[5]<<16 | bytes[6]<<8 | bytes[7])/1000*multiple12;
+      decode.Current3_A=(bytes[8]<<16 | bytes[9]<<8 | bytes[10])/1000*multiple34;
+      decode.Current4_A=(bytes[11]<<16 | bytes[12]<<8 | bytes[13])/1000*multiple34;
+      decode.Cur1L_status= (bytes[14] &0x80)? "True":"False";
+      decode.Cur1H_status= (bytes[14] &0x40)? "True":"False";
+      decode.Cur2L_status= (bytes[14] &0x20)? "True":"False";
+      decode.Cur2H_status= (bytes[14] &0x10)? "True":"False";   
+      decode.Cur3L_status= (bytes[14] &0x08)? "True":"False";
+      decode.Cur3H_status= (bytes[14] &0x04)? "True":"False";
+      decode.Cur4L_status= (bytes[14] &0x02)? "True":"False";
+      decode.Cur4H_status= (bytes[14] &0x01)? "True":"False"; 
+  	  
+  	  if(bytes.length==32)
+  	  {
+  	    decode.curtotal_mod=bytes[15];
+  	    decode.curtotal1_mA_min=(bytes[16]<<24 | bytes[17]<<16 | bytes[18]<<8 | bytes[19])>>>0;
+  	    decode.curtotal2_mA_min=(bytes[20]<<24 | bytes[21]<<16 | bytes[22]<<8 | bytes[23])>>>0;
+  	    decode.curtotal3_mA_min=(bytes[24]<<24 | bytes[25]<<16 | bytes[26]<<8 | bytes[27])>>>0;
+  	    decode.curtotal4_mA_min=(bytes[28]<<24 | bytes[29]<<16 | bytes[30]<<8 | bytes[31])>>>0;
+  	  }
+  	  return decode;
+    }  
   }
   else if(fPort==7)
   {
@@ -85,12 +136,12 @@ function Decode(fPort, bytes, variables) {
         data_sum+=data;
     }
     return{
-	Node_type:"CS01-LB",
+	  Node_type:"CS01-LB",
     Bat_V:Bat,
     DATALOG:data_sum
     };    
   }  
-  else if(fPort==0x03)  
+  else if(fport==0x03)  
   {
     var pnack= ((bytes[0]>>7)&0x01) ? "True":"False";
     for(var i=0;i<bytes.length;i=i+11)
