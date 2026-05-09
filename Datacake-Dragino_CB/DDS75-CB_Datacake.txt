@@ -42,6 +42,7 @@ function Decoder(payload, payloadB64) {
         var mod = toInt(hex.substr(offset, 2)); offset += 2;
         var interrupt = toInt(hex.substr(offset, 2)); offset += 2;
         var Interrupt_level = toInt(hex.substr(offset, 2)); offset += 2;
+        var Ds18b20_temp = toInt(hex.substr(offset, 4)); offset += 4;
         var distance = toInt(hex.substr(offset, 4)); offset += 4;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         var Latitude = parseCoordinate(hex.substr(offset, 8)); offset += 8; // 使用修复的坐标解析
@@ -74,8 +75,9 @@ function Decoder(payload, payloadB64) {
         var dataSet = [];
         while (offset < hex.length) {
             var distance1 = toInt(hex.substr(offset, 4)); offset += 4;
+            var Ds18b20_temp1 = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ distance1: distance1, timestamp: timestampLog });
+            dataSet.push({ distance1: distance1,Ds18b20_temp1: Ds18b20_temp1, timestamp: timestampLog });
         }
 
         return {
@@ -86,6 +88,8 @@ function Decoder(payload, payloadB64) {
             mod: mod,   
             Interrupt_level: Interrupt_level,
             interrupt: interrupt,
+            Ds18b20_temp :Ds18b20_temp,
+            Ds18b20_temp1 :Ds18b20_temp1,
             distance: distance,
             distance1: distance1,
             Latitude: Latitude,
@@ -106,6 +110,7 @@ function Decoder(payload, payloadB64) {
     var mainmod = payload.mod;
     var mainInterrupt_level = payload.Interrupt_level;
     var maininterrupt = payload.interrupt;
+    var mainDs18b20_temp = payload.Ds18b20_temp;
     var maindistance = payload.distance;
     var mainLatitude  = payload.Latitude;
     var mainLongitude  = payload.Longitude;
@@ -140,6 +145,11 @@ function Decoder(payload, payloadB64) {
         timestamp: mainTimestamp
     });
     result.push({
+        field: "Ds18b20_temp",
+        value: mainDs18b20_temp,
+        timestamp: mainTimestamp
+    });
+    result.push({
         field: "distance",
         value: maindistance,
         timestamp: mainTimestamp
@@ -164,12 +174,17 @@ function Decoder(payload, payloadB64) {
     for (var i = 0; i < dataSet.length; i++) {
         var data = dataSet[i];
         var distance1 = data.distance1;
-      
+        var Ds18b20_temp1 = data.Ds18b20_temp1;
         var timestamp = data.timestamp;
         
         result.push({
             field: "distance",
             value: distance1,
+            timestamp: timestamp
+        });
+         result.push({
+            field: "Ds18b20_temp",
+            value: Ds18b20_temp1,
             timestamp: timestamp
         });
     }
