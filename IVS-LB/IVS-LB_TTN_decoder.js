@@ -27,7 +27,10 @@ function Decoder(bytes, port) {
 function decodeDeviceInfo(bytes) {
   var freq_band;
   var sub_band;
-  var sensor = "IVS-LB";
+   var sensor;
+   if(bytes[0]==0x51)
+      sensor= "IVS-LB";
+ 
 
   if (!bytes || bytes.length < 7) {
     return {
