@@ -55,7 +55,7 @@ function Decoder(bytes, port) {
 	}	
 	if((bytes[17]>>3&0x01)==1)
 	{	
-     decode.TSR=bytes[18+k]<<8 | bytes[19+k];
+     decode.TSR=(bytes[18+k]<<8 | bytes[19+k])/10;
       k=k+2;	 
 	}
 	if((bytes[17]>>4&0x01)==1)
