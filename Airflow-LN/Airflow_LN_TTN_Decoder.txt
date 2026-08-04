@@ -139,7 +139,7 @@ function getMyDate(str){
         case 5:
         { 
             if(bytes[0]==0x16)
-                data.SENSOR_MODEL= "PS-LB";
+                data.SENSOR_MODEL= "Airflow-LN;
             
             if(bytes[4]==0xff)
                 data.SUB_BAND="NULL";
@@ -177,7 +177,7 @@ function getMyDate(str){
                 
             data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
             data.BAT= (bytes[5]<<8 | bytes[6])/1000;
-			data.Node_type="PS-LB";
+			data.Node_type="Airflow-LN";
         }
         return {
             data: data,
@@ -193,7 +193,7 @@ function getMyDate(str){
             else
                 data_sum+=data1;
         }
-        data.Node_type="PS-LB";
+        data.Node_type="Airflow-LN";
         data.DATALOG2=data_sum;
         data.PNACKMD=pnack;
         return {
@@ -210,7 +210,7 @@ function getMyDate(str){
                 else
                     data_sum+=data1;
             }
-            data.Node_type="PS-LB";
+            data.Node_type="Airflow-LN
             data.Bat_V=Bat;
             data.DATALOG=data_sum;
         return {
@@ -218,7 +218,7 @@ function getMyDate(str){
         }
         break;
         default:
-		    data.Node_type="PS-LB";
+		    data.Node_type="Airflow-LN";
             data.Bat_V = (bytes[0]<<8 | bytes[1])/1000;
             data.Probe_mod = str_pad(bytes[2])+str_pad(bytes[3]);   
             var IDC_intput_mA = (bytes[4]<<8 | bytes[5])/1000;  
