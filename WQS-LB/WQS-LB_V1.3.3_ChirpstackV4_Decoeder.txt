@@ -1,0 +1,166 @@
+function decodeUplink(input) {
+  var bytes = input.bytes;
+  var port = input.fPort;
+  var result = {};   
+  if (port === 0x02) {
+    var decode = {};
+
+
+    decode.BatV = ((bytes[0] << 8 | bytes[1]) & 0x3FFF) / 1000;
+
+
+    var value = bytes[2] << 8 | bytes[3];
+    if (bytes[2] & 0x80) {
+      value |= 0xFFFF0000;
+    }
+    decode.temp_DS18B20 = (value / 10).toFixed(2);
+
+    decode.i_flag = bytes[4] & 0x01;
+
+
+    var sensor_type3 = bytes[5] & 0xFF;
+    var sensor_type2 = bytes[6] & 0xFF;
+    var sensor_type  = bytes[7] & 0xFF;
+
+    var j = 8;
+
+
+    if (((sensor_type >> 5) & 0x01) === 1) {
+      decode.turbidity = (bytes[j] << 8 | bytes[j + 1]) / 10;
+      j += 2;
+    }
+    if (((sensor_type >> 4) & 0x01) === 1) {
+      decode.dissolved_oxygen = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      decode.do_temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 100;
+      j += 4;
+    }
+    if (((sensor_type >> 3) & 0x01) === 1) {
+      decode.ORP = (bytes[j] << 24 >> 16 | bytes[j + 1]);
+      j += 2;
+    }
+    if (((sensor_type >> 2) & 0x01) === 1) {
+      decode.EC_K10 = (bytes[j] << 8 | bytes[j + 1]) * 10;
+      decode.EC10_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if (((sensor_type >> 1) & 0x01) === 1) {
+      decode.EC_K1 = bytes[j] << 8 | bytes[j + 1];
+      decode.EC1_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if ((sensor_type & 0x01) === 1) {
+      decode.PH = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      decode.PH_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if (((sensor_type >> 6) & 0x01) === 1) {
+      decode.RC_2A = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      j += 2;
+    }
+    if (((sensor_type >> 7) & 0x01) === 1) {
+      decode.RC_10A = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      j += 2;
+    }
+
+
+    if (((sensor_type2 >> 1) & 0x01) === 1) {
+      decode.turbidity_200 = (bytes[j] << 8 | bytes[j + 1]) / 10;
+      decode.turbidity_200_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if (((sensor_type2 >> 2) & 0x01) === 1) {
+      decode.turbidity_4000 = (bytes[j] << 8 | bytes[j + 1]) / 10;
+      decode.turbidity_4000_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if ((sensor_type2 & 0x01) === 1) {
+      decode.Four_EC = bytes[j] << 16 | bytes[j + 1] << 8 | bytes[j + 2];
+      decode.Salinity = (bytes[j + 3] << 8 | bytes[j + 4]) / 10;
+      decode.Four_EC_Temp = (bytes[j + 5] << 8 | bytes[j + 6]) / 10;
+      j += 7;
+    }
+    if (((sensor_type2 >> 3) & 0x01) === 1) {
+      decode.DO_Saturation = (bytes[j] << 8 | bytes[j + 1]) / 10;
+      decode.DO_Concentration = (bytes[j + 2] << 8 | bytes[j + 3]) / 100;
+      decode.DOSEA_Temp = (bytes[j + 4] << 8 | bytes[j + 5]) / 10;
+      j += 6;
+    }
+    if (((sensor_type2 >> 4) & 0x01) === 1) {
+      decode.COD = (bytes[j] << 8 | bytes[j + 1]) / 10;
+      decode.COD_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      decode.COD_turbidity = (bytes[j + 4] << 8 | bytes[j + 5]) / 10;
+      j += 6;
+    }
+    if (((sensor_type2 >> 5) & 0x01) === 1) {
+      decode.PH2 = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      decode.PH2_Temp = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if (((sensor_type2 >> 6) & 0x01) === 1) {
+      decode.EC_K10_2 = (bytes[j] << 8 | bytes[j + 1]) * 10;
+      decode.EC10_Temp2 = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+    if (((sensor_type2 >> 7) & 0x01) === 1) {
+      decode.EC_K1_2 = bytes[j] << 8 | bytes[j + 1];
+      decode.EC1_Temp2 = (bytes[j + 2] << 8 | bytes[j + 3]) / 10;
+      j += 4;
+    }
+
+ 
+    if ((sensor_type3 & 0x01) === 1) {
+      decode.dissolved_oxygen2 = (bytes[j] << 8 | bytes[j + 1]) / 100;
+      decode.do_temp2 = (bytes[j + 2] << 8 | bytes[j + 3]) / 100;
+      j += 4;
+    }
+
+    result = decode;
+  }
+
+ 
+  else if (port === 0x05) {
+    var sensor, sub_band, freq_band;
+
+    if (bytes[0] === 0x3C) {
+      sensor = "WQS01-LB";
+    }
+
+    if (bytes[4] === 0xff) {
+      sub_band = "NULL";
+    } else {
+      sub_band = bytes[4];
+    }
+
+    var freq_code = bytes[3];
+    if (freq_code === 0x01) freq_band = "EU868";
+    else if (freq_code === 0x02) freq_band = "US915";
+    else if (freq_code === 0x03) freq_band = "IN865";
+    else if (freq_code === 0x04) freq_band = "AU915";
+    else if (freq_code === 0x05) freq_band = "KZ865";
+    else if (freq_code === 0x06) freq_band = "RU864";
+    else if (freq_code === 0x07) freq_band = "AS923";
+    else if (freq_code === 0x08) freq_band = "AS923_1";
+    else if (freq_code === 0x09) freq_band = "AS923_2";
+    else if (freq_code === 0x0A) freq_band = "AS923_3";
+    else if (freq_code === 0x0B) freq_band = "CN470";
+    else if (freq_code === 0x0C) freq_band = "EU433";
+    else if (freq_code === 0x0D) freq_band = "KR920";
+    else if (freq_code === 0x0E) freq_band = "MA869";
+
+    var firm_ver = (bytes[1] & 0x0f) + '.' + ((bytes[2] >> 4) & 0x0f) + '.' + (bytes[2] & 0x0f);
+    var bat = (bytes[5] << 8 | bytes[6]) / 1000;
+
+    result = {
+      SENSOR_MODEL: sensor,
+      FIRMWARE_VERSION: firm_ver,
+      FREQUENCY_BAND: freq_band,
+      SUB_BAND: sub_band,
+      BAT: bat
+    };
+  }
+
+
+  return {
+    data: result
+  };
+}
