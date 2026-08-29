@@ -1,0 +1,422 @@
+// v1.5.0_v1.0.0
+
+function decodeUplink(input) {
+  return {
+      data: Decode(input.fPort, input.bytes, input.variables)
+  };
+}
+
+function datalog(i,bytes){
+  var aa= parseFloat((bytes[i]<<24>>16 | bytes[i+1])/1000).toFixed(3);
+  var bb= parseFloat((bytes[i+2]<<24>>16 | bytes[i+3])/1000).toFixed(3);
+  var cc= parseFloat((bytes[i+4]<<24>>16 | bytes[i+5])/1000).toFixed(3);
+  var string='[('+ aa +'),'+'('+ bb +'),' +'('+ cc +')]'+',';
+  return string;
+}
+
+function datalog_pnackmd_retrieval(i, bytes) {
+    var value1 = (bytes[i] << 24 >>> 16) | bytes[i + 1];
+    var value2 = (bytes[i + 2] << 24 >> 0) | (bytes[i + 3] << 24 >> 8) | (bytes[i + 4] << 24 >> 16) | bytes[i + 5];
+    var temp_raw = (bytes[i + 2] << 8) | bytes[i + 3];
+    var hum_raw  = (bytes[i + 4] << 8) | bytes[i + 5];
+
+    var value3 = bytes[i + 6];
+    var value4 = (((bytes[i + 7] << 24) | (bytes[i + 8] << 16) | (bytes[i + 9] << 8) | bytes[i + 10]) >>> 0);
+
+    var symbol = value3;
+    var timestamp_utc = value4;
+
+    var packet_type;
+
+    if ((symbol & 0xC0) === 0x80) {
+      packet_type = "pnackmd";
+    } else if ((symbol & 0xC0) === 0x40) {
+      packet_type = "retrieval";
+    }
+    var mode     = (symbol & 0x0C) >> 2;
+    var is_tdc   = (symbol & 0x02) ? 'YES' : 'NO';
+    var is_alarm = (symbol & 0x01) ? 'TRUE' : 'FALSE';
+
+    var vib_count;
+    var vib_time;
+    var sht_temp;
+    var sht_hum;
+
+
+    var datetime_utc = formatTimestamp(timestamp_utc);
+
+    var string;
+    var string_common = 'timestamp_utc:' + timestamp_utc + ', ' + 'datetime_utc:' + datetime_utc + ', ' + 'packet_type:' + packet_type + ', ' + 'mode:' + mode + ', ' + 'TDC:' + is_tdc + ', ' + 'Alarm:' + is_alarm + ', ';
+
+    if (mode === 1) {
+      vib_count = value1;
+
+      vib_time  = value2;
+
+      string = '[' + string_common + 'vib_count:' + vib_count + ', ' + 'work_min:' + vib_time + ']';
+    } else if (mode === 2) {
+      vib_count = value1;
+
+      sht_temp = (temp_raw << 16) >> 16;
+      sht_hum  = (hum_raw  << 16) >> 16;
+      sht_temp = parseFloat((sht_temp / 100).toFixed(2));
+      sht_hum  = parseFloat((sht_hum / 10).toFixed(1));
+
+      string = '[' + string_common + 'vib_count:' + vib_count + ', ' + 'TempC_SHT:' + sht_temp + ', ' + 'Hum_SHT:' + sht_hum + ']';
+    } else if (mode === 3) {
+      vib_time = value1;
+
+      sht_temp = (temp_raw << 16) >> 16;
+      sht_hum  = (hum_raw  << 16) >> 16;
+      sht_temp = parseFloat((sht_temp / 100).toFixed(2));
+      sht_hum  = parseFloat((sht_hum / 10).toFixed(1));
+
+      string = '[' + string_common + 'work_min:'  + vib_time  + ', '  + 'TempC_SHT:' + sht_temp + ', ' + 'Hum_SHT:' + sht_hum + ']';
+    }
+
+    return string;
+}
+
+function is_pnackmd_or_retrieval(symbol) {
+  return (symbol >= 0x44 && symbol <= 0x4F) || (symbol >= 0x84 && symbol <= 0x8F);
+}
+
+function is_regular(symbol) {
+  return symbol >= 0x04 && symbol <= 0x0F;
+}
+
+function getOdrStringByByte(bytes) {
+  const map = {
+    0x01: "1Hz",
+    0x02: "10Hz",
+    0x03: "25Hz",
+    0x04: "50Hz",
+    0x05: "100Hz",
+    0x06: "200Hz",
+    0x07: "400Hz",
+    0x08: "1600Hz",
+    0x09: "1344Hz"
+  };
+  return map[bytes] ?? "OdrStringNotFound";
+}
+
+function getOpmdStringByByte(bytes) {
+  const map = {
+    0x00: "HR mode (12 bit)",
+    0x01: "Normal mode (10 bit)",
+    0x02: "Low-power mode (8 bit)"
+  };
+  return map[bytes] ?? "OpmdStringNotFound";
+}
+
+function getFsStringByByte(bytes) {
+  const map = {
+    0x00: "2g",
+    0x01: "4g",
+    0x02: "8g",
+    0x03: "16g"
+  };
+  return map[bytes] ?? "FsStringNotFound";
+}
+
+function formatTimestamp(timestamp, unit, separator) {
+    if (unit === undefined) {
+        unit = 's';
+    }
+    if (separator === undefined) {
+        separator = ' ';
+    }
+
+    var ts = Number(timestamp);
+
+    if (isNaN(ts)) {
+        throw new Error('Invalid timestamp: Must be a number');
+    }
+
+    if (unit === 's') ts *= 1000;
+    else if (unit !== 'ms') throw new Error('Invalid unit');
+
+    const date = new Date(ts);
+
+    if (isNaN(date.getTime())) {
+        throw new Error('Invalid timestamp: Cannot be converted to a valid date');
+    }
+
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, '0');
+    var day = String(date.getDate()).padStart(2, '0');
+    var hours = String(date.getHours()).padStart(2, '0');
+    var minutes = String(date.getMinutes()).padStart(2, '0');
+    var seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return year + '-' + month + '-' + day + separator + hours + ':' + minutes + ':' + seconds;
+}
+
+function Decode(fPort, bytes, variables) {
+  var decode = {};
+  if(fPort==0x02)
+  {
+    if (bytes.length > 11) {
+      if (bytes.length % 11 === 0) {
+        var data_sum_pnackmd_retrieval = "";
+
+        for (var j = 0; j < bytes.length; j += 11) {
+            data_sum_pnackmd_retrieval += datalog_pnackmd_retrieval(j, bytes);
+            if (j < bytes.length - 11) {
+                data_sum_pnackmd_retrieval += ', ';
+            }
+        }
+
+        decode.Datalog = data_sum_pnackmd_retrieval;
+
+        decode.NodeType = "LHT65N-VIB";
+
+        return decode;
+      } else {
+        decode.Error = "Unrecognized uplink";
+
+        decode.NodeType = "LHT65N-VIB";
+
+        return decode;
+      }
+    } else if (bytes.length === 11) {
+      var symbol_position_regular = bytes[2];
+      var symbol_position_pnackmd_or_retrieval = bytes[6];
+
+      if (is_regular(symbol_position_regular) === false && is_pnackmd_or_retrieval(symbol_position_pnackmd_or_retrieval) === true) {
+        decode.Datalog = datalog_pnackmd_retrieval(0, bytes);
+
+        decode.NodeType = "LHT65N-VIB";
+
+        return decode;
+      } else if (is_regular(symbol_position_regular) === true && is_pnackmd_or_retrieval(symbol_position_pnackmd_or_retrieval) === false) {
+        decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
+        var mod=(bytes[2]>>2)&0x07;
+        if(mod==1)
+        {
+          decode.vib_count=(bytes[3]<<24 | bytes[4]<<16 | bytes[5]<<8 | bytes[6])>>>0;
+          decode.work_min=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10])>>>0;
+        }
+        else if(mod==2)
+        {
+          decode.vib_count=(bytes[3]<<24 | bytes[4]<<16 | bytes[5]<<8 | bytes[6])>>>0;
+          decode.TempC_SHT=parseFloat(((bytes[7]<<24>>16 | bytes[8])/100).toFixed(2));
+          decode.Hum_SHT=parseFloat((((bytes[9]<<8 | bytes[10])&0xFFF)/10).toFixed(1));
+        }
+        else if(mod==3)
+        {
+          decode.TempC_SHT=parseFloat(((bytes[3]<<24>>16 | bytes[4])/100).toFixed(2));
+          decode.Hum_SHT=parseFloat((((bytes[5]<<8 | bytes[6])&0xFFF)/10).toFixed(1));
+          decode.work_min=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10])>>>0;
+        }
+
+        decode.Alarm= (bytes[2] & 0x01)? "TRUE":"FALSE";
+        decode.TDC  = (bytes[2] & 0x02)? "YES":"NO";
+        decode.Node_type="LHT65N-VIB";
+
+        // if(bytes.length==11)
+          return decode;
+      } else if (is_regular(symbol_position_regular) === true && is_pnackmd_or_retrieval(symbol_position_pnackmd_or_retrieval) === true) {
+        // decode.Error = "Unrecognized uplink"
+        decode.Datalog = datalog_pnackmd_retrieval(0, bytes);
+
+        decode.NodeType = "LHT65N-VIB";
+
+        return decode;
+      }
+    } else {
+        decode.Error = "Unrecognized uplink";
+
+        decode.NodeType = "LHT65N-VIB";
+
+        return decode;
+    }
+  }
+  else if(fPort==7)
+  {
+    var data_sum = "";
+    var data;
+    var Bat= (bytes[0]<<8 | bytes[1])/1000;
+    for(var k=2;k<bytes.length;k=k+6)
+    {
+      data= datalog(k,bytes);
+      if(k=='2')
+        data_sum=data;
+      else
+        data_sum+=data;
+    }
+    return{
+	Node_type:"LHT65N-VIB",
+    Bat_V:Bat,
+    DATALOG:data_sum
+    };
+  }
+  else if (fPort === 9) {
+    decode.BatV = (bytes[0] << 8 | bytes[1]) / 1000;
+
+    decode.max_acc_x_g = parseFloat((bytes[2] << 24 >> 16 | bytes[3]) / 1000).toFixed(3);
+    decode.max_acc_y_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
+    decode.max_acc_z_g = parseFloat((bytes[6] << 24 >> 16 | bytes[7]) / 1000).toFixed(3);
+
+    decode.Node_type = "LHT65N-VIB";
+
+    if (bytes.length === 8)
+      return decode;
+  }
+  else if (fPort === 12) {
+    if (bytes[0] === 0x0B) {
+      if (bytes[1] === 0x05 && bytes[2] === 0x00) {
+        decode.odr = getOdrStringByByte(bytes[3]);
+        decode.op_md = getOpmdStringByByte(bytes[4]);
+        decode.fs = getFsStringByByte(bytes[5]);
+        decode.watermark = bytes[6];
+        decode.TDC_sec = (bytes[7] << 8) | bytes[8];
+
+        decode.Node_type = "LHT65N-VIB";
+
+        if (bytes.length === 9)
+          return decode;
+      } else if (bytes[1] === 0x06) {
+        if (bytes[2] === 0x00) {
+          decode.odr = getOdrStringByByte(bytes[3]);
+          decode.op_md = getOpmdStringByByte(bytes[4]);
+          decode.fs = getFsStringByByte(bytes[5]);
+          decode.watermark = bytes[6];
+          decode.TDC_sec = (bytes[7] << 8) | bytes[8];
+
+          decode.Node_type = "LHT65N-VIB";
+
+          if (bytes.length === 9)
+            return decode;
+        } else if (bytes[2] === 0x01) {
+          decode.start_thld_mg = (bytes[3] << 8) | bytes[4];
+          decode.stop_thld_mg = (bytes[5] << 8) | bytes[6];
+          decode.start_debounce = bytes[7];
+          decode.stop_debounce = bytes[8];
+
+          decode.Node_type = "LHT65N-VIB";
+
+          if (bytes.length === 9)
+            return decode;
+        } else if (bytes[2] === 0x02) {
+          decode.exit_timeout_sec = (bytes[3] << 8) | bytes[4];
+          decode.stop_finish_timeout_sec = (bytes[5] << 8) | bytes[6];
+
+          decode.Node_type = "LHT65N-VIB";
+
+          if (bytes.length === 7)
+            return decode;
+        } else if (bytes[2] === 0x03) {
+          decode.hp_stable_thld_mg = (bytes[3] << 8) | bytes[4];
+          decode.hp_stable_samples = (bytes[5] << 8) | bytes[6];
+          decode.hp_recalib_intvl_sec = (bytes[7] << 8) | bytes[8];
+
+          decode.Node_type = "LHT65N-VIB";
+
+          if (bytes.length === 9)
+            return decode;
+        }
+      }
+    }
+  }
+  else if (fPort === 14) {
+    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
+
+    decode.ambient_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
+    decode.ambient_acc_y_g = parseFloat((bytes[6] << 24 >> 16 | bytes[7]) / 1000).toFixed(3);
+    decode.ambient_acc_z_g = parseFloat((bytes[8] << 24 >> 16 | bytes[9]) / 1000).toFixed(3);
+
+    decode.BatV = (bytes[10] * 20) / 1000;
+
+    decode.Node_type = "LHT65N-VIB";
+
+    if (bytes.length === 11)
+      return decode;
+  }
+  else if (fPort === 15) {
+    if (bytes.length === 10) {
+      decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+      decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
+
+      decode.start_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
+      decode.start_acc_y_g = parseFloat((bytes[6] << 24 >> 16 | bytes[7]) / 1000).toFixed(3);
+      decode.start_acc_z_g = parseFloat((bytes[8] << 24 >> 16 | bytes[9]) / 1000).toFixed(3);
+
+      decode.Node_type = "LHT65N-VIB";
+
+      return decode;
+    }
+  }
+  else if (fPort === 16) {
+    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
+
+    decode.peak_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
+    decode.peak_acc_y_g = parseFloat((bytes[6] << 24 >> 16 | bytes[7]) / 1000).toFixed(3);
+    decode.peak_acc_z_g = parseFloat((bytes[8] << 24 >> 16 | bytes[9]) / 1000).toFixed(3);
+    decode.Duration_ms = (bytes[10] << 8) | bytes[11];
+    decode.MergedSessionCount = bytes[12];
+
+    decode.Node_type = "LHT65N-VIB";
+
+    return decode;
+  }
+  else if(fPort==5)
+  {
+  	var freq_band;
+  	var sub_band;
+    var sensor;
+
+    if(bytes[0]==0x3F)
+      sensor= "LHT65N-VIB";
+
+	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+
+    if(bytes[3]==0x01)
+        freq_band="EU868";
+  	else if(bytes[3]==0x02)
+        freq_band="US915";
+  	else if(bytes[3]==0x03)
+        freq_band="IN865";
+  	else if(bytes[3]==0x04)
+        freq_band="AU915";
+  	else if(bytes[3]==0x05)
+        freq_band="KZ865";
+  	else if(bytes[3]==0x06)
+        freq_band="RU864";
+  	else if(bytes[3]==0x07)
+        freq_band="AS923";
+  	else if(bytes[3]==0x08)
+        freq_band="AS923_1";
+  	else if(bytes[3]==0x09)
+        freq_band="AS923_2";
+  	else if(bytes[3]==0x0A)
+        freq_band="AS923_3";
+  	else if(bytes[3]==0x0F)
+        freq_band="AS923_4";
+  	else if(bytes[3]==0x0B)
+        freq_band="MA869";
+  	else if(bytes[3]==0x0C)
+        freq_band="KR920";
+  	else if(bytes[3]==0x0D)
+        freq_band="EU433";
+  	else if(bytes[3]==0x0E)
+        freq_band="CN470";
+
+    if(bytes[4]==0xff)
+      sub_band="NULL";
+	  else
+      sub_band=bytes[4];
+
+    var bat= (bytes[5]<<8 | bytes[6])/1000;
+
+  	return {
+  	  SENSOR_MODEL:sensor,
+      FIRMWARE_VERSION:firm_ver,
+      FREQUENCY_BAND:freq_band,
+      SUB_BAND:sub_band,
+      BAT:bat,
+  	}
+  }
+}
