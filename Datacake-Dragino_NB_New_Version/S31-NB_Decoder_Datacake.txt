@@ -66,12 +66,14 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 16 <= hex.length) {
             var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
             var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ shtTemp: shtTemp, shtHum: shtHum, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({ shtTemp: shtTemp, shtHum: shtHum, timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -87,6 +89,8 @@ function Decoder(payload, payloadB64) {
             shtTemp: shtTemp,
             shtHum: shtHum,
             timestamp: timestamp,
+            PA4_level: PA4_level,
+            Interrupt_level: Interrupt_level,
             dataSet: dataSet
         };
     }

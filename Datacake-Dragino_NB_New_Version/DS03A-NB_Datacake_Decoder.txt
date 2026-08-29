@@ -63,13 +63,15 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 22 <= hex.length) {
             var Dorr_status = toInt(hex.substr(offset, 2)); offset += 2;
             var Door_open_num = toInt(hex.substr(offset, 6)); offset += 6;
             var Last_open_times = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Dorr_status:Dorr_status, Door_open_num: Door_open_num, Last_open_times: Last_open_times, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({Dorr_status:Dorr_status, Door_open_num: Door_open_num, Last_open_times: Last_open_times, timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -84,6 +86,7 @@ function Decoder(payload, payloadB64) {
             Alarm_status: Alarm_status,
             Door_open_num: Door_open_num,
             Last_open_times: Last_open_times,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }

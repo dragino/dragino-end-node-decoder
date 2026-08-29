@@ -64,12 +64,14 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 16 <= hex.length) {
             var Soil_PH = toInt(hex.substr(offset, 4), 16)/ 100; offset += 4;
             var Soil_Temperature = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({  Soil_PH: Soil_PH, Soil_Temperature: Soil_Temperature,timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({  Soil_PH: Soil_PH, Soil_Temperature: Soil_Temperature,timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,

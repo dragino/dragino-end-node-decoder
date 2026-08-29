@@ -67,12 +67,14 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 16 <= hex.length) {
             var IDC_intput_mA = toInt(hex.substr(offset, 4)); offset += 4;
             var VDC_intput_V = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ IDC_intput_mA: IDC_intput_mA,VDC_intput_V:VDC_intput_V,  timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({ IDC_intput_mA: IDC_intput_mA,VDC_intput_V:VDC_intput_V,  timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,

@@ -97,13 +97,15 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 20 <= hex.length) {
             var temp1 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var temp2 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var temp3 = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({  temp1: temp1, temp2: temp2,temp3: temp3,timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({  temp1: temp1, temp2: temp2,temp3: temp3,timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,

@@ -62,11 +62,13 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 12 <= hex.length) {
             var Distance = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Distance: Distance,    timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({Distance: Distance,    timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,

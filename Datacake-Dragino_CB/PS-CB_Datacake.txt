@@ -34,7 +34,7 @@ function Decoder(payload, payloadB64) {
         }
 
         var deviceID = hex.substr(offset, 16); offset += 16;
-        var MSI = hex.substr(offset, 16); offset += 16;
+        var IMSI = hex.substr(offset, 16); offset += 16;
         var versionStr = hex.substr(offset, 4); offset += 4;
         var version = toInt(versionStr) / 100;
         var battery = toInt(hex.substr(offset, 4)) / 1000; offset += 4;
@@ -76,12 +76,14 @@ function Decoder(payload, payloadB64) {
         }
         
         var dataSet = [];
-        while (offset < hex.length) {
+        while (offset + 16 <= hex.length) {
             var IDC_input1 = toInt(hex.substr(offset, 4))/1000; offset += 4;
             var VDC_input1 = toInt(hex.substr(offset, 4))/1000; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ IDC_input1: IDC_input1, VDC_input1: VDC_input1,timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({ IDC_input1: IDC_input1, VDC_input1: VDC_input1,timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -103,8 +105,8 @@ function Decoder(payload, payloadB64) {
             Longitude: Longitude,
             timestamp: timestamp,
             gps_timestamp: gps_timestamp,
-            dataSet: dataSet,
-        };
+            IMSI: IMSI,
+            dataSet: dataSet,        };
     }
 
     var payloadHex = bytesToHex(payloadB64);

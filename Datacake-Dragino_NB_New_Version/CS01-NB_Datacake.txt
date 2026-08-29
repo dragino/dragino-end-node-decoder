@@ -66,14 +66,16 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 32 <= hex.length) {
            var Current_Chan1 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
            var Current_Chan2 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
            var Current_Chan3 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
            var Current_Chan4 = parseInt(hex.substr(offset, 6))/1000; offset += 6;
            var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Current_Chan1:Current_Chan1, Current_Chan2:Current_Chan2,Current_Chan3:Current_Chan3,Current_Chan4:Current_Chan4, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({Current_Chan1:Current_Chan1, Current_Chan2:Current_Chan2,Current_Chan3:Current_Chan3,Current_Chan4:Current_Chan4, timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -92,6 +94,7 @@ function Decoder(payload, payloadB64) {
             Current_Chan2:Current_Chan2,
             Current_Chan3:Current_Chan3,
             Current_Chan4:Current_Chan4,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }

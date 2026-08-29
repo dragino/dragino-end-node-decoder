@@ -70,14 +70,16 @@ function Decoder(payload, payloadB64) {
         }
 
         var dataset = [];
-        while (offset < hex.length) {
+        while (offset + 28 <= hex.length) {
             var PA8_status1 = parseInt(hex.substr(offset, 2), 16); offset += 2;
             var count_time11 = toInt(hex.substr(offset, 6)); offset += 6;
             var count_time22 = toInt(hex.substr(offset, 6)); offset += 6;
             var count_time33 = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataset.push({ PA8_status1: PA8_status1,count_time11: count_time11,count_time22: count_time22,count_time33: count_time33, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataset.push({ PA8_status1: PA8_status1,count_time11: count_time11,count_time22: count_time22,count_time33: count_time33, timestamp: timestampLog });
+            }
+            }
         return {
             deviceID: deviceID,
             IMSI:IMSI,

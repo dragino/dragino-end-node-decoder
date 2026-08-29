@@ -64,13 +64,15 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 22 <= hex.length) {
             var Leak_status = toInt(hex.substr(offset, 2)); offset += 2;
             var Leak_times = toInt(hex.substr(offset, 6)); offset += 6;
             var Last_leak_duration = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ Leak_times: Leak_times, Last_leak_duration: Last_leak_duration, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({ Leak_times: Leak_times, Last_leak_duration: Last_leak_duration, timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,

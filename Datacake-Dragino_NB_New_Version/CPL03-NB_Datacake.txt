@@ -37,7 +37,7 @@ function Decoder(payload, payloadB64) {
         var PA8_last_open_time = toInt(hex.substr(offset, 6)); offset += 6;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         var dataset = [];
-        while (offset < hex.length) {
+        while (offset + 22 <= hex.length) {
             var PA8_status1 = parseInt(hex.substr(offset, 2), 16); offset += 2;
             var count_mode1 = (PA8_status1 >> 5) & 0x01; 
             var tdc_send_flag1 = (PA8_status1 >> 4) & 0x01; 
@@ -47,8 +47,10 @@ function Decoder(payload, payloadB64) {
             var PA8_door_open_num1 = toInt(hex.substr(offset, 6)); offset += 6;
             var PA8_last_open_time1 = toInt(hex.substr(offset, 6)); offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataset.push({ PA8_status1: PA8_status1,count_mode1: count_mode1,tdc_send_flag1: tdc_send_flag1,trigger_mode1: trigger_mode1,pa8_alarm_status1: pa8_alarm_status1,pa8_level_status1: pa8_level_status1, PA8_door_open_num1: PA8_door_open_num1,PA8_last_open_time1: PA8_last_open_time1, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataset.push({ PA8_status1: PA8_status1,count_mode1: count_mode1,tdc_send_flag1: tdc_send_flag1,trigger_mode1: trigger_mode1,pa8_alarm_status1: pa8_alarm_status1,pa8_level_status1: pa8_level_status1, PA8_door_open_num1: PA8_door_open_num1,PA8_last_open_time1: PA8_last_open_time1, timestamp: timestampLog });
+            }
+            }
         return {
             deviceID: deviceID,
             IMSI:IMSI,
@@ -83,20 +85,22 @@ function Decoder(payload, payloadB64) {
         var count_time3 = toInt(hex.substr(offset, 6)) ; offset += 6;
         var timestamp = toInt(hex.substr(offset, 8)); offset += 8;
         var dataset = [];
-        while (offset < hex.length) {
-            var PA8_status1 = toInt(hex.substr(offset, 2), 16) ; offset += 2;
-            var tdc_send_flag = (PA8_status1 >> 4) & 0x01; 
-            var trigger_mode = (PA8_status1 >> 2) & 0x01; 
-            var pa8_alarm_status = (PA8_status1 >> 1) & 0x01; 
-            var pa8_level_status = PA8_status1 & 0x01;
-            var PA8_door_open_num1 = toInt(hex.substr(offset, 6)); offset += 6;
-            var PA8_last_open_time1 = toInt(hex.substr(offset, 6)); offset += 6;
+        while (offset + 40 <= hex.length) {
+            var logPA8_status1 = toInt(hex.substr(offset, 2), 16) ; offset += 2;
+            var logTdc_send_flag = (logPA8_status1 >> 4) & 0x01; 
+            var logTrigger_mode = (logPA8_status1 >> 2) & 0x01; 
+            var logPa8_alarm_status = (logPA8_status1 >> 1) & 0x01; 
+            var logPa8_level_status = logPA8_status1 & 0x01;
+            var logPA8_door_open_num1 = toInt(hex.substr(offset, 6)); offset += 6;
+            var logPA8_last_open_time1 = toInt(hex.substr(offset, 6)); offset += 6;
             var count_time11 = toInt(hex.substr(offset, 6)); offset += 6;
             var count_time22 = toInt(hex.substr(offset, 6)); offset += 6;
             var count_time33 = toInt(hex.substr(offset, 6)) ; offset += 6;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataset.push({ PA8_status1: PA8_status1,count_mode: count_mode,tdc_send_flag: tdc_send_flag,trigger_mode: trigger_mode,pa8_alarm_status: pa8_alarm_status,pa8_level_status: pa8_level_status, count_time11: count_time11,count_time22: count_time22,count_time33: count_time33,  timestamp: timestampLog });
-			}
+            if (timestampLog > 0) {
+                dataset.push({ PA8_status1: logPA8_status1,count_mode: count_mode,tdc_send_flag: logTdc_send_flag,trigger_mode: logTrigger_mode,pa8_alarm_status: logPa8_alarm_status,pa8_level_status: logPa8_level_status, count_time11: count_time11,count_time22: count_time22,count_time33: count_time33,  timestamp: timestampLog });
+            }
+            }
         return {
             deviceID: deviceID,
             IMSI:IMSI,

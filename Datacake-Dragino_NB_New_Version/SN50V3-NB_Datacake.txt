@@ -52,14 +52,22 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             tempDS18B20: tempDS18B20,
-            PA4_LEVEL: PA4_LEVEL
+            tempDS18B201: tempDS18B20,
+            PA4_LEVEL: PA4_LEVEL,
             interrupt: interrupt,
             interrupt_level: interrupt_level,
             adc: adc,
             shtTemp: shtTemp,
             shtHum: shtHum,
-            timestamp: timestamp,
-   
+            timestamp: timestamp,            IMSI: IMSI,
+            ADC1: ADC1,
+            ADC2: ADC2,
+            ADC3: ADC3,
+            Distance: Distance,
+            Weigt: Weigt,
+            pulse_count: pulse_count,
+            tempDS18B202: tempDS18B202,
+            tempDS18B203: tempDS18B203,
         };
         }
         
@@ -82,14 +90,20 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             tempDS18B20: tempDS18B20,
-            PA4_LEVEL: PA4_LEVEL
+            tempDS18B201: tempDS18B20,
+            PA4_LEVEL: PA4_LEVEL,
             interrupt: interrupt,
             interrupt_level: interrupt_level,
             adc: adc,
             timestamp: timestamp,
-            Distance : Distance,
-   
-            
+            Distance : Distance,            IMSI: IMSI,
+            ADC1: ADC1,
+            ADC2: ADC2,
+            ADC3: ADC3,
+            Weigt: Weigt,
+            pulse_count: pulse_count,
+            tempDS18B202: tempDS18B202,
+            tempDS18B203: tempDS18B203,
         };
         }
         if (mod == 3)
@@ -113,7 +127,8 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             tempDS18B20: tempDS18B20,
-            PA4_LEVEL: PA4_LEVEL
+            tempDS18B201: tempDS18B20,
+            PA4_LEVEL: PA4_LEVEL,
             interrupt: interrupt,
             interrupt_level: interrupt_level,
             adc: adc,
@@ -122,9 +137,12 @@ function Decoder(payload, payloadB64) {
             timestamp: timestamp,
             ADC1: ADC1,
             ADC2: ADC2,
-            ADC3: ADC3,
-     
-            
+            ADC3: ADC3,            IMSI: IMSI,
+            Distance: Distance,
+            Weigt: Weigt,
+            pulse_count: pulse_count,
+            tempDS18B202: tempDS18B202,
+            tempDS18B203: tempDS18B203,
         };
         }
         if (mod == 4)
@@ -147,14 +165,20 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             tempDS18B20: tempDS18B20,
-            PA4_LEVEL: PA4_LEVEL
+            tempDS18B201: tempDS18B20,
+            PA4_LEVEL: PA4_LEVEL,
             interrupt: interrupt,
             interrupt_level: interrupt_level,
             adc: adc,
             timestamp: timestamp,
             tempDS18B202: tempDS18B202,
-            tempDS18B203: tempDS18B203,
-     
+            tempDS18B203: tempDS18B203,            IMSI: IMSI,
+            ADC1: ADC1,
+            ADC2: ADC2,
+            ADC3: ADC3,
+            Distance: Distance,
+            Weigt: Weigt,
+            pulse_count: pulse_count,
         };
         }
         if (mod == 5)
@@ -177,14 +201,20 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             tempDS18B20: tempDS18B20,
-            PA4_LEVEL: PA4_LEVEL
+            tempDS18B201: tempDS18B20,
+            PA4_LEVEL: PA4_LEVEL,
             interrupt: interrupt,
             interrupt_level: interrupt_level,
             adc: adc,
             timestamp: timestamp,
-            Weigt: Weigt,
-         
-            
+            Weigt: Weigt,            IMSI: IMSI,
+            ADC1: ADC1,
+            ADC2: ADC2,
+            ADC3: ADC3,
+            Distance: Distance,
+            pulse_count: pulse_count,
+            tempDS18B202: tempDS18B202,
+            tempDS18B203: tempDS18B203,
         };
         }
         if (mod == 6)
@@ -199,8 +229,14 @@ function Decoder(payload, payloadB64) {
             signal: signal,
             mod: mod,
             timestamp: timestamp,
-            pulse_count:pulse_count,
-            
+            pulse_count:pulse_count,            IMSI: IMSI,
+            ADC1: ADC1,
+            ADC2: ADC2,
+            ADC3: ADC3,
+            Distance: Distance,
+            Weigt: Weigt,
+            tempDS18B202: tempDS18B202,
+            tempDS18B203: tempDS18B203,
         };
         }
         try {

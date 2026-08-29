@@ -65,12 +65,14 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
-            var Total_pulse = toInt(hex.substr(offset, 8)); offset += 8;
-            var water_sum =Total_pulse/Calculate_flag
+        while (offset + 16 <= hex.length) {
+            var logTotal_pulse = toInt(hex.substr(offset, 8)); offset += 8;
+            var water_sum =logTotal_pulse/Calculate_flag
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Total_pulse:Total_pulse, water_sum:water_sum, timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({Total_pulse:logTotal_pulse, water_sum:water_sum, timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -87,6 +89,7 @@ function Decoder(payload, payloadB64) {
             Water_sum:Water_sum,
             water_sum:water_sum,
             //Total_pulse1:Total_pulse1,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }

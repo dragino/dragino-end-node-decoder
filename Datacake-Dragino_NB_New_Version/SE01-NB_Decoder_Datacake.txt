@@ -66,14 +66,16 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 24 <= hex.length) {
             var Soil_Moisture = toInt(hex.substr(offset, 4), 16)/ 100; offset += 4;
             var Soil_Temperature = toInt(hex.substr(offset, 4), 16)/ 100; offset += 4;
             var Soil_EC = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var Soil_dielectric_constant = toInt(hex.substr(offset, 4), 16)/ 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({  Soil_Moisture: Soil_Moisture, Soil_Temperature: Soil_Temperature,Soil_EC: Soil_EC,Soil_dielectric_constant: Soil_dielectric_constant,timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({  Soil_Moisture: Soil_Moisture, Soil_Temperature: Soil_Temperature,Soil_EC: Soil_EC,Soil_dielectric_constant: Soil_dielectric_constant,timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -91,6 +93,7 @@ function Decoder(payload, payloadB64) {
             Soil_EC1: Soil_EC1,
             Soil_dielectric_constant1: Soil_dielectric_constant1,
             timestamp: timestamp,
+            Interrupt_level: Interrupt_level,
             dataSet: dataSet
         };
     }

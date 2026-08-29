@@ -70,11 +70,14 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
-            var shtTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
-            var shtHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
+        while (offset + 16 <= hex.length) {
+            var logTemp = toInt(hex.substr(offset, 4), 16) / 10; offset += 4;
+            var logHum = toInt(hex.substr(offset, 4)) / 10; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ shtTemp: shtTemp, shtHum: shtHum, timestamp: timestampLog });
+
+            if (timestampLog > 0) {
+                dataSet.push({ shtTemp: logTemp, shtHum: logHum, timestamp: timestampLog });
+            }
         }
 
         return {
@@ -83,9 +86,11 @@ function Decoder(payload, payloadB64) {
             battery: battery,
             signal: signal,
             mod: mod,
+            tempDS18B20: tempDS18B20,
+            Ds18b20: tempDS18B20,
+            PA4_level: PA4_level,
             Interrupt_level: Interrupt_level,
             interrupt: interrupt,
-            Ds18b20 : tempDS18B20,
             adc: adc,
             count: count,
             adc: adc,

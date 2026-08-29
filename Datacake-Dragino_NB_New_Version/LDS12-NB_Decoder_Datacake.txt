@@ -65,13 +65,15 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 20 <= hex.length) {
             var Distance = toInt(hex.substr(offset, 4)); offset += 4;
             var Distance_signal_strength = toInt(hex.substr(offset, 4)); offset += 4;
             var LiDAR_temp = toInt(hex.substr(offset, 4)); offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({Distance: Distance,  Distance_signal_strength:  Distance_signal_strength,  LiDAR_temp: LiDAR_temp,   timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({Distance: Distance,  Distance_signal_strength:  Distance_signal_strength,  LiDAR_temp: LiDAR_temp,   timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -88,6 +90,7 @@ function Decoder(payload, payloadB64) {
             Distance1: Distance1,
             Distance_signal_strength1: Distance_signal_strength1,
             LiDAR_temp1: LiDAR_temp1,
+            timestamp: timestamp,
             dataSet: dataSet
         };
     }

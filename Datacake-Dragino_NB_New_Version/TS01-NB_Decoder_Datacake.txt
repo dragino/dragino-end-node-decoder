@@ -66,13 +66,15 @@ function Decoder(payload, payloadB64) {
 
         var dataSet = [];
 
-        while (offset < hex.length) {
+        while (offset + 20 <= hex.length) {
             var ds18b20 = toInt(hex.substr(offset, 4))/10; offset += 4;
             var roll = toInt(hex.substr(offset, 4))/100; offset += 4;
             var pitch = toInt(hex.substr(offset, 4))/100; offset += 4;
             var timestampLog = toInt(hex.substr(offset, 8)); offset += 8;
-            dataSet.push({ ds18b20: ds18b20,roll: roll,pitch: pitch,  timestamp: timestampLog });
-        }
+            if (timestampLog > 0) {
+                dataSet.push({ ds18b20: ds18b20,roll: roll,pitch: pitch,  timestamp: timestampLog });
+            }
+            }
 
         return {
             deviceID: deviceID,
@@ -91,6 +93,8 @@ function Decoder(payload, payloadB64) {
             roll1: roll1,
             pitch: pitch1,
             times1tamp: timestamp,
+            timestamp: timestamp,
+            pitch1: pitch1,
             dataSet: dataSet
         };
     }
