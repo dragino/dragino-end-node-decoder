@@ -1,14 +1,14 @@
 function decodeUplink(input) {
-        return { 
-            data: Decode(input.fPort, input.bytes, input.variables)
-        };   
+        var r = Decode(input.fPort, input.bytes, input.variables);
+        if (r && r.errors) return { errors: r.errors };
+        return { data: r };
 }
 function datalog(i,bytes){
   var aa= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/10).toFixed(1)); 
   var bb= parseFloat(((bytes[2+i]<<24>>16 | bytes[3+i])/10).toFixed(1));
   var cc= (bytes[6+i]&0x02) ? "High":"Low";
   var dd= (bytes[6+i]&0x01) ? "True":"False";
-  var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ee= getMyDate(ReadTimestamp(bytes, 7 + i));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+']'+',';  
   
   return string;
@@ -44,6 +44,8 @@ function Decode(fPort, bytes, variables) {
   if(fPort==0x02)
   {
     var decode = {};
+    if(bytes.length !== 11)
+      return { errors: ["FPort 2 requires 11 bytes"] };
     decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
     decode.Interrupt_flag=(bytes[2] & 0x01)? "TRUE":"FALSE";
     decode.Interrupt_level=(bytes[2] & 0x02)? "HIGH":"LOW";      
@@ -69,15 +71,21 @@ function Decode(fPort, bytes, variables) {
     {
     decode.Temp_Channel2 = Temp_Channel2;
     }
-    decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));         
+    decode.Data_time= getMyDate(ReadTimestamp(bytes, 7));         
     decode.Node_type="LTC2-LB";
+    /* Temperature → Resistance: Add two new fields. */   
+    decode.Resistance_Channel1= Pt100ToResistance(decode.Temp_Channel1);
+    decode.Resistance_Channel2= Pt100ToResistance(decode.Temp_Channel2);
 
     if(bytes.length==11)
       return decode;
   }
   else if(fPort==3)  
   {
+    if(bytes.length === 0 || bytes.length % 11 !== 0)
+      return { errors: ["FPort 3 requires complete 11-byte records"] };
     var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
+    var res_list= [];//Resistance recording array
     for(var i=0;i<bytes.length;i=i+11)
     {
       var data= datalog(i,bytes);
@@ -85,15 +93,23 @@ function Decode(fPort, bytes, variables) {
         data_sum=data;
       else
         data_sum+=data;
+      /*Add one resistance data entry for each group.*/
+      res_list.push({
+        Resistance_Channel1: Pt100ToResistance((bytes[4+i]<<24>>16 | bytes[5+i])/10),
+        Resistance_Channel2: Pt100ToResistance((bytes[2+i]<<24>>16 | bytes[3+i])/10)
+      });
     }
     return{
 	Node_type:"LTC2-LB",
     DATALOG:data_sum,
+    Resistance_DATALOG:res_list,//Add resistance field
     PNACKMD:pnack,
     };    
   }
   else if(fPort==5)
   {
+    if(bytes.length < 7)
+      return { errors: ["FPort 5 requires at least 7 bytes"] };
   	var freq_band;
   	var sub_band;
     var sensor;
@@ -149,4 +165,32 @@ function Decode(fPort, bytes, variables) {
       BAT:bat,
   	}
   }
+  else
+  {
+    return { errors: ["unknown FPort"] };
+  }
+}
+
+function ReadTimestamp(bytes, offset) {
+  return (bytes[offset] * 0x1000000) +
+         (bytes[offset + 1] << 16 | bytes[offset + 2] << 8 | bytes[offset + 3]);
+}
+
+// Pt100: resistance at 0 degrees Celsius is 100 ohms.
+function Pt100ToResistance(temp) {
+  var LTC_R0 = 100;
+  var LTC_A = 3.9083e-3;
+  var LTC_B = -5.775e-7;
+  var LTC_C = -4.183e-12;
+
+  // Outside the Pt100 conversion range, do not report a resistance.
+  if (typeof temp !== 'number' || !(temp >= -200 && temp <= 850))
+    return null;
+
+  var t2 = temp * temp;
+  var ratio = 1 + LTC_A * temp + LTC_B * t2;
+  if (temp < 0)
+    ratio += LTC_C * (temp - 100) * t2 * temp;
+
+  return parseFloat((LTC_R0 * ratio).toFixed(3));
 }
