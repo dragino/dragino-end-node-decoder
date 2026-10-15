@@ -89,7 +89,7 @@ function Decode(fPort, bytes, variables) {
       else
         data_sum+=data;
     }
-    return
+    return{
 	Node_type:"LDS12-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
