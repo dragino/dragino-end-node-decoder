@@ -4,8 +4,8 @@ function decodeUplink(input) {
 	var mode=(bytes[6] & 0x7C)>>2;
 	var data = {};
 function datalog(i,bytes){
-  var aa= (bytes[2+i]<<8 | bytes[3+i])/10;
-  var bb= bytes[4+i]<<8 | bytes[5+i];
+  var aa= (bytes[2+i]<<24>>16 | bytes[3+i])/10;
+  var bb= (bytes[4+i]<<8 | bytes[5+i])/10;
   var cc= bytes[6+i]<<24>>24;    
   var dd= (bytes[0+i]&0x02) ? "High":"Low";
   var ee= (bytes[0+i]&0x01) ? "True":"False"; 
