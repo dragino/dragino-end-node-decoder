@@ -1,0 +1,204 @@
+function decodeUplink(input) {
+	var port = input.fPort;
+    var bytes = input.bytes;
+	var data = {};
+	var decode = {};
+	var value;
+	var mod=(bytes[33]>>7)&0x01;
+	var factor=(bytes[33])&0x0F;	
+	var divisor=bytes[34];	 
+
+function datalog2(i,res,bytes,port){
+  var aa;
+  var bb;
+  var string;
+  if(port==7)
+  {
+    if(res==1)
+    {
+      aa= parseFloat((bytes[2+i]<<24>>8 | bytes[2+i+1]<<8 | bytes[2+i+2])/100.0).toFixed(2); 
+      bb= parseFloat((bytes[2+i+3]<<24>>8 | bytes[2+i+4]<<8 | bytes[2+i+5])/100.0).toFixed(2);
+    }
+    else
+    {
+      aa= parseFloat((bytes[2+i]<<24>>16 | bytes[2+i+1])/10.0).toFixed(1); 
+      bb= parseFloat((bytes[2+i+2]<<24>>16 | bytes[2+i+3])/10.0).toFixed(1);
+    }
+  string='['+ aa +','+ bb+']'+`,`; 
+  }
+  else
+  {
+    if(res==1)
+      aa= parseFloat((bytes[2+i]<<24>>8 | bytes[2+i+1]<<8 | bytes[2+i+2])/100.0).toFixed(2); 
+    else
+      aa= parseFloat((bytes[2+i]<<24>>16 | bytes[2+i+1])/10.0).toFixed(1); 
+  string='['+ aa +']'+`,`;    
+  }
+  return string;
+}
+
+function datalog(i,bytes){
+  var aa= parseFloat(((bytes[0+i]<<24>>8 | bytes[1+i]<<8 | bytes[2+i])/100).toFixed(2)); 
+  var bb= parseFloat(((bytes[3+i]<<24>>8 | bytes[4+i]<<8 | bytes[5+i])/100).toFixed(2)); 
+  var cc= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var string='['+aa+','+bb+','+cc+']'+',';
+  
+  return string;
+}
+
+function getzf(c_num){ 
+  if(parseInt(c_num) < 10)
+    c_num = '0' + c_num; 
+
+  return c_num; 
+}
+
+function getMyDate(str){ 
+  var c_Date;
+  if(str > 9999999999)
+    c_Date = new Date(parseInt(str));
+  else 
+    c_Date = new Date(parseInt(str) * 1000);
+  
+  var c_Year = c_Date.getFullYear(), 
+  c_Month = c_Date.getMonth()+1, 
+  c_Day = c_Date.getDate(),
+  c_Hour = c_Date.getHours(), 
+  c_Min = c_Date.getMinutes(), 
+  c_Sen = c_Date.getSeconds();
+  var c_Time = c_Year +'-'+ getzf(c_Month) +'-'+ getzf(c_Day) +' '+ getzf(c_Hour) +':'+ getzf(c_Min) +':'+getzf(c_Sen); 
+  
+  return c_Time;
+}
+switch (input.fPort) {
+case 2:
+    if((bytes[0]>>6&0x03)===0x00)
+      data.Calibration_mode="Factory calibration";
+    else if((bytes[0]>>6&0x03)==0x01)
+      data.Calibration_mode="User Calibration";
+    else
+      data.Calibration_mode="Invalid Calibration";
+    data.BatV=((bytes[0]<<8 | bytes[1])&0x3FFF)/1000;
+    data.Resolution=(bytes[2] & 0x80)>>7;
+    data.TEMP1H_flag= (bytes[2] &0x10)? "True":"False";
+    data.TEMP1L_flag= (bytes[2] &0x20)? "True":"False";
+    data.TEMP2H_flag= (bytes[2] &0x04)? "True":"False";
+    data.TEMP2L_flag= (bytes[2] &0x08)? "True":"False";       
+    data.Temp_Channel1=parseFloat(((bytes[3]<<24>>16 | bytes[4])/10).toFixed(1)); 
+    data.Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/10).toFixed(1)); 
+    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));      
+    data.Node_type="LTC2N-LB";
+	
+ if(bytes.length==11)
+  return {
+      data: data,
+    }
+ break;
+case 5:
+  { 
+    if(bytes[0]==0x16)
+      data.SENSOR_MODEL= "LTC2N-LB";
+      
+    if(bytes[4]==0xff)
+      data.SUB_BAND="NULL";
+    else
+      data.SUB_BAND=bytes[4];
+    
+    if(bytes[3]==0x01)
+      data.FREQUENCY_BAND="EU868";
+    else if(bytes[3]==0x02)
+      data.FREQUENCY_BAND="US915";
+    else if(bytes[3]==0x03)
+      data.FREQUENCY_BAND="IN865";
+    else if(bytes[3]==0x04)
+      data.FREQUENCY_BAND="AU915";
+    else if(bytes[3]==0x05)
+      data.FREQUENCY_BAND="KZ865";
+    else if(bytes[3]==0x06)
+      data.FREQUENCY_BAND="RU864";
+    else if(bytes[3]==0x07)
+      data.FREQUENCY_BAND="AS923";
+    else if(bytes[3]==0x08)
+      data.FREQUENCY_BAND="AS923_1";
+    else if(bytes[3]==0x09)
+      data.FREQUENCY_BAND="AS923_2";
+    else if(bytes[3]==0x0A)
+      data.FREQUENCY_BAND="AS923_3";
+    else if(bytes[3]==0x0B)
+      data.FREQUENCY_BAND="CN470";
+    else if(bytes[3]==0x0C)
+      data.FREQUENCY_BAND="EU433";
+    else if(bytes[3]==0x0D)
+      data.FREQUENCY_BAND="KR920";
+    else if(bytes[3]==0x0E)
+      data.FREQUENCY_BAND="MA869";
+      
+    data.FIRMWARE_VERSION= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
+    data.BAT= (bytes[5]<<8 | bytes[6])/1000;
+    data.Ch1_calibration_value= bytes[7]<<8 | bytes[8];
+    data.Ch2_calibration_value= bytes[9]<<8 | bytes[10];
+  }
+  return {
+      data: data,
+    }
+  break;
+case 3:
+   var pnack= ((bytes[6]>>7)&0x01) ? "True":"False";
+    for(var i=0;i<bytes.length;i=i+11)
+    {
+      var data1= datalog(i,bytes);
+      if(i=='0')
+        data_sum=data1;
+      else
+        data_sum+=data1;
+    }
+    data.Node_type="LTC2N-LB";
+    data.DATALOG=data_sum;
+    data.PNACKMD=pnack;
+    return {
+      data: data,
+    }
+    
+  break;
+case 7:
+case 8:
+  var Bat= (bytes[0]<<8 | bytes[1])/1000;
+  var res=(bytes[0]&0x80)>>7;
+  var bytelen;
+  if(input.fPort==7)
+  {
+    if(res==1)
+     bytelen=6;
+   else
+     bytelen=4;
+  }
+  else 
+  {
+   if(res==1)
+    bytelen=3;
+   else
+    bytelen=2;
+  }
+    for(var j=0;j<bytes.length-2;j=j+bytelen)
+    {
+      data1= datalog2(j,res,bytes,input.fPort);
+      if(j=='0')
+        data_sum=data1;
+      else
+        data_sum+=data1;
+    }
+	data.Node_type="LTC2N-LB";
+    data.DATALOG=data_sum;
+    data.Bat=Bat;
+    return {
+      data: data,
+    }
+    
+  break;
+  
+default:
+    return {
+      errors: ["unknown FPort"]
+    }
+}
+}
