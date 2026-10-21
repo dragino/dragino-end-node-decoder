@@ -1,4 +1,8 @@
-function Decode(fPort, bytes, variables)  {
+function decodeUplink(input) {
+  return { data: Decoder(input.bytes, input.fPort) };
+}
+
+function Decoder(bytes, port) {
   // Decode an uplink message from a buffer
   // (array) of bytes to an object of fields.
   var value=(bytes[0]<<8 | bytes[1]) & 0x3FFF;
@@ -16,7 +20,7 @@ function Decode(fPort, bytes, variables)  {
   
   var s_flag = bytes[7];	
   return {
-       Node_type:"LDDS75",
+	   Node_type:"LDDS45",
        Bat:batV +" V",
        Distance:distance,
 	   Interrupt_flag:i_flag,
