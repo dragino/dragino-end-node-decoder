@@ -1,8 +1,13 @@
+function decodeUplink(input) {
+  return { data: Decoder(input.bytes, input.fPort) || {} };
+}
+
 function Decoder(bytes, port) {
 	var data = {};
 	var decode = {};
 	var value;
 	var type;
+  var i, j, k;
    if(port==0x02)
   {	
 	var channel	  =["temp_SOIL1","water_SOIL1","conduct_SOIL1",
@@ -112,7 +117,7 @@ function Decoder(bytes, port) {
       freq_band="MA869";
       
     var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
-     bat= (bytes[5]<<8 | bytes[6])/1000;
+    var bat= (bytes[5]<<8 | bytes[6])/1000;
     return {
     SENSOR_MODEL:sensor,
     FIRMWARE_VERSION:firm_ver,
