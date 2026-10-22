@@ -4,7 +4,7 @@ function decodeUplink(input) {
         };   
 }
 
-function Decode(fPort, bytes, variables) {
+function datalog(i, bytes) {
   var aa=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
   var bb=(bytes[0+i]&0x01)?"OPEN":"CLOSE";  
   var cc=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
@@ -43,6 +43,7 @@ function getMyDate(str){
 function Decode(fPort, bytes, variables) {
   if(fPort==0x03)
   {
+    var data_sum = "";
     for(var i=0;i<bytes.length;i=i+11)
     {
       var data= datalog(i,bytes);
