@@ -18,7 +18,7 @@ function Datalog(bytes,num)
     var eventType = bytes[4 + num];
     switch (eventType) {
       case 0x03:
-        datalog_event = "HEARTBEAT_EVNET";
+        datalog_event = "HEARTBEAT_EVENT";
         break;
       case 0x04:
         datalog_event = "RELAY_ACK_EVENT";
@@ -60,7 +60,7 @@ function Decode(fPort, bytes, variables) {
     
     switch (eventType) {
       case 0x03:
-        event = "HEARTBEAT_EVNET";
+        event = "HEARTBEAT_EVENT";
         break;
       case 0x04:
         event = "RELAY_ACK_EVENT";
