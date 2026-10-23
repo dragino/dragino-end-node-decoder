@@ -17,10 +17,10 @@ function Datalog(bytes,num)
         datalog_event = "PLUG_INSERT_EVENT";
         break;
       case 0x02:
-        datalog_event = "PLUG_PULL_EVNET";
+        datalog_event = "PLUG_PULL_EVENT";
         break;      
       case 0x03:
-        datalog_event = "HEARTBEAT_EVNET";
+        datalog_event = "HEARTBEAT_EVENT";
         break;
       case 0x04:
         datalog_event = "RELAY_ACK_EVENT";
@@ -72,10 +72,10 @@ function Decoder(bytes,port) {
         event = "PLUG_INSERT_EVENT";
         break;
       case 0x02:
-        event = "PLUG_PULL_EVNET";
+        event = "PLUG_PULL_EVENT";
         break;      
       case 0x03:
-        event = "HEARTBEAT_EVNET";
+        event = "HEARTBEAT_EVENT";
         break;
       case 0x04:
         event = "RELAY_ACK_EVENT";
