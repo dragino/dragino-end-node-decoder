@@ -1,3 +1,14 @@
+function decodeUplink(input) {
+  var result = Decoder(input.bytes, input.fPort);
+  if (result && (result.data !== undefined || result.errors !== undefined)) {
+    return result;
+  }
+  if (result === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: result };
+}
+
 /**
  * Helper: Format byte to hex string with padding
  */

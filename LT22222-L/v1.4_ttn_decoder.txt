@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 function Decoder(bytes, port) {
 //Payload Formats of LT33222 or LT22222 Deceive
 // For TTN, LoRaServer

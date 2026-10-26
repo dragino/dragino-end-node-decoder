@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 function Str1(str2){
   var str3 ="";
   for (var i=0;i<str2.length;i++){
@@ -121,7 +129,7 @@ function Decoder(bytes, port) {
       else
         data_sum+=data;
     }
-    return
+    return {
 	Node_type:"SE02-LB",
     DATALOG:data_sum,
     PNACKMD:pnack,
