@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 function Decoder(bytes, port) {
   var hardware= (bytes[10] & 0xC0)>>6;
   var mode0= bytes[10] & 0xff;

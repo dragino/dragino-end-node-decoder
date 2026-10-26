@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 function getzf(num) {
     return num < 10 ? '0' + num : num;
 }

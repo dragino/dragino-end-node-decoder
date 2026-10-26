@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 // Decode decodes an array of bytes into an object.
 //  - fPort contains the LoRaWAN fPort number
 //  - bytes is an array of bytes, e.g. [225, 230, 255, 0]

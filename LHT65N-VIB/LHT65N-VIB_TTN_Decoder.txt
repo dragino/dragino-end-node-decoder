@@ -1,3 +1,11 @@
+function decodeUplink(input) {
+  var data = Decoder(input.bytes, input.fPort);
+  if (data === undefined) {
+    return { errors: ["Unsupported fPort: " + input.fPort] };
+  }
+  return { data: data };
+}
+
 function datalog(i,bytes){
   var aa= parseFloat((bytes[i]<<24>>16 | bytes[i+1])/1000).toFixed(3); 
   var bb= parseFloat((bytes[i+2]<<24>>16 | bytes[i+3])/1000).toFixed(3); 
