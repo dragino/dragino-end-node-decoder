@@ -24,7 +24,7 @@ function Decoder(bytes) {
     data.doorflg = doorflg
     data.latitude=parseFloat(((bytes[1]<<24|bytes[2]<<16|bytes[3]<<8|bytes[4])/1000000).toFixed(6));
     data.longitude=parseFloat(((bytes[5]<<24|bytes[6]<<16|bytes[7]<<8|bytes[8])/1000000).toFixed(6));
-    timestamp1=bytes[9]<<24|bytes[10]<<16|bytes[11]<<8|bytes[12];
+    timestamp1=(bytes[9]<<24|bytes[10]<<16|bytes[11]<<8|bytes[12]) >>> 0;
     data.timestamp=timestamp1;
     data.beijintime=format((timestamp1+28800)*1000);
     return data;

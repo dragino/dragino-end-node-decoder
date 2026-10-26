@@ -11,7 +11,7 @@ function datalog(i,bytes){
   var bb= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/10).toFixed(2));
   var cc= (bytes[6+i]&0x02) ? "High":"Low";
   var dd= (bytes[6+i]&0x01) ? "True":"False";
-  var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ee= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+']'+',';  
   
   return string;
@@ -54,7 +54,7 @@ function Decoder(bytes, port) {
     decode.Interrupt_level=(bytes[5] & 0x02)? "HIGH":"LOW";      
     decode.TEMPH_flag= (bytes[5] &0x04)? "True":"False";
     decode.TEMPL_flag= (bytes[5] &0x08)? "True":"False";
-    decode.Data_time= getMyDate((bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9]).toString(10));         
+    decode.Data_time= getMyDate(((bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9]) >>> 0).toString(10));         
     decode.Node_type="TC01-LB";
     if(bytes.length==10)
       return decode;

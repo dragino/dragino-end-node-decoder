@@ -38,7 +38,7 @@ function datalog(i,bytes){
   var bb= parseFloat(((bytes[2+i]<<24>>16 | bytes[3+i])/10).toFixed(1));
   var cc= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/100).toFixed(2)); 
   var dd= bytes[6+i] & 0x01; // keep only the meaningful bit; other bits are masked out for strict decoding
-  var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ee= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+']'+',';  
   
   return string;
@@ -55,7 +55,7 @@ function Decode(fPort, bytes, variables) {
         decode.TempC_DS=parseFloat(((bytes[4]<<24>>16 | bytes[5])/100).toFixed(2));
 
         decode.Ext=bytes[6];
-        decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]);
+        decode.Systimestamp=((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0);
         decode.Node_type="LHT52";
         return decode;
       }

@@ -9,7 +9,7 @@ function decodeUplink(input) {
 function datalog(i,bytes){
   var aa= parseFloat(((bytes[3+i]<<24>>16 | bytes[4+i])/10).toFixed(1));
   var bb= parseFloat(((bytes[5+i]<<8 | bytes[6+i])/10).toFixed(1));
-  var cc= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var cc= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+']'+',';  
   
   return string;
@@ -61,7 +61,7 @@ function Decoder(bytes, port) {
   if(port==0x02)
   {
     batV= (bytes[0]<<8 | bytes[1])/1000;
-    Data_time= getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10)); 
+    Data_time= getMyDate(((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]) >>> 0).toString(10)); 
 		integer=bytes[6]<<24 | bytes[7]<<16 | bytes[8]<<8 | bytes[9];
 		decimal=bytes[10]<<24 | bytes[11]<<16 | bytes[12]<<8 | bytes[13];
 		if(decimal<100000)
@@ -85,7 +85,7 @@ function Decoder(bytes, port) {
   if(port==0x03)
   {
     batV= (bytes[4]<<8 | bytes[5])/1000;
-    Data_time= getMyDate((bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]).toString(10)); 
+    Data_time= getMyDate(((bytes[0]<<24 | bytes[1]<<16 | bytes[2]<<8 | bytes[3]) >>> 0).toString(10)); 
 		total_packages=bytes[6];
 		subcontracting_count=bytes[7];
 		// var data = bytes;
@@ -129,7 +129,7 @@ if (port === 0x04)
     // Process Data_time and initialize integers & decimals
     for (let i = 0; i < 32; i++) {
         let startIndex = 2 + i * 12; // Calculate starting index for each set
-        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
+        dataTimes.push(getMyDate(((((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]) >>> 0)).toString(10)));
         integers.push((bytes[startIndex + 7]<< 24) | (bytes[startIndex + 6] << 16) | (bytes[startIndex + 5] << 8) | bytes[startIndex + 4]);
         decimals.push((bytes[startIndex + 11] << 24) | (bytes[startIndex + 10] << 16) | (bytes[startIndex + 9] << 8) | bytes[startIndex + 8]);
     }
@@ -221,7 +221,7 @@ if (port === 0x04)
     // Process Data_time and initialize integers & decimals
     for (let i = 0; i < 3324; i++) {
         let startIndex = i * 12; // Calculate starting index for each set
-        dataTimes.push(getMyDate(((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]).toString(10)));
+        dataTimes.push(getMyDate(((((bytes[startIndex] << 24) | (bytes[startIndex + 1] << 16) | (bytes[startIndex + 2] << 8) | bytes[startIndex + 3]) >>> 0)).toString(10)));
         integers.push((bytes[startIndex + 4]<< 24) | (bytes[startIndex + 5] << 16) | (bytes[startIndex + 6] << 8) | bytes[startIndex + 7]);
         decimals.push((bytes[startIndex + 8] << 24) | (bytes[startIndex + 9] << 16) | (bytes[startIndex + 10] << 8) | bytes[startIndex + 11]);
     }

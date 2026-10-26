@@ -58,7 +58,7 @@ else if(Ext=='11')
 }
   var cc= parseFloat(((bytes[2+i]<<24>>16 | bytes[3+i])/100).toFixed(2));
   var dd= parseFloat((((bytes[4+i]<<8 | bytes[5+i])&0xFFF)/10).toFixed(1));
-  var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ee= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+bb+','+cc+','+dd+','+ee+']'+',';  
   
   return string;
@@ -255,7 +255,7 @@ else if(Ext=='8')
 else if(Ext=='9')
 {
   decode.Work_mode="DS18B20 & timestamp";
-  decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] );
+  decode.Systimestamp=((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] ) >>> 0);
 }
 else if(Ext=='11')
 {

@@ -25,7 +25,7 @@ function decodeUplink(input) {
     var bb = ((bytes[i+2] << 24 >> 16 | bytes[i+3]) / 10).toFixed(1);
     var cc = ((bytes[i+4] << 24 >> 16 | bytes[i+5]) / 10).toFixed(1);
     var dd = (bytes[i+6] & 0x01) ? "True" : "False";
-    var timestamp = bytes[i+7] << 24 | bytes[i+8] << 16 | bytes[i+9] << 8 | bytes[i+10];
+    var timestamp = (bytes[i+7] << 24 | bytes[i+8] << 16 | bytes[i+9] << 8 | bytes[i+10]) >>> 0;
     
     return `[${aa},${bb},${cc},${dd},${getMyDate(timestamp.toString())}],`;
   }
@@ -56,7 +56,7 @@ function decodeUplink(input) {
           parseFloat(((bytes[i+2] << 24 >> 16 | bytes[i+3]) / 10).toFixed(1)),
           parseFloat(((bytes[i+4] << 24 >> 16 | bytes[i+5]) / 10).toFixed(1)),
           (bytes[i+6] & 0x01) ? "True" : "False",
-          getMyDate((bytes[i+7] << 24 | bytes[i+8] << 16 | bytes[i+9] << 8 | bytes[i+10]).toString(10))
+          getMyDate(((bytes[i+7] << 24 | bytes[i+8] << 16 | bytes[i+9] << 8 | bytes[i+10]) >>> 0).toString(10))
         ]);
       }
       return { data: data };

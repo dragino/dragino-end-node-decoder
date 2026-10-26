@@ -8,7 +8,7 @@ function datalog(i, bytes) {
   else if (bb == 0x01) ee = (dd / 360).toFixed(1);
   else ee = (dd / 450).toFixed(1);
 
-  var ff = getMyDate(((bytes[7 + i] << 24) | (bytes[8 + i] << 16) | (bytes[9 + i] << 8) | bytes[10 + i]).toString(10));
+  var ff = getMyDate(((((bytes[7 + i] << 24) | (bytes[8 + i] << 16) | (bytes[9 + i] << 8) | bytes[10 + i]) >>> 0)).toString(10));
   var string = '[' + aa + ',' + bb + ',' + cc + ',' + dd + ',' + ee + ',' + ff + ']' + ',';
 
   return string;
@@ -56,7 +56,7 @@ function decodeUplink(input) {
         if (bytes[5] == 0x01) data.Last_pulse = ((bytes[1] << 24) | (bytes[2] << 16) | (bytes[3] << 8) | bytes[4]) >>> 0;
         else data.Total_pulse = ((bytes[1] << 24) | (bytes[2] << 16) | (bytes[3] << 8) | bytes[4]) >>> 0;
 
-        data.Data_time = getMyDate(((bytes[7] << 24) | (bytes[8] << 16) | (bytes[9] << 8) | bytes[10]).toString(10));
+        data.Data_time = getMyDate(((((bytes[7] << 24) | (bytes[8] << 16) | (bytes[9] << 8) | bytes[10]) >>> 0)).toString(10));
       }
       return {
         data: data,

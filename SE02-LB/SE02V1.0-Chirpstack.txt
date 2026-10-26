@@ -29,7 +29,7 @@ function datalog(i,bytes){
   var gg= parseFloat(((bytes[8+i]<<24>>16 | bytes[9+i])/100).toFixed(2));
   var hh= parseFloat((bytes[10+i]<<8 | bytes[11+i]));
   
-  var ee= getMyDate((bytes[13+i]<<24 | bytes[14+i]<<16 | bytes[15+i]<<8 | bytes[16+i]).toString(10));
+  var ee= getMyDate(((bytes[13+i]<<24 | bytes[14+i]<<16 | bytes[15+i]<<8 | bytes[16+i]) >>> 0).toString(10));
   var string='['+bb+','+cc+','+dd+','+ff+','+gg+','+hh+','+ee+']'+',';  
   
   return string;

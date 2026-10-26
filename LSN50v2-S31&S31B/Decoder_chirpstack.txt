@@ -1,7 +1,7 @@
 function datalog(i,bytes){
   var aa= parseFloat(((bytes[3+i]<<24>>16 | bytes[4+i])/10).toFixed(1));
   var bb= parseFloat(((bytes[5+i]<<8 | bytes[6+i])/10).toFixed(1));
-  var cc= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var cc= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+']'+',';  
   
   return string;
@@ -45,7 +45,7 @@ function Decode(fPort, bytes, variables) {
       decode.Door_status=(bytes[6] & 0x80)? "CLOSE":"OPEN";     
       decode.TempC_SHT31= parseFloat(((bytes[7]<<24>>16 | bytes[8])/10).toFixed(1));
       decode.Hum_SHT31=parseFloat(((bytes[9]<<8 | bytes[10])/10).toFixed(1));
-      decode.Data_time= getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10));         
+      decode.Data_time= getMyDate(((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]) >>> 0).toString(10));         
     }
     else if(mode==31)
     {

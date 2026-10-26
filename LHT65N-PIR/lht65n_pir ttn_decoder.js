@@ -258,7 +258,7 @@ function Decoder(bytes, port) {
             } else if (Ext === 9) {
                 decode.Work_mode = "DS18B20 & timestamp";
                 if(bytes.length > 10) {
-                    decode.Systimestamp = (bytes[7] << 24) | (bytes[8] << 16) | (bytes[9] << 8) | bytes[10];
+                    decode.Systimestamp = (((bytes[7] << 24) | (bytes[8] << 16) | (bytes[9] << 8) | bytes[10]) >>> 0);
                 }
             } else if (Ext === 11) {
                 decode.Work_mode = "SHT31 Sensor";

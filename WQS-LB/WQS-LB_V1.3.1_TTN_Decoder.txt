@@ -129,7 +129,7 @@ function datalog(i,bytes){
 		  k++;
 		}		
 	} 
-  var ee= getMyDate((bytes[8+i]<<24 | bytes[9+i]<<16 | bytes[10+i]<<8 | bytes[11+i]).toString(10));
+  var ee= getMyDate(((bytes[8+i]<<24 | bytes[9+i]<<16 | bytes[10+i]<<8 | bytes[11+i]) >>> 0).toString(10));
   var string='['+bb[0]+','+bb[1]+','+bb[2]+','+ee+']'+',';  
   
   return string;

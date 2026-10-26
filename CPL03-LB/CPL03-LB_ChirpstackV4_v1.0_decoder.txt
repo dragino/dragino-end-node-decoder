@@ -13,7 +13,7 @@ function datalog(i,bytes){
   var gg=(bytes[0+i]&0x07);
   var hh=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
   var ii=(bytes[4+i]<<16 | bytes[5+i]<<8 | bytes[6+i]).toString(10);
-  var jj= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var jj= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string;
   
   if(aa=="CPL01")
@@ -154,7 +154,7 @@ function Decode(fPort, bytes, variables) {
     var pin_status=(bytes[0]&0x01)?"OPEN":"CLOSE";  
     var total_pulse=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
     var last_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];   
-    var data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    var data_time= getMyDate(((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0).toString(10));
     var calculate_flag=(bytes[0]&0x07);
     var pa8_total_pulse=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
     var pa4_total_pulse=bytes[4]<<16 | bytes[5]<<8 | bytes[6];

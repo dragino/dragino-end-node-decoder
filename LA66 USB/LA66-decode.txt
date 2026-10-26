@@ -16,7 +16,7 @@ function Decoder(bytes) {
   if (bytes.length==12){
     data.latitude=parseFloat(((bytes[0]<<24|bytes[1]<<16|bytes[2]<<8|bytes[3])/1000000).toFixed(6));
     data.longitude=parseFloat(((bytes[4]<<24|bytes[5]<<16|bytes[6]<<8|bytes[7])/1000000).toFixed(6));
-    timestamp1=bytes[8]<<24|bytes[9]<<16|bytes[10]<<8|bytes[11];
+    timestamp1=(bytes[8]<<24|bytes[9]<<16|bytes[10]<<8|bytes[11]) >>> 0;
     data.timestamp=timestamp1;
     data.beijintime=format((timestamp1+28800)*1000);
     return data;

@@ -10,7 +10,7 @@ function datalog(i,bytes){
   var a4=((bytes[4+i]>>1) & 0x01)? "Yes":"No";
   var a5=(bytes[4+i] & 0x01)? "Yes":"No";
   var dd= (bytes[6+i]&0x01) ? "True":"False";
-  var ee= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ee= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+a1+','+a2+','+a3+','+a4+','+a5+','+dd+','+ee+']'+',';  
   
   return string;

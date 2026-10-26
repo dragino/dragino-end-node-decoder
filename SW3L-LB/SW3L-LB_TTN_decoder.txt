@@ -23,7 +23,7 @@ function datalog(i,bytes){
   else
     hh= (gg/450).toFixed(1);
     
-  var ii= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ii= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+','+hh+','+ii+']'+',';  
   
   return string;
@@ -164,7 +164,7 @@ function Decoder(bytes, port) {
     else
       decode.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
       
-    decode.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    decode.Data_time= getMyDate(((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0).toString(10));
     decode.Node_type="SW3L-LB";
     if(bytes.length==11)
     {
