@@ -330,7 +330,7 @@ function Decode(fPort, bytes, variables) {
     }
   }
   else if (fPort === 14) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.ambient_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
@@ -346,7 +346,7 @@ function Decode(fPort, bytes, variables) {
   }
   else if (fPort === 15) {
     if (bytes.length === 10) {
-      decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+      decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
       decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
       decode.start_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
@@ -359,7 +359,7 @@ function Decode(fPort, bytes, variables) {
     }
   }
   else if (fPort === 16) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.peak_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
@@ -373,7 +373,7 @@ function Decode(fPort, bytes, variables) {
     return decode;
   }
   else if (fPort === 17) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.duration_sec = (bytes[4] << 8) | bytes[5];
@@ -389,7 +389,7 @@ function Decode(fPort, bytes, variables) {
       return decode;
   }
   else if (fPort === 18) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.duration_sec = (bytes[4] << 8) | bytes[5];

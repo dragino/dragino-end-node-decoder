@@ -19,7 +19,7 @@ function decodeUplink(input) {
   else
     hh= (gg/450).toFixed(1);
     
-  var ii= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ii= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+','+hh+','+ii+']'+',';  
   
   return string;
@@ -147,7 +147,7 @@ default:
     else
       data.Total_pulse=((bytes[1]<<24 | bytes[2]<<16 | bytes[3]<<8 | bytes[4])>>>0);
       
-    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    data.Data_time= getMyDate(((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0).toString(10));
 	if(bytes.length==11)
   return {
       data: data,

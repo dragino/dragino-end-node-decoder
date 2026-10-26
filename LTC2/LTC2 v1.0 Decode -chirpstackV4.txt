@@ -28,7 +28,7 @@ else if(decode.Ext==0x03)
   decode.Res_Channel2=parseFloat(((bytes[5]<<8 | bytes[6])/100).toFixed(2));
 }
 
-decode.Systimestamp=(bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] );
+decode.Systimestamp=((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10] ) >>> 0);
 
 
 if(poll_message_status===0)

@@ -272,7 +272,7 @@ function Decoder(bytes, port) {
     }
   }
   else if (port === 14) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
     decode.BatV = (bytes[4] << 8 | bytes[5]) / 1000;
     

@@ -75,7 +75,7 @@ function Decode(fPort, bytes, variables) {
     switch(fPort) {
         case 0x02:
             batV = (bytes[0] << 8 | bytes[1]) / 1000;
-            Data_time = getMyDate((bytes[2] << 24 | bytes[3] << 16 | bytes[4] << 8 | bytes[5]).toString());
+            Data_time = getMyDate(((bytes[2] << 24 | bytes[3] << 16 | bytes[4] << 8 | bytes[5]) >>> 0).toString());
             var integer = bytes[6] << 24 | bytes[7] << 16 | bytes[8] << 8 | bytes[9];
             var decimal = bytes[10] << 24 | bytes[11] << 16 | bytes[12] << 8 | bytes[13];
             var reading = calculateReading(integer, decimal);
@@ -90,7 +90,7 @@ function Decode(fPort, bytes, variables) {
 
         case 0x03:
             batV = (bytes[4] << 8 | bytes[5]) / 1000;
-            Data_time = getMyDate((bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]).toString());
+            Data_time = getMyDate(((bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]) >>> 0).toString());
             total_packages = bytes[6];
             subcontracting_count = bytes[7];
             

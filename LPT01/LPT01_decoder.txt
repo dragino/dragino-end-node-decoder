@@ -44,7 +44,7 @@ function Decoder(bytes, port) {
   {
     var decode = {};
       decode.BatV=(bytes[0]<<8 | bytes[1])/1000;
-      decode.Time=getMyDate((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]).toString(10));
+      decode.Time=getMyDate(((bytes[2]<<24 | bytes[3]<<16 | bytes[4]<<8 | bytes[5]) >>> 0).toString(10));
       decode.Unit=(bytes[6]>>7 & 0x01)? "℉":"℃";
       number=(bytes[6] & 0x7F);
       decode.Count=number;	  

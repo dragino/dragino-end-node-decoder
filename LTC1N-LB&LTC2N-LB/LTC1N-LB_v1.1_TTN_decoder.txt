@@ -40,7 +40,7 @@ function datalog2(i,res,bytes,port){
 function datalog(i,bytes){
   var aa= parseFloat(((bytes[0+i]<<24>>8 | bytes[1+i]<<8 | bytes[2+i])/100).toFixed(2)); 
   var bb= parseFloat(((bytes[3+i]<<24>>8 | bytes[4+i]<<8 | bytes[5+i])/100).toFixed(2)); 
-  var cc= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var cc= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+']'+',';
   
   return string;
@@ -86,7 +86,7 @@ case 2:
     data.TEMP2L_flag= (bytes[2] &0x08)? "True":"False";       
     data.Temp_Channel1=parseFloat(((bytes[3]<<24>>16 | bytes[4])/10).toFixed(1)); 
     data.Temp_Channel2=parseFloat(((bytes[5]<<24>>16 | bytes[6])/10).toFixed(1)); 
-    data.Data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));      
+    data.Data_time= getMyDate(((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0).toString(10));      
     data.Node_type="LTC2N-LB";
 	
  if(bytes.length==11)

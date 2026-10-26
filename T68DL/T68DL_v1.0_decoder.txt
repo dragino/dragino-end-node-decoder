@@ -5,7 +5,7 @@ function decodeUplink(input) {
 	var data = {};
 	function datalog(i,bytes){
   var aa= parseFloat(((bytes[4+i]<<24>>16 | bytes[5+i])/100).toFixed(2));
-  var bb= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var bb= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+']'+',';  
   
   return string;
@@ -42,7 +42,7 @@ function decodeUplink(input) {
     data.TempC= parseFloat(((bytes[2]<<24>>16 | bytes[3])/100).toFixed(2));
     data.TEMPH_flag= (bytes[4] &0x01)? "True":"False";
     data.TEMPL_flag= (bytes[4] &0x02)? "True":"False";
-    data.Data_time= getMyDate((bytes[5]<<24 | bytes[6]<<16 | bytes[7]<<8 | bytes[8]).toString(10));         
+    data.Data_time= getMyDate(((bytes[5]<<24 | bytes[6]<<16 | bytes[7]<<8 | bytes[8]) >>> 0).toString(10));         
     data.Node_type="T68DL";
 
 

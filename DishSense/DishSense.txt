@@ -72,7 +72,7 @@ function Decode(fport, bytes, variables) {
     var signedValue;
     
     if (fport === 2) {
-        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Timestamp = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
         decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = (bytes[4] * 20) / 1000;
         
@@ -101,7 +101,7 @@ function Decode(fport, bytes, variables) {
         if (bytes.length === 11) return decode;
     } 
     else if (fport === 17 || fport === 18) {
-        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Timestamp = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
         decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = (bytes[4] * 20) / 1000;
         
@@ -123,7 +123,7 @@ function Decode(fport, bytes, variables) {
         return decode;
     } 
     else if (fport === 13) {
-        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Timestamp = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
         decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = bytes[4] << 8 | bytes[5];
         
@@ -223,7 +223,7 @@ function Decode(fport, bytes, variables) {
         }
     } 
     else if (fport === 6) {
-        decode.Timestamp = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+        decode.Timestamp = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
         decode.Time = formatTimestamp(decode.Timestamp);
         decode.BatV = ((bytes[4] << 8) | bytes[5]) / 1000;
         

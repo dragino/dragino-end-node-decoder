@@ -11,7 +11,7 @@ function datalog(i,bytes){
   var cc=(bytes[4+i]<<8 |bytes[5+i])/10
   var dd=(bytes[6+i]&0x01)?"YES":"NO"; 
   var ee=(bytes[6+i]&0x40)?"1":"0"; 
-  var ff= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var ff= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+']'+',';  
   
   

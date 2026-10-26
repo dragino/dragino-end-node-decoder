@@ -47,7 +47,7 @@ function getMyDate(str){
         var ff= (bytes[6+i]&0x02) ? "High":"Low";
         var gg= (bytes[6+i]&0x01) ? "True":"False";
         var hh= transform(cc,bytes[i],bytes[1+i]);
-        var ii= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+        var ii= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
         var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+','+hh+','+ii+']';  
         
         return string;

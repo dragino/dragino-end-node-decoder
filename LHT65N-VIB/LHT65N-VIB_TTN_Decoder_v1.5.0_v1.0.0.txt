@@ -321,7 +321,7 @@ function Decoder(bytes, port) {
     }
   }
   else if (port === 14) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.ambient_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
@@ -337,7 +337,7 @@ function Decoder(bytes, port) {
   }
   else if (port === 15) {
     if (bytes.length === 10) {
-      decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+      decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
       decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
       decode.start_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);
@@ -350,7 +350,7 @@ function Decoder(bytes, port) {
     }
   }
   else if (port === 16) {
-    decode.Timestamp_utc = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    decode.Timestamp_utc = (((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0);
     decode.Datetime_utc = formatTimestamp(decode.Timestamp_utc);
 
     decode.peak_acc_x_g = parseFloat((bytes[4] << 24 >> 16 | bytes[5]) / 1000).toFixed(3);

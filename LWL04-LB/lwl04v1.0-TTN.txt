@@ -13,7 +13,7 @@ function datalog(i,bytes){
   var dd=(bytes[0+i]&0x01)?"LEAK":"NO LEAK";   
   var ee=(bytes[1+i]<<16 | bytes[2+i]<<8 | bytes[3+i]).toString(10);
   var ff=(bytes[4+i]<<16 | bytes[5+i]<<8 | bytes[6+i]).toString(10);
-  var gg= getMyDate((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]).toString(10));
+  var gg= getMyDate(((bytes[7+i]<<24 | bytes[8+i]<<16 | bytes[9+i]<<8 | bytes[10+i]) >>> 0).toString(10));
   var string='['+aa+','+bb+','+cc+','+dd+','+ee+','+ff+','+gg+']'+',';  
   
   return string;
@@ -141,7 +141,7 @@ function Decoder(bytes, port) {
     var leak_status=(bytes[0]&0x01)?"LEAK":"NO LEAK";  
     var leak_times=bytes[1]<<16 | bytes[2]<<8 | bytes[3];
     var leak_duration=bytes[4]<<16 | bytes[5]<<8 | bytes[6];
-    var data_time= getMyDate((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]).toString(10));
+    var data_time= getMyDate(((bytes[7]<<24 | bytes[8]<<16 | bytes[9]<<8 | bytes[10]) >>> 0).toString(10));
     
     if(bytes.length==11)
     {

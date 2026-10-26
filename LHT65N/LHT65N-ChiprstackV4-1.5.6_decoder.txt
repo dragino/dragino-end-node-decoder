@@ -68,7 +68,7 @@ function decodeUplink(input, port) {
         }
         var cc = parseFloat(((buf[2 + startIdx] << 24 >> 16 | buf[3 + startIdx]) / 100).toFixed(2));
         var dd = parseFloat((((buf[4 + startIdx] << 8 | buf[5 + startIdx]) & 0xFFF) / 10).toFixed(1));
-        var ee = getMyDate((buf[7 + startIdx] << 24 | buf[8 + startIdx] << 16 | buf[9 + startIdx] << 8 | buf[10 + startIdx]).toString(10));
+        var ee = getMyDate(((buf[7 + startIdx] << 24 | buf[8 + startIdx] << 16 | buf[9 + startIdx] << 8 | buf[10 + startIdx]) >>> 0).toString(10));
         return '[' + bb + ',' + cc + ',' + dd + ',' + ee + '],';
     }
 
@@ -193,10 +193,10 @@ function decodeUplink(input, port) {
                 if (bytes.length >= 11) decode.Exit_count = bytes[7] << 24 | bytes[8] << 16 | bytes[9] << 8 | bytes[10];
             } else if (ext === 0x09) {
                 decode.Work_mode = "DS18B20 & timestamp";
-                if (bytes.length >= 11) decode.Systimestamp = (bytes[7] << 24 | bytes[8] << 16 | bytes[9] << 8 | bytes[10]);
+                if (bytes.length >= 11) decode.Systimestamp = ((bytes[7] << 24 | bytes[8] << 16 | bytes[9] << 8 | bytes[10]) >>> 0);
             } else if (ext === 0x0A) {
                 decode.Work_mode = "TMP117 & timestamp";
-                if (bytes.length >= 11) decode.Systimestamp = (bytes[7] << 24 | bytes[8] << 16 | bytes[9] << 8 | bytes[10]);
+                if (bytes.length >= 11) decode.Systimestamp = ((bytes[7] << 24 | bytes[8] << 16 | bytes[9] << 8 | bytes[10]) >>> 0);
             } else if (ext === 0x0B) {
                 decode.Work_mode = "SHT31 Sensor";
                 if (bytes.length >= 11) {
