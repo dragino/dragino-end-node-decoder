@@ -15,7 +15,8 @@ function Decoder(bytes, port) {
    {
 	decode.BatV=((bytes[0]<<8 | bytes[1]) & 0x3FFF)/1000;//Battery,units:V
 	decode.Payload_Ver=bytes[2];
-    decode.rain=(bytes[3]<<24 |bytes[4]<<16 |bytes[5]<<8 | bytes[6]);	
+  var rain_count = ((bytes[3]<<24) | (bytes[4]<<16) | (bytes[5]<<8) | bytes[6]) >>> 0;
+  decode.rain = +(rain_count * 0.2).toFixed(1); 
 	value=bytes[7]<<8 | bytes[8];
 	if(bytes[7] & 0x80)
 	{value |= 0xFFFF0000;}
